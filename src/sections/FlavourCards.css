@@ -1,0 +1,10 @@
+.cards-section {
+  padding-block: 100px 120px;
+}
+
+@media (max-width: 767px) {
+  .cards-section {
+    padding-top: 65px;
+    padding-bottom: 70px;
+  }
+}

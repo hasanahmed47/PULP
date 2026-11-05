@@ -1,0 +1,111 @@
+.peek-can {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+  touch-action: pan-y pinch-zoom;
+}
+
+.peek-can__image {
+  display: block;
+  width: min(100%, calc(var(--inside-can-height) * .6));
+  height: auto;
+  aspect-ratio: 3 / 5;
+  overflow: visible;
+  user-select: none;
+  cursor: pointer;
+}
+
+.peek-can[data-peekable='true'] .peek-can__image {
+  cursor: crosshair;
+}
+
+.peek-can__silhouette {
+  mask-type: alpha;
+}
+
+.peek-can__interior {
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+
+.peek-can__lens {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1;
+  stroke-opacity: .3;
+  vector-effect: non-scaling-stroke;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease;
+}
+
+.peek-can[data-peeking='true'] .peek-can__interior,
+.peek-can[data-peeking='true'] .peek-can__lens {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .peek-can[data-selected='true'] .peek-can__interior,
+  .peek-can[data-selected='true'] .peek-can__lens {
+    opacity: 1;
+  }
+}
+
+.peek-can__label {
+  display: grid;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  min-height: 58px;
+  padding-block: 10px;
+  border-bottom: 1px solid var(--line);
+  transition: border-color 180ms ease;
+}
+
+.peek-can__name {
+  font-size: clamp(12px, 1.1vw, 16px);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.peek-can__action {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+.peek-can[data-selected='true'] .peek-can__label {
+  border-color: var(--flavour-colour);
+}
+
+.peek-can:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 6px;
+}
+
+@media (max-width: 767px) {
+  .peek-can__label {
+    gap: 3px;
+    min-height: 55px;
+    padding-block: 8px;
+  }
+
+  .peek-can__action {
+    font-size: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .peek-can__interior,
+  .peek-can__lens,
+  .peek-can__label {
+    transition: none;
+  }
+}

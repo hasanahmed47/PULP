@@ -1,0 +1,330 @@
+.film-section {
+  --film-card-width: 86%;
+  --film-gap: 24px;
+  --film-control-size: 70px;
+  --film-control-surface: rgb(232 232 237 / 78%);
+  --film-control-ease: cubic-bezier(.22, 1, .36, 1);
+  position: relative;
+  padding-block: var(--section-space);
+  overflow: clip;
+  background: var(--paper);
+}
+
+.film-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin: 0 7% clamp(48px, 5vw, 80px);
+}
+
+.film-header .headline {
+  font-size: clamp(48px, 5.5vw, 88px);
+  line-height: .96;
+}
+
+.film-watch {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 44px;
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  color: var(--blue);
+  font-size: clamp(15px, 1.2vw, 20px);
+  white-space: nowrap;
+}
+
+.film-watch:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.film-watch svg {
+  width: 21px;
+  height: 21px;
+}
+
+.film-stage {
+  position: relative;
+  overflow: clip;
+  touch-action: pan-y pinch-zoom;
+  user-select: none;
+  cursor: grab;
+}
+
+.film-stage[data-dragging='true'] {
+  cursor: grabbing;
+}
+
+.film-track {
+  display: flex;
+  gap: var(--film-gap);
+  width: 100%;
+  margin-inline-start: calc((100% - var(--film-card-width)) / 2);
+}
+
+.film-card {
+  position: relative;
+  flex: 0 0 var(--film-card-width);
+  height: clamp(440px, min(62vw, 76svh), 900px);
+  overflow: hidden;
+  border-radius: 32px;
+  background: var(--ink);
+  isolation: isolate;
+}
+
+.film-card__video,
+.film-card__poster {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.film-card__poster {
+  position: absolute;
+  inset: 0;
+}
+
+.film-card[data-position='top'] :is(.film-card__video, .film-card__poster) {
+  object-position: center top;
+}
+
+.film-card[data-position='bottom'] :is(.film-card__video, .film-card__poster) {
+  object-position: center bottom;
+}
+
+.film-card[data-position='left'] :is(.film-card__video, .film-card__poster) {
+  object-position: left center;
+}
+
+.film-card[data-position='right'] :is(.film-card__video, .film-card__poster) {
+  object-position: right center;
+}
+
+.film-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgb(0 0 0 / 72%), transparent 52%);
+  pointer-events: none;
+}
+
+.film-card__title {
+  position: absolute;
+  z-index: 1;
+  top: clamp(28px, 3.2vw, 60px);
+  left: clamp(28px, 3.2vw, 60px);
+  max-width: 70%;
+  margin: 0;
+  color: var(--paper);
+  font-family: var(--font-display);
+  font-size: clamp(36px, 4vw, 64px);
+  font-weight: 800;
+  line-height: .98;
+  letter-spacing: -.015em;
+  pointer-events: none;
+}
+
+.film-card__status {
+  position: absolute;
+  z-index: 1;
+  top: clamp(118px, 10vw, 160px);
+  left: clamp(28px, 3.2vw, 60px);
+  max-width: 75%;
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgb(23 23 25 / 85%);
+  color: var(--paper);
+  font-size: 14px;
+}
+
+.film-controls {
+  position: absolute;
+  z-index: 2;
+  bottom: 36px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: max-content;
+  opacity: 0;
+  visibility: hidden;
+  transform: translate(-50%, 16px);
+  transition: opacity .4s, transform .5s var(--film-control-ease), visibility .4s;
+  cursor: default;
+}
+
+.film-controls[data-visible='true'] {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
+}
+
+.film-toggle,
+.film-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--film-control-size);
+  border: 0;
+  border-radius: 999px;
+  background: var(--film-control-surface);
+  color: var(--ink);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+
+.film-toggle {
+  flex: 0 0 var(--film-control-size);
+  width: var(--film-control-size);
+  padding: 0;
+  transition: background-color .2s, transform .2s;
+}
+
+.film-toggle:hover {
+  background: rgb(244 244 247 / 92%);
+}
+
+.film-toggle:active {
+  transform: scale(.94);
+}
+
+.film-toggle svg {
+  width: 24px;
+  height: 24px;
+}
+
+.film-pagination {
+  padding-inline: 12px;
+}
+
+.film-dot {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  transition: width .35s var(--film-control-ease);
+}
+
+.film-dot[data-active='true'] {
+  width: 88px;
+}
+
+.film-dot:focus-visible {
+  outline-offset: 1px;
+}
+
+.film-dot__track {
+  display: block;
+  width: 10px;
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgb(23 23 25 / 48%);
+  transition: width .35s var(--film-control-ease), background-color .2s;
+}
+
+.film-dot:hover .film-dot__track {
+  background: rgb(23 23 25 / 70%);
+}
+
+.film-dot[data-active='true'] .film-dot__track {
+  width: 60px;
+  background: rgb(23 23 25 / 24%);
+}
+
+.film-dot__fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--ink);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+@media (max-width: 1023px) {
+  .film-section {
+    --film-card-width: 88%;
+    --film-gap: 20px;
+  }
+
+  .film-header {
+    margin-inline: 6%;
+  }
+}
+
+@media (max-width: 767px) {
+  .film-section {
+    --film-card-width: 90%;
+    --film-gap: 12px;
+    --film-control-size: 54px;
+  }
+
+  .film-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 16px;
+    margin: 0 5% 36px;
+  }
+
+  .film-header .headline {
+    max-width: 320px;
+    font-size: clamp(48px, 10vw, 64px);
+  }
+
+  .film-card {
+    height: clamp(420px, 70svh, 650px);
+    border-radius: 24px;
+  }
+
+  .film-card__title {
+    top: 28px;
+    left: 24px;
+    max-width: calc(100% - 48px);
+    font-size: clamp(36px, 8vw, 48px);
+  }
+
+  .film-card__status {
+    top: 120px;
+    left: 24px;
+    max-width: calc(100% - 48px);
+    font-size: 12px;
+  }
+
+  .film-controls {
+    bottom: 24px;
+    gap: 10px;
+  }
+
+  .film-pagination {
+    padding-inline: 8px;
+  }
+
+  .film-dot[data-active='true'] {
+    width: 72px;
+  }
+
+  .film-dot[data-active='true'] .film-dot__track {
+    width: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .film-controls,
+  .film-toggle,
+  .film-dot,
+  .film-dot__track {
+    transition: none;
+  }
+}

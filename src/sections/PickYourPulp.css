@@ -1,0 +1,315 @@
+.pulp-shop {
+  color: var(--ink);
+  background: var(--paper);
+  scroll-margin-top: 24px;
+}
+
+.pulp-shop,
+.pulp-shop [data-flavour] {
+  --shop-accent: var(--flavour-colour);
+  --shop-pale: var(--flavour-pale);
+}
+
+.pulp-shop__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: clamp(36px, 5vw, 80px);
+}
+
+.pulp-shop__header .headline {
+  font-size: clamp(80px, 10vw, 156px);
+}
+
+.pulp-shop__header .pulp-shop__full-stop {
+  display: inline;
+  color: var(--blue);
+}
+
+.pulp-shop__bag-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  margin-bottom: 8px;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.pulp-shop__bag-count:hover {
+  color: var(--blue);
+}
+
+.pulp-shop__layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: clamp(32px, 7vw, 112px);
+}
+
+.pulp-shop__art {
+  position: relative;
+  min-width: 0;
+  height: clamp(420px, 46vw, 660px);
+  isolation: isolate;
+}
+
+.pulp-shop__halo {
+  position: absolute;
+  inset: 9% 0 8%;
+  border: 1px solid color-mix(in srgb, var(--shop-accent) 12%, transparent);
+  border-radius: 50%;
+  background: var(--shop-pale);
+  transition: background-color 350ms ease, border-color 350ms ease;
+}
+
+.pulp-shop__halo::after {
+  content: '';
+  position: absolute;
+  inset: 20px;
+  border: 1px dashed color-mix(in srgb, var(--shop-accent) 30%, transparent);
+  border-radius: inherit;
+}
+
+.pulp-shop__product {
+  position: absolute;
+  inset: 0;
+  animation: shop-product-arrive 550ms cubic-bezier(.2,.7,.2,1) both;
+}
+
+.pulp-shop__can {
+  position: absolute;
+  width: 70%;
+  height: 94%;
+  left: 13%;
+  top: 0;
+  object-fit: contain;
+  transform: rotate(-12deg);
+  filter: drop-shadow(6px 22px 15px rgb(23 23 25 / 12%));
+}
+
+.pulp-shop__fruit {
+  position: absolute;
+  width: 36%;
+  height: auto;
+  right: -3%;
+  bottom: 12%;
+  transform: rotate(15deg);
+}
+
+.pulp-shop__art-caption {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+  color: var(--muted);
+  font-size: 9px;
+  letter-spacing: .18em;
+}
+
+.pulp-shop__details {
+  min-width: 0;
+}
+
+.pulp-shop__eyebrow {
+  display: block;
+  margin-bottom: 16px;
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: .15em;
+}
+
+.pulp-shop__details h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(44px, 4.7vw, 76px);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -.015em;
+}
+
+.pulp-shop__description {
+  margin: 18px 0 34px;
+  font-size: clamp(15px, 1.4vw, 20px);
+  line-height: 1.5;
+}
+
+.pulp-shop__quantity-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding-block: 22px;
+  margin-top: 26px;
+  border-top: 1px solid var(--line);
+  font-size: 14px;
+}
+
+.pulp-shop__actions {
+  display: grid;
+  grid-template-columns: 1fr 58px;
+  gap: 12px;
+}
+
+.pulp-shop__add,
+.pulp-shop__buy,
+.pulp-shop__favourite {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-height: 58px;
+  padding: 14px 24px;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 500;
+  transition: background-color 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+.pulp-shop__add {
+  background: var(--ink);
+  color: var(--paper);
+  box-shadow: 0 4px 0 var(--shop-accent);
+}
+
+.pulp-shop__add > .shop-icon:last-child {
+  margin-left: auto;
+}
+
+.pulp-shop__add:hover {
+  background: var(--blue);
+  border-color: var(--blue);
+  transform: translateY(-2px);
+}
+
+.pulp-shop__add:active {
+  transform: translateY(2px);
+}
+
+.pulp-shop__favourite {
+  padding: 14px;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.pulp-shop__favourite[aria-pressed='true'] {
+  background: var(--shop-pale);
+  border-color: var(--shop-accent);
+  color: var(--shop-accent);
+}
+
+.pulp-shop__favourite[aria-pressed='true'] .shop-icon {
+  fill: currentColor;
+}
+
+.pulp-shop__favourite:hover {
+  transform: scale(1.06);
+}
+
+.pulp-shop__buy {
+  grid-column: 1 / -1;
+  justify-content: space-between;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.pulp-shop__buy:hover {
+  background: var(--yellow);
+}
+
+.pulp-shop__status {
+  min-height: 34px;
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+@keyframes shop-product-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(18px) rotate(3deg);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(0);
+  }
+}
+
+@media (max-width: 900px) {
+  .pulp-shop__layout {
+    gap: 28px;
+  }
+
+  .pulp-shop__art {
+    height: 470px;
+  }
+
+  .pulp-shop__can {
+    width: 84%;
+    left: 4%;
+  }
+
+  .pulp-shop__art-caption {
+    font-size: 8px;
+  }
+}
+
+@media (max-width: 700px) {
+  .pulp-shop__header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 18px;
+  }
+
+  .pulp-shop__header .headline {
+    font-size: clamp(76px, 18vw, 112px);
+  }
+
+  .pulp-shop__bag-count {
+    margin-bottom: 0;
+    font-size: 13px;
+  }
+
+  .pulp-shop__layout {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .pulp-shop__art {
+    height: clamp(370px, 104vw, 550px);
+  }
+
+  .pulp-shop__can {
+    width: 72%;
+    left: 12%;
+  }
+
+  .pulp-shop__fruit {
+    right: 0;
+  }
+
+  .pulp-shop__details h3 {
+    font-size: 52px;
+  }
+
+  .pulp-shop__description {
+    margin-bottom: 28px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulp-shop__product {
+    animation: none;
+  }
+
+  .pulp-shop *,
+  .pulp-shop *::after {
+    transition: none;
+  }
+}

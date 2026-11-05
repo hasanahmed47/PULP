@@ -1,0 +1,73 @@
+.colour-ribbon {
+  position: absolute;
+  pointer-events: none;
+  opacity: .18;
+  z-index: 0;
+}
+
+.colour-ribbon > path {
+  stroke-width: 10;
+}
+
+.colour-ribbon > path:nth-child(1) {
+  stroke: var(--orange);
+}
+
+.colour-ribbon > path:nth-child(2) {
+  stroke: var(--passionfruit);
+}
+
+.colour-ribbon > path:nth-child(3) {
+  stroke: var(--lime);
+}
+
+.colour-ribbon > path:nth-child(4) {
+  stroke: var(--blue);
+}
+
+.colour-ribbon--footer > path {
+  stroke-width: 11;
+}
+
+.colour-ribbon--hero {
+  right: -2%;
+  top: -8%;
+  width: 57%;
+  height: 120%;
+}
+
+.colour-ribbon--mascot {
+  left: -6%;
+  top: 0;
+  width: 45%;
+  height: 110%;
+  opacity: .14;
+}
+
+.colour-ribbon--footer {
+  left: -4%;
+  top: -30px;
+  width: 108%;
+  height: 570px;
+  opacity: .13;
+}
+
+@media (max-width: 767px) {
+  .colour-ribbon--hero {
+    width: 85%;
+    top: 30%;
+    height: 75%;
+    right: -30%;
+    opacity: .13;
+  }
+
+  .colour-ribbon--mascot {
+    width: 70%;
+    left: -30%;
+  }
+
+  .colour-ribbon--footer {
+    height: 330px;
+    top: -5px;
+  }
+}

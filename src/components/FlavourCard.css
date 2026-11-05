@@ -1,0 +1,192 @@
+.flavour-card {
+  position: sticky;
+  top: calc(20px + var(--card-index) * 18px);
+  z-index: calc(2 + var(--card-index));
+  display: grid;
+  grid-template-columns: 1fr 1.12fr;
+  align-items: center;
+  height: 80svh;
+  min-height: 500px;
+  max-height: 950px;
+  padding: 5%;
+  margin-bottom: 55px;
+  border: 1px solid var(--flavour-colour);
+  border-radius: 32px;
+  background: var(--paper);
+  overflow: hidden;
+}
+
+.flavour-card:last-child {
+  margin-bottom: 0;
+}
+
+.card-copy {
+  position: relative;
+  z-index: 3;
+}
+
+.card-copy .headline {
+  font-size: clamp(60px, min(8.8vw, 16svh), 142px);
+}
+
+.flavour-card[data-flavour='passionfruit-yuzu'] .card-copy .headline {
+  font-size: clamp(54px, min(7.8vw, 14svh), 125px);
+}
+
+.card-copy > p {
+  font-size: 17px;
+  line-height: 1.5;
+  margin: 28px 0 0;
+}
+
+.card-art {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  perspective: 900px;
+}
+
+.card-blob {
+  position: absolute;
+  inset: 10% 2% 5% 2%;
+}
+
+.card-product-tilt {
+  position: absolute;
+  inset: -6% 5%;
+  z-index: 2;
+  transform-style: preserve-3d;
+}
+
+.card-can {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transform: rotate(var(--can-tilt));
+  filter: drop-shadow(4px 22px 12px rgba(35,20,10,.1));
+}
+
+.card-fruit--top {
+  width: 33%;
+  right: -4%;
+  top: -4%;
+  z-index: 3;
+  transform: rotate(15deg);
+}
+
+.card-fruit--bottom {
+  width: 36%;
+  left: -7%;
+  bottom: -1%;
+  z-index: 3;
+  transform: rotate(-20deg);
+}
+
+@media (max-height: 600px) and (min-width: 768px) {
+  .flavour-card {
+    position: relative;
+    top: auto;
+  }
+}
+
+@media (max-width: 1100px) and (min-width: 768px) {
+  .card-copy .headline {
+    font-size: 9vw;
+  }
+
+  .flavour-card[data-flavour='passionfruit-yuzu'] .card-copy .headline {
+    font-size: 7.5vw;
+  }
+}
+
+@media (max-width: 767px) {
+  .flavour-card {
+    min-height: 720px;
+    height: 88svh;
+    max-height: 850px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 34px 26px 20px;
+    border-radius: 26px;
+    margin-bottom: 38px;
+    top: calc(12px + var(--card-index) * 13px);
+  }
+
+  .card-copy .headline {
+    font-size: 17vw;
+  }
+
+  .flavour-card[data-flavour='passionfruit-yuzu'] .card-copy .headline {
+    font-size: 14vw;
+  }
+
+  .card-copy > p {
+    font-size: 14px;
+    margin-top: 18px;
+  }
+
+  .card-art {
+    flex: 1;
+    min-height: 340px;
+    margin-top: 18px;
+  }
+
+  .card-blob {
+    inset: 10% -3% 7%;
+  }
+
+  .card-product-tilt {
+    inset: -4% 0 -1%;
+  }
+
+  .card-fruit--top {
+    right: -13%;
+    top: 2%;
+    width: 38%;
+  }
+
+  .card-fruit--bottom {
+    left: -15%;
+    bottom: -1%;
+    width: 42%;
+  }
+}
+
+@media (max-width: 370px) {
+  .flavour-card {
+    padding-inline: 20px;
+    min-height: 670px;
+  }
+
+  .card-copy > p {
+    font-size: 12px;
+  }
+}
+
+.flavour-card:nth-of-type(1) {
+  --card-index: 0;
+}
+
+.flavour-card:nth-of-type(2) {
+  --card-index: 1;
+}
+
+.flavour-card:nth-of-type(3) {
+  --card-index: 2;
+}
+
+.flavour-card:nth-of-type(4) {
+  --card-index: 3;
+}
+
+.card-shop-link {
+  margin-top: 22px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flavour-card {
+    position: relative;
+    top: auto;
+  }
+}

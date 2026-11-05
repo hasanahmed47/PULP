@@ -1,0 +1,41 @@
+.fruit {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+}
+
+.fruit__image {
+  width: 100%;
+  height: auto;
+  animation: fruit-drift 5.5s ease-in-out infinite alternate;
+  animation-play-state: paused;
+}
+
+[data-visible='true'] .fruit__image {
+  animation-play-state: running;
+  will-change: transform;
+}
+
+.fruit:nth-of-type(even) .fruit__image {
+  animation-delay: -2.4s;
+  animation-duration: 6.6s;
+}
+
+@keyframes fruit-drift {
+  from {
+    transform: translateY(-8px) rotate(-3deg);
+  }
+
+  to {
+    transform: translateY(9px) rotate(3deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fruit__image,
+  [data-visible='true'] .fruit__image {
+    animation: none;
+    will-change: auto;
+  }
+}

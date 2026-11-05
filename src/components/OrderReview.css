@@ -1,0 +1,120 @@
+.order-review {
+  width: min(560px, calc(100% - 32px));
+  max-height: calc(100svh - 40px);
+  margin: auto;
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: var(--paper);
+  color: var(--ink);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.order-review::backdrop {
+  background: rgb(23 23 25 / 48%);
+  backdrop-filter: blur(7px);
+}
+
+.order-review__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.order-review__eyebrow {
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: .12em;
+}
+
+.order-review__close {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--ink);
+  flex: 0 0 auto;
+}
+
+.order-review h2 {
+  margin: 24px 0;
+  font-family: var(--font-display);
+  font-size: clamp(48px, 7vw, 68px);
+  font-weight: 900;
+  line-height: .95;
+  letter-spacing: -.02em;
+}
+
+.order-review__items {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.order-review__items li {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-block: 16px;
+  border-top: 1px solid var(--line);
+  font-size: 15px;
+}
+
+.order-review__items img {
+  width: 42px;
+  height: 70px;
+  object-fit: contain;
+}
+
+.order-review__quantity {
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.order-review__total {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding-block: 20px;
+  margin: 0;
+  border-block: 1px solid var(--line);
+  font-size: 14px;
+}
+
+.order-review__note {
+  margin: 20px 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.order-review__continue {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  min-height: 54px;
+  padding: 14px 24px;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 14px;
+}
+
+.order-review__continue:hover {
+  background: var(--blue);
+  border-color: var(--blue);
+}
+
+@media (max-width: 600px) {
+  .order-review {
+    padding: 22px;
+  }
+}

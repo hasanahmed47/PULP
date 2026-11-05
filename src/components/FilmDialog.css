@@ -1,0 +1,80 @@
+.film-dialog {
+  width: min(1100px, 92vw);
+  max-width: none;
+  max-height: calc(100svh - 48px);
+  margin: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 24px;
+  background: var(--ink);
+  color: var(--paper);
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+
+.film-dialog::backdrop {
+  background: rgb(23 23 25 / 80%);
+  backdrop-filter: blur(12px);
+}
+
+.film-dialog__video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  max-height: calc(100svh - 48px);
+  object-fit: contain;
+}
+
+.film-dialog__close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgb(255 255 255 / 30%);
+  border-radius: 50%;
+  background: rgb(23 23 25 / 80%);
+  color: var(--paper);
+  cursor: pointer;
+}
+
+.film-dialog__close:hover {
+  background: var(--ink);
+}
+
+.film-dialog__close:focus-visible,
+.film-dialog__video:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: -3px;
+}
+
+.film-dialog__close svg {
+  width: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.film-dialog__error {
+  position: absolute;
+  top: 50%;
+  width: 100%;
+  padding: 24px;
+  transform: translateY(-50%);
+  text-align: center;
+  background: var(--ink);
+}
+
+@media (max-width: 767px) {
+  .film-dialog {
+    border-radius: 16px;
+  }
+
+  .film-dialog__close {
+    top: 8px;
+    right: 8px;
+  }
+}

@@ -1,0 +1,76 @@
+@theme {
+  --font-sans: 'DM Sans', sans-serif;
+  --font-display: 'Barlow Condensed', sans-serif;
+  --color-ink: #171719;
+}
+
+:root {
+  --font-body: var(--font-sans);
+  --ink: #171719;
+  --paper: #fff;
+  --blue: #2257f5;
+  --yellow: #ffdf4b;
+  --muted: #66666b;
+  --line: #e4e4e5;
+  --orange: #ed252a;
+  --orange-pale: #ffe8de;
+  --passionfruit: #ffd52a;
+  --passionfruit-pale: #fff4ba;
+  --blueberry-pale: #e5eaff;
+  --lime: #23b447;
+  --lime-pale: #e3f4d9;
+  --surface: #fafaf8;
+  --surface-hover: #f2f2ef;
+  --disabled: #b7b7b7;
+  --danger-soft: #fff0ed;
+  --color-paper: var(--paper);
+  --color-border: var(--line);
+  --color-muted: var(--muted);
+  --page-gutter: 5vw;
+  --page-padding: var(--page-gutter);
+  --section-space: clamp(72px, 8vw, 128px);
+  --space-sm: 12px;
+  --space-md: 24px;
+  --space-lg: 40px;
+  --radius-panel: 28px;
+}
+
+/*
+ * --flavour-accent is the flavour colour darkened with ink until it keeps at least 4.5:1
+ * contrast on white and on the hero tint (white button text, headline full stop).
+ * Raw flavour colours such as yellow are too light for that on their own.
+ */
+[data-flavour='blood-orange'] {
+  --flavour-colour: var(--orange);
+  --flavour-pale: var(--orange-pale);
+  --flavour-accent: color-mix(in srgb, var(--orange) 90%, var(--ink));
+  --can-tilt: -12deg;
+}
+
+[data-flavour='passionfruit-yuzu'] {
+  --flavour-colour: var(--passionfruit);
+  --flavour-pale: var(--passionfruit-pale);
+  --flavour-accent: color-mix(in srgb, var(--passionfruit) 47%, var(--ink));
+  --can-tilt: 12deg;
+}
+
+[data-flavour='blueberry'] {
+  --flavour-colour: var(--blue);
+  --flavour-pale: var(--blueberry-pale);
+  --flavour-accent: var(--blue);
+  --can-tilt: -10deg;
+}
+
+[data-flavour='lime-basil'] {
+  --flavour-colour: var(--lime);
+  --flavour-pale: var(--lime-pale);
+  --flavour-accent: color-mix(in srgb, var(--lime) 67%, var(--ink));
+  --can-tilt: 11deg;
+}
+
+@media (max-width: 767px) {
+  :root {
+    --page-gutter: 6vw;
+    --radius-panel: 20px;
+  }
+}

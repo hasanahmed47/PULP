@@ -1,0 +1,98 @@
+.flavour-picker {
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+
+.flavour-picker legend {
+  padding: 0;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+.flavour-picker__options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.flavour-picker__option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 58px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background-color 180ms ease, border-color 180ms ease;
+}
+
+.flavour-picker__option input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  clip-path: inset(50%);
+  overflow: hidden;
+}
+
+.flavour-picker__option:hover {
+  background: color-mix(in srgb, var(--flavour-pale) 55%, var(--paper));
+}
+
+.flavour-picker__option:has(input:checked) {
+  border-color: var(--flavour-colour);
+  background: color-mix(in srgb, var(--flavour-pale) 36%, var(--paper));
+  box-shadow: inset 0 0 0 1px var(--flavour-colour);
+}
+
+.flavour-picker__option:has(input:focus-visible) {
+  outline: 2px solid var(--ink);
+  outline-offset: 4px;
+}
+
+.flavour-picker__swatch {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--flavour-colour);
+  color: var(--paper);
+}
+
+.flavour-picker__swatch .shop-icon {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2.5;
+}
+
+[data-flavour='passionfruit-yuzu'] > .flavour-picker__swatch {
+  color: var(--ink);
+}
+
+
+@media (max-width: 900px) {
+  .flavour-picker__options {
+    gap: 8px;
+  }
+
+  .flavour-picker__option {
+    gap: 8px;
+    padding: 10px 8px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 700px) {
+  .flavour-picker__option {
+    font-size: 12px;
+    min-height: 60px;
+    padding: 12px;
+  }
+}

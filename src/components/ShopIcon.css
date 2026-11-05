@@ -1,0 +1,11 @@
+.shop-icon {
+  display: block; /* avoids the few stray pixels inline SVGs leave under the text baseline */
+  width: var(--icon-size, 22px);
+  height: var(--icon-size, 22px);
+  flex: 0 0 auto; /* never shrink inside flex rows */
+  fill: none;
+  stroke: currentColor; /* follows the text colour, so hover and disabled states just work */
+  stroke-width: var(--icon-stroke, 1.7);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}

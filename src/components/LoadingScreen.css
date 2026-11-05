@@ -1,0 +1,230 @@
+.loading-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: clamp(24px, 3vw, 48px) var(--page-gutter);
+  background: var(--paper);
+  color: var(--ink);
+  overflow: hidden;
+  isolation: isolate;
+  transform: translateY(0);
+  transition: transform 850ms cubic-bezier(.76, 0, .24, 1);
+}
+
+.loading-screen[data-exiting='true'] {
+  transform: translateY(-100%);
+}
+
+.loading-screen__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-md);
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: .12em;
+}
+
+.loading-screen__top > span:last-child {
+  text-align: right;
+}
+
+.loading-screen__art {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 0;
+  padding-block: var(--space-md);
+}
+
+.loading-screen__wordmark {
+  position: relative;
+  font-size: clamp(120px, 26vw, 360px);
+  line-height: 1.05;
+  color: var(--blue);
+  animation: loading-wordmark-enter 500ms ease both;
+}
+
+.loading-screen__citrus {
+  position: absolute;
+  top: 16%;
+  right: 12%;
+  width: clamp(66px, 9vw, 134px);
+  aspect-ratio: 1;
+  border: 5px solid var(--paper);
+  border-radius: 50%;
+  outline: 1px solid var(--orange);
+  background: repeating-conic-gradient(var(--orange) 0deg 42deg, var(--paper) 42deg 45deg);
+  animation: loading-citrus-turn 18s linear infinite;
+}
+
+.loading-screen__citrus::after {
+  content: '';
+  position: absolute;
+  inset: 43%;
+  border-radius: 50%;
+  background: var(--paper);
+}
+
+.loading-screen__art > p {
+  margin: clamp(16px, 3vw, 40px) 0 0;
+  font-size: 10px;
+  letter-spacing: .2em;
+}
+
+.loading-screen__bottom {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 22px var(--space-md);
+}
+
+.loading-screen__palette {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 14px;
+}
+
+.loading-screen__palette > span {
+  width: 25px;
+  height: 5px;
+  border-radius: 1px;
+  background: var(--orange);
+}
+
+.loading-screen__palette > span:nth-child(2) {
+  background: var(--passionfruit);
+}
+
+.loading-screen__palette > span:nth-child(3) {
+  background: var(--blue);
+}
+
+.loading-screen__palette > span:nth-child(4) {
+  background: var(--lime);
+}
+
+.loading-screen__meta > p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.loading-screen__number {
+  font-family: var(--font-body);
+  font-size: clamp(36px, 4vw, 56px);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: -.035em;
+}
+
+.loading-screen__number > span {
+  padding-left: 3px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.loading-screen__progress {
+  grid-column: 1 / -1;
+  display: block;
+  width: 100%;
+  height: 2px;
+  border: 0;
+  border-radius: 0;
+  appearance: none;
+  background: var(--line);
+  color: var(--blue);
+}
+
+.loading-screen__progress::-webkit-progress-bar {
+  background: var(--line);
+}
+
+.loading-screen__progress::-webkit-progress-value {
+  background: var(--blue);
+  transition: width 220ms ease;
+}
+
+.loading-screen__progress::-moz-progress-bar {
+  background: var(--blue);
+}
+
+@keyframes loading-wordmark-enter {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes loading-citrus-turn {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 767px) {
+  .loading-screen__top {
+    font-size: 8px;
+    letter-spacing: .08em;
+  }
+
+  .loading-screen__wordmark {
+    font-size: 29vw;
+  }
+
+  .loading-screen__citrus {
+    top: 24%;
+    right: 9%;
+  }
+
+  .loading-screen__art > p {
+    font-size: 8px;
+    letter-spacing: .13em;
+  }
+
+  .loading-screen__meta > p {
+    max-width: 170px;
+    font-size: 10px;
+  }
+}
+
+@media (max-height: 520px) {
+  .loading-screen__wordmark {
+    font-size: min(26vw, 32vh);
+  }
+
+  .loading-screen__citrus {
+    top: 6%;
+    right: 24%;
+    width: 48px;
+  }
+
+  .loading-screen__art > p {
+    margin-top: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-screen {
+    transition: opacity 140ms ease;
+  }
+
+  .loading-screen[data-exiting='true'] {
+    transform: none;
+    opacity: 0;
+  }
+
+  .loading-screen__wordmark,
+  .loading-screen__citrus {
+    animation: none;
+  }
+
+  .loading-screen__progress::-webkit-progress-value {
+    transition: none;
+  }
+}

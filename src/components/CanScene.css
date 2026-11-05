@@ -1,0 +1,173 @@
+.can-scene {
+  --can-controls-space: 64px;
+  --can-controls-compact-space: 40px;
+  --can-controls-height: 52px;
+  --can-controls-compact-height: 32px;
+  --can-controls-duration: .2s;
+  --can-control-target: 44px;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  border-radius: 24px;
+}
+
+.can-scene[data-controls='true'] {
+  container: can-scene / inline-size;
+}
+
+.can-scene[data-interactive='true'] {
+  cursor: grab;
+  touch-action: pan-y pinch-zoom;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.can-scene[data-dragging='true'] {
+  cursor: grabbing;
+}
+
+.can-scene__stage {
+  position: absolute;
+  inset: 0;
+}
+
+.can-scene__fallback {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transform: rotate(-7deg);
+  pointer-events: none;
+}
+
+.can-scene__fallback[data-unavailable='true'] {
+  visibility: hidden;
+}
+
+.can-scene__canvas {
+  position: absolute;
+  inset: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.can-scene[data-ready='true'] .can-scene__canvas {
+  visibility: visible;
+}
+
+.can-scene[data-controls='true'] .can-scene__canvas {
+  bottom: var(--can-controls-space);
+}
+
+.can-scene[data-controls='true'] .can-scene__fallback {
+  height: calc(100% - var(--can-controls-space));
+}
+
+.can-scene canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.can-scene__controls {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--space-sm) / 2);
+  width: max-content;
+  max-width: 100%;
+  min-height: var(--can-controls-height);
+  padding: 3px 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-paper);
+  cursor: default;
+}
+
+.can-scene__hint {
+  color: var(--color-ink);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 16px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
+  transition: color var(--can-controls-duration);
+}
+
+.can-scene__views {
+  display: flex;
+  padding-left: calc(var(--space-sm) / 2);
+  border-left: 1px solid var(--color-border);
+}
+
+.can-scene__view {
+  min-width: var(--can-control-target);
+  min-height: var(--can-control-target);
+  padding: 0 8px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  transition: color var(--can-controls-duration), background-color var(--can-controls-duration);
+}
+
+.can-scene__view[aria-pressed='true'] {
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+
+.can-scene__view:disabled {
+  color: var(--disabled);
+}
+
+.can-scene__view:disabled[aria-pressed='true'] {
+  background: var(--surface-hover);
+}
+
+.can-scene__view:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .can-scene__view:hover:not(:disabled):not([aria-pressed='true']) {
+    background: var(--surface-hover);
+    color: var(--color-ink);
+  }
+}
+
+.can-scene[data-dragging='true'] .can-scene__hint {
+  color: var(--color-muted);
+}
+
+@container can-scene (max-width: 420px) {
+  .can-scene__canvas,
+  .can-scene__fallback {
+    --can-controls-space: var(--can-controls-compact-space);
+  }
+
+  .can-scene__controls {
+    min-height: var(--can-controls-compact-height);
+  }
+
+  .can-scene__views {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .can-scene__hint,
+  .can-scene__view {
+    transition: none;
+  }
+}

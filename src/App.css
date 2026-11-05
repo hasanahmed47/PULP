@@ -1,0 +1,7 @@
+html {
+  scrollbar-gutter: stable;
+}
+
+html[data-loading='true'] {
+  overflow: hidden;
+}
