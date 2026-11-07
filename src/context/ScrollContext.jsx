@@ -25,6 +25,15 @@ function resolveScrollTarget(target) {
   }
 }
 
+function getScrollPosition(destination) {
+  if (typeof destination === 'number') return destination;
+
+  const pinnedTrigger = ScrollTrigger.getAll().find((trigger) => trigger.pin === destination);
+  if (pinnedTrigger) return Math.max(0, pinnedTrigger.start);
+
+  return destination.getBoundingClientRect().top + window.scrollY;
+}
+
 export function ScrollProvider({ children, suspended = false }) {
   const reducedMotion = useReducedMotion();
   const lenisRef = useRef(null);
@@ -67,15 +76,13 @@ export function ScrollProvider({ children, suspended = false }) {
   const scrollTo = useCallback(function scrollToTarget(target, { immediate = false } = {}) {
     const destination = resolveScrollTarget(target);
     if (destination === null || destination === undefined) return;
+    const top = getScrollPosition(destination);
 
     if (lenisRef.current && !reducedMotion) {
-      lenisRef.current.scrollTo(destination, { immediate, duration: anchorScrollDuration });
+      lenisRef.current.scrollTo(top, { immediate, duration: anchorScrollDuration });
       return;
     }
 
-    const top = typeof destination === 'number'
-      ? destination
-      : destination.getBoundingClientRect().top + window.scrollY;
     window.scrollTo({ top, behavior: 'instant' });
   }, [reducedMotion]);
 

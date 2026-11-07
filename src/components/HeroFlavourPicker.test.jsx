@@ -6,7 +6,7 @@ import { Hero } from '../sections/Hero';
 
 const scene = vi.hoisted(() => ({
   setRotation: vi.fn(),
-  setFlavourPosition: vi.fn(),
+  setFlavourBlend: vi.fn(),
   setPointer: vi.fn(),
 }));
 
@@ -54,16 +54,16 @@ it('keeps hero colour, pressed chips, can flavour and live text in sync', async 
   expectSelection(0, 'blood-orange', 'Blood Orange');
   await user.click(chips[1]);
   expectSelection(1, 'passionfruit-yuzu', 'Passionfruit Yuzu');
-  expect(scene.setFlavourPosition).toHaveBeenLastCalledWith(1);
+  expect(scene.setFlavourBlend).toHaveBeenLastCalledWith(0, 1, 1);
   await user.tab();
   expect(document.activeElement).toBe(chips[2]);
   await user.keyboard('{Enter}');
   expectSelection(2, 'blueberry', 'Blueberry');
-  expect(scene.setFlavourPosition).toHaveBeenLastCalledWith(2);
+  expect(scene.setFlavourBlend).toHaveBeenLastCalledWith(1, 2, 1);
   await user.tab();
   await user.keyboard(' ');
   expectSelection(3, 'lime-basil', 'Lime Basil');
-  expect(scene.setFlavourPosition).toHaveBeenLastCalledWith(3);
+  expect(scene.setFlavourBlend).toHaveBeenLastCalledWith(2, 3, 1);
   expect(warn).not.toHaveBeenCalled();
   expect(error).not.toHaveBeenCalled();
 });

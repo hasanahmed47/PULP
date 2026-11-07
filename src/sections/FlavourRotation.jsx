@@ -19,7 +19,7 @@ function getFlavourScrollPosition(trigger, index) {
   return destination;
 }
 
-export function FlavourRotation() {
+export function FlavourRotation({ onReady }) {
   const sectionRef = useRef(null);
   const canRef = useRef(null);
   const triggerRef = useRef(null);
@@ -62,6 +62,7 @@ export function FlavourRotation() {
           start: 'top top',
           end: () => `+=${window.innerHeight * 3}`,
           pin: true,
+          anticipatePin: 1,
           scrub: true,
           invalidateOnRefresh: true,
         },
@@ -109,10 +110,10 @@ export function FlavourRotation() {
       </p>
       <div className="rotation-blob organic-shape" aria-hidden="true" />
       <div className="rotation-product">
-        <CanScene ref={canRef} allFlavours />
+        <CanScene ref={canRef} allFlavours preload onReady={onReady} />
       </div>
-      <FloatingFruit key={`${flavour.id}-left`} flavour={flavour.id} className="rotation-fruit--left" />
-      <FloatingFruit key={`${flavour.id}-right`} flavour={flavour.id} className="rotation-fruit--right" />
+      <FloatingFruit flavour={flavour.id} className="rotation-fruit--left" />
+      <FloatingFruit flavour={flavour.id} className="rotation-fruit--right" />
       <div
         className="flavour-dots flex items-center justify-center gap-2"
         role="group"

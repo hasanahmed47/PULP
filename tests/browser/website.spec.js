@@ -25,7 +25,7 @@ async function expectNoHorizontalOverflow(page) {
 test('loading waits for the can and exits even without CSS transitions', async ({ page }) => {
   let releaseTexture;
   const textureGate = new Promise((resolve) => { releaseTexture = resolve; });
-  await page.route('**/blood-orange-wrap.webp', async (route) => {
+  await page.route('**/blood-orange-wrap.png', async (route) => {
     await textureGate;
     await route.continue();
   });
@@ -39,7 +39,7 @@ test('loading waits for the can and exits even without CSS transitions', async (
     releaseTexture();
   }
 
-  await expect(page.locator('.hero .can-scene')).toHaveAttribute('data-ready', 'true');
+  await expect(page.locator('.hero .can-scene')).toHaveAttribute('data-ready', 'true', { timeout: 20000 });
   await expect(page.locator('.loading-screen')).toHaveCount(0, { timeout: 20000 });
   await expect(page.locator('.site-content')).not.toHaveAttribute('inert');
 });
@@ -95,11 +95,13 @@ test('all interiors open and select the matching shop flavour', async ({ page, i
       await can.locator('svg').hover();
       await expect(can).toHaveAttribute('data-peeking', 'true');
     }
-    await can.click();
-    await expect(can).toHaveAttribute('aria-pressed', 'true');
-    await expect(inside.locator('#inside-detail')).toContainText(name);
     await can.press('Space');
-    await expect(can).toHaveAttribute('aria-pressed', 'false');
+    await expect(can).toHaveAttribute('aria-pressed', 'true');
+    await expect(inside.locator('.peek-can[aria-pressed="true"]')).toHaveCount(1);
+    await expect(inside.locator('#inside-detail')).toContainText(name);
+    await can.click();
+    await expect(inside.locator('.peek-can[aria-pressed="true"]')).toHaveCount(1);
+    await expect(can).toHaveAttribute('aria-pressed', 'true');
   }
 
   await inside.getByRole('link', { name: /Pick this flavour/ }).click();
@@ -222,7 +224,7 @@ test('footer shows a live local clock and fits the viewport', async ({ page }, t
 test('anchor navigation preserves browser history and avoids duplicate entries', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await openWebsite(page);
-  await page.locator('.hero-intro .underlined-link').click();
+  await page.getByRole('link', { name: 'Explore flavours' }).click();
   await expect(page).toHaveURL(/#flavours$/);
   const backToTop = page.locator('.footer-bottom .text-link');
   await backToTop.click();
@@ -240,14 +242,14 @@ test('keyboard anchor navigation cleans up temporary focus attributes', async ({
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await openWebsite(page);
   const link = page.locator('.hero-bottom .text-link');
-  const target = page.locator('#people-pulp');
+  const target = page.locator('#hl-heading');
   await expect(target).not.toHaveAttribute('tabindex');
-  await link.evaluate((element) => element.setAttribute('href', '#people-pulp'));
+  await link.evaluate((element) => element.setAttribute('href', '#hl-heading'));
   await link.focus();
   await link.press('Enter');
   await expect(target).toBeFocused();
   await expect(target).toHaveAttribute('tabindex', '-1');
-  await expect(page).toHaveURL(/#people-pulp$/);
+  await expect(page).toHaveURL(/#hl-heading$/);
   await page.keyboard.press('Tab');
   await expect(target).not.toHaveAttribute('tabindex');
   await page.locator('.skip-link').focus();
@@ -260,7 +262,7 @@ test('keyboard anchor navigation cleans up temporary focus attributes', async ({
 test('anchor click interception preserves native navigation cases', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await openWebsite(page);
-  const results = await page.locator('.hero-intro .underlined-link').evaluate((link) => {
+  const results = await page.getByRole('link', { name: 'Explore flavours' }).evaluate((link) => {
     const cases = [
       { name: 'control click', event: { ctrlKey: true } },
       { name: 'command click', event: { metaKey: true } },

@@ -25,6 +25,7 @@ function getSpinHint(status, canSpin) {
 export function CanScene({
   allFlavours = false,
   interactive = false,
+  preload = false,
   className = '',
   onReady,
   stageRef,
@@ -41,7 +42,7 @@ export function CanScene({
   const helpId = useId();
   const reducedMotion = useReducedMotion();
   const visible = useVisibility(wrapperRef);
-  const { sceneRef, status } = useCanRenderer(canvasRef, poseRef, { allFlavours, interactive, visible });
+  const { sceneRef, status } = useCanRenderer(canvasRef, poseRef, { allFlavours, interactive, preload, visible });
 
   const flavour = flavours[active];
   const failed = status === 'failed';

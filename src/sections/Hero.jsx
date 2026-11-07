@@ -98,7 +98,6 @@ export function Hero({ onReady }) {
         },
       });
       timeline.to(stageRef.current, { x: getProductOffset }, 0);
-      // The controls stay put while the can travels, and fade out over the start of the scroll.
       timeline.to([controlsRef.current, pickerRef.current], {
         autoAlpha: 0,
         duration: heroMotion.controlsExit,

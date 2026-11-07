@@ -113,6 +113,5 @@ export function createCanModel(track) {
     group,
     setFlavour,
     setEndTexture,
-    hasLabel: () => Boolean(label.material.map && endMaterials.top.map && endMaterials.bottom.map),
   };
 }

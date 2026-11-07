@@ -9,7 +9,7 @@ const imageSources = [
   media.mascot,
   media.poster,
 ];
-const totalAssets = imageSources.length + 2;
+const totalAssets = imageSources.length + 3;
 const assetTimeout = 12000;
 const entranceDuration = 700;
 
@@ -22,6 +22,7 @@ function preloadImage(source) {
 export function useSiteLoading() {
   const [settledAssets, setSettledAssets] = useState(0);
   const [canSettled, setCanSettled] = useState(false);
+  const [rotationSettled, setRotationSettled] = useState(false);
   const [entranceComplete, setEntranceComplete] = useState(false);
   const [revealed, setRevealed] = useState(false);
 
@@ -70,12 +71,16 @@ export function useSiteLoading() {
     setCanSettled(true);
   }, []);
 
+  const markRotationReady = useCallback(function markRotationReady() {
+    setRotationSettled(true);
+  }, []);
+
   const revealSite = useCallback(function revealSite() {
     setRevealed(true);
   }, []);
-  const completedAssets = settledAssets + Number(canSettled);
+  const completedAssets = settledAssets + Number(canSettled) + Number(rotationSettled);
   const progress = Math.round(completedAssets / totalAssets * 100);
   const ready = completedAssets === totalAssets && entranceComplete;
 
-  return { progress, ready, revealed, markCanReady, revealSite };
+  return { progress, ready, revealed, markCanReady, markRotationReady, revealSite };
 }

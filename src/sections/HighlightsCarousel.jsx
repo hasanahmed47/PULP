@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { media } from '../data/media';
 import { useCarouselDrag } from '../hooks/useCarouselDrag';
+import { useMobileViewport } from '../hooks/useMobileViewport';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import { useVisibility } from '../hooks/useVisibility';
 import './HighlightsCarousel.css';
@@ -10,14 +11,32 @@ const MIN_VISIBLE_RATIO = 0.2;
 const VISIBILITY_THRESHOLDS = [0, MIN_VISIBLE_RATIO, 0.5, 0.8, 1];
 
 const defaultSlides = [
-  { id: 'bold', title: 'UNLEASH THE BOLD.', videoSrc: media.film, posterSrc: media.poster },
-  { id: 'fruit', title: 'A BURST OF REAL FRUIT.', videoSrc: media.film, posterSrc: media.poster },
+  {
+    id: 'bold',
+    videoSrc: media.firstTileDesktopFilm,
+    posterSrc: media.firstTileDesktopPoster,
+    mobileVideoSrc: media.firstTileMobileFilm,
+    mobilePosterSrc: media.firstTileMobilePoster,
+  },
+  { id: 'fruit', title: 'GOOD TIME, GREAT TASTE.', videoSrc: media.lifestyleFilm, posterSrc: media.lifestylePoster },
   { id: 'chill', title: 'CHILL. SIP. REPEAT.', videoSrc: media.film, posterSrc: media.poster },
-  { id: 'unexpected', title: 'TASTE THE UNEXPECTED.', videoSrc: media.film, posterSrc: media.poster },
 ];
 
 export default function HighlightsCarousel({ slides: suppliedSlides = defaultSlides }) {
-  const slides = suppliedSlides.length > 0 ? suppliedSlides : defaultSlides;
+  const mobileViewport = useMobileViewport();
+  const slides = useMemo(function selectVideoSources() {
+    const sourceSlides = suppliedSlides.length > 0 ? suppliedSlides : defaultSlides;
+    if (!mobileViewport) return sourceSlides;
+
+    return sourceSlides.map((slide) => {
+      if (!slide.mobileVideoSrc) return slide;
+      return {
+        ...slide,
+        videoSrc: slide.mobileVideoSrc,
+        posterSrc: slide.mobilePosterSrc,
+      };
+    });
+  }, [suppliedSlides, mobileViewport]);
   const slideCount = slides.length;
   const reducedMotion = useReducedMotion();
   const [selectedIndex, setIndex] = useState(0);
@@ -147,7 +166,7 @@ export default function HighlightsCarousel({ slides: suppliedSlides = defaultSli
 
     updateProgress();
     return () => cancelAnimationFrame(frame);
-  }, [index, running]);
+  }, [index, running, activeSlide.videoSrc]);
 
   useEffect(function skipFailedVideo() {
     if (!failed[activeSlide.videoSrc] || !running || slides.every((slide) => failed[slide.videoSrc])) return;

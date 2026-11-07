@@ -1,6 +1,45 @@
 ﻿# Validation record
 
-## Current: remove the hero's moving background
+## Current: responsive first Highlights video
+
+Verified on 7 November 2026. First tile selects the supplied `1st tile mobile.mp4` at widths up to 640px and `1st tile laptop.mp4` above that breakpoint, matching the existing mobile CSS layout. Matching WebP previews were extracted from each clip at 0.04 seconds. Second tile keeps `footer-video.mp4`; third tile uses the original first-tile film, `pulp-film.mp4`. Three tiles remain.
+
+- Production build passed with 110 modules; ESLint passed with zero warnings; both existing carousel component tests passed.
+- Playwright with installed Chrome checked 390, 768 and 1440px: correct initial source and poster, no request for the unused first-tile variant, actual playback of all three videos, pause, navigation wraparound, no horizontal overflow and no page errors. All three screenshots were visually inspected.
+- Resizing a playing first tile to 640px switched to the portrait clip and continued playback. Resizing a paused first tile to 641px switched to the landscape clip and retained pause. End-of-video automatic advance and ordinary-motion autoplay also passed.
+- Evidence: `test-results/responsive-highlights/` and `test-results/responsive-highlights-check.mjs`. Physical devices and other browser engines were not tested. The previously documented artwork dimension mismatch remains outside this change; no full asset-check pass is claimed.
+
+Changed: `src/sections/HighlightsCarousel.jsx`, its existing test, `src/data/media.js`, `README.md`, `docs/FILES.md` and this record. Added: `src/hooks/useMobileViewport.js`, the two supplied MP4 assets and `first-tile-laptop-poster.webp`/`first-tile-mobile-poster.webp`. Original MP4 files were not modified. No dependencies were added.
+
+## Earlier: three Highlights tiles
+
+Verified on 7 November 2026. Removed the fourth tile, TASTE THE UNEXPECTED., from the default carousel. Three tiles and three navigation dots remain. The existing navigation derives its bounds from the slide count; next from the third tile wraps to the first, and previous from the first wraps to the third.
+
+Production build, lint and both existing carousel component tests passed. Playwright/Chrome checked tile/dot counts, second-video playback, forward/reverse wraparound, no horizontal overflow and no page errors at 390, 768 and 1440px. Screenshots/results are in `test-results/highlights-media/`. Physical devices were not tested; the previously documented artwork dimension mismatch remains outside this change.
+
+Changed: `src/sections/HighlightsCarousel.jsx`, its existing test, `README.md`, `docs/FILES.md` and this record. No dependencies or new production files were added.
+
+## Earlier: remove People Pulp and move its film into Highlights
+
+Verified on 6 November 2026. People Pulp is removed from the page. Its JSX/CSS files, dedicated scroll-video hook and section-specific browser tests were deleted. The second Highlights card, A BURST OF REAL FRUIT., now uses the supplied `footer-video.mp4` and matching `footer-poster.webp`. Existing carousel playback, navigation and other cards remain in place. The MP4 is unchanged; the poster is an 81,348-byte still extracted at 0.04 seconds.
+
+- Production build passed with 109 modules. ESLint passed with zero warnings. Both existing HighlightsCarousel component tests passed.
+- Playwright/Chrome verified actual second-clip playback, pause, navigation to the third card, removed section, no horizontal overflow and no page errors at 390, 768 and 1440px. Screenshots at all three widths were visually inspected. Evidence: `test-results/highlights-media/`.
+- The keyboard-anchor regression now uses the Highlights heading instead of the deleted section. All three viewport cases passed; evidence: `test-results/removed-section-navigation/`.
+- App and asset-checker section order now contains eight sections. Current source, tests, scripts and source documentation contain no references to the removed section or scroll-video hook.
+- The existing asset check still has a separate Blood Orange dimension mismatch: intact PNG is 971x1619, cutaway is 971x1620. These artwork files were not changed. A full asset-check pass is not claimed.
+
+Changed: `src/App.jsx`, `src/sections/HighlightsCarousel.jsx`, `src/data/media.js`, `scripts/check-project.mjs`, `tests/browser/website.spec.js`, the supplied media/poster and current documentation. Deleted: `src/sections/PeoplePulp.jsx`, `src/sections/PeoplePulp.css`, `src/hooks/useScrollVideo.js`, `tests/browser/footer-video.spec.js`. The previous once-only and scroll-scrubbing versions are superseded by this placement. Physical devices and other browser engines were not tested. No deployment was performed.
+
+## Earlier today: can frame retention and scroll navigation
+
+The unsuccessful synchronous-resize workaround was replaced. Both on-demand WebGL renderers now preserve the last drawn buffer, and buffer resizing happens with the next actual draw. Offscreen resize only updates desired dimensions. Rotation textures and its first frame prepare behind the loader; back-to-top resolves the pinned hero's original scroll position. Unused legacy pouring/dialog/playback files and unused renderer/model methods were removed.
+
+Production build, lint, 13 component tests and 9 unit tests passed during this work. Six retained-pixel browser cases passed across 390/768/1440 widths and three additional viewport/DPR configurations. Fifteen navigation, rotation-readiness, loading and interior regression cases passed at the three standard widths. Evidence: `test-results/retained-can-frames/` and `test-results/can-final-regressions/`.
+
+The exact transient visual flash reported on the user's hardware was not reproduced reliably in headless capture. Tests prove idle buffer retention, resize behavior and sampled rendered frames; they do not prove every GPU/compositor frame or native Chrome zoom behavior. Scale checks used viewport/DPR emulation. The separate one-pixel artwork mismatch above remains.
+
+## Earlier: remove the hero's moving background
 
 Verified on 30 October 2026 after visual feedback. The pink blob element, its CSS rule and reduced-motion selector were deleted. Hero's pale tint and background transition were also removed; its background is now plain paper white. Existing text/CTA accents remain. This feedback supersedes the blob/tint portion of the original hero upgrade plan; later steps should not restore them.
 

@@ -4,12 +4,11 @@ import { AnchorLink } from './components/AnchorLink';
 import { Header } from './components/Header';
 import { Hero } from './sections/Hero';
 import { Mascot } from './sections/Mascot';
-import HighlightsCarousel from './sections/HighlightsCarousel'
+import HighlightsCarousel from './sections/HighlightsCarousel';
 import { Cutaway } from './sections/Cutaway';
 import { FlavourRotation } from './sections/FlavourRotation';
 import { FlavourCards } from './sections/FlavourCards';
 import { PickYourPulp } from './sections/PickYourPulp';
-import { PeoplePulp } from './sections/PeoplePulp';
 import { Footer } from './sections/Footer';
 import { LoadingScreen } from './components/LoadingScreen';
 import { useSiteLoading } from './hooks/useSiteLoading';
@@ -34,15 +33,14 @@ export default function App() {
         <main>
           <Hero onReady={loading.markCanReady} />
           <Mascot />
-        <HighlightsCarousel />
+          <HighlightsCarousel />
           <Cutaway onPickFlavour={setSelectedFlavourId} />
-          <FlavourRotation />
+          <FlavourRotation onReady={loading.markRotationReady} />
           <FlavourCards onPickFlavour={setSelectedFlavourId} />
           <PickYourPulp
             selectedId={selectedFlavourId}
             onSelectFlavour={setSelectedFlavourId}
           />
-          <PeoplePulp />
         </main>
         <Footer />
       </div>

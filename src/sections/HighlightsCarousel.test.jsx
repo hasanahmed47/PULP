@@ -14,6 +14,11 @@ const customSlides = [0, 1, 2, 3, 4].map((index) => ({
 }));
 
 beforeEach(() => {
+  vi.stubGlobal('matchMedia', vi.fn(() => ({
+    matches: false,
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+  })));
   vi.stubGlobal('IntersectionObserver', class {
     constructor(callback) { this.callback = callback; }
     observe(target) {
@@ -65,8 +70,8 @@ it('uses custom slides, wraps across five items and survives list shrink in Stri
 
 it('uses the existing fallback when slides are omitted or empty', () => {
   const { container, rerender } = render(<HighlightsCarousel />);
-  expect(container.querySelectorAll('.hl__slide')).toHaveLength(4);
+  expect(container.querySelectorAll('.hl__slide')).toHaveLength(3);
   expect(container.querySelector('.hl__slide.is-active').textContent).toBe('UNLEASH THE BOLD.');
   rerender(<HighlightsCarousel slides={[]} />);
-  expect(container.querySelectorAll('.hl__slide')).toHaveLength(4);
+  expect(container.querySelectorAll('.hl__slide')).toHaveLength(3);
 });

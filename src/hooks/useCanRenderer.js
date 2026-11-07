@@ -3,16 +3,16 @@ import { flavours } from '../data/flavours';
 
 const firstFrameTimeout = 12000;
 
-export function useCanRenderer(hostRef, poseRef, { allFlavours, interactive, visible }) {
+export function useCanRenderer(hostRef, poseRef, { allFlavours, interactive, preload, visible }) {
   const sceneRef = useRef(null);
-  const [requested, setRequested] = useState(interactive);
+  const [requested, setRequested] = useState(interactive || preload);
   const [status, setStatus] = useState('loading');
 
   useEffect(() => {
     const needsFirstFrame = status === 'loading';
     sceneRef.current?.setVisible(visible || needsFirstFrame);
-    if (visible || interactive) setRequested(true);
-  }, [interactive, status, visible]);
+    if (visible || interactive || preload) setRequested(true);
+  }, [interactive, preload, status, visible]);
 
   useEffect(() => {
     if (!requested) return;

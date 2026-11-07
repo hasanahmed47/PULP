@@ -34,4 +34,10 @@ export const media = {
   poster: asset('pour-poster.webp'),
 
   film: asset('pulp-film.mp4'),
+  firstTileDesktopFilm: asset('1st tile laptop.mp4'),
+  firstTileDesktopPoster: asset('first-tile-laptop-poster.webp'),
+  firstTileMobileFilm: asset('1st tile mobile.mp4'),
+  firstTileMobilePoster: asset('first-tile-mobile-poster.webp'),
+  lifestyleFilm: asset('footer-video.mp4'),
+  lifestylePoster: asset('footer-poster.webp'),
 };

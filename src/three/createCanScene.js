@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { createCanModel } from './createCanModel';
 import { media } from '../data/media';
-import { blendFromPosition, clampBlend } from '../lib/flavourBlend';
+import { clampBlend } from '../lib/flavourBlend';
 
 function configureRenderer(renderer, host) {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
@@ -77,6 +77,7 @@ export function createCanScene(host, flavours, { onReady, onError }) {
   const renderer = new THREE.WebGLRenderer({
     alpha: true,
     antialias: true,
+    preserveDrawingBuffer: true,
     powerPreference: 'low-power',
   });
   const resources = new Set();
@@ -128,16 +129,27 @@ export function createCanScene(host, flavours, { onReady, onError }) {
     scene.add(model.group, createShadow(track));
 
     let visible = true;
+    let prepared = false;
     let ready = false;
+    let width = 0;
+    let height = 0;
+    const renderedSize = new THREE.Vector2();
     let blend = { from: 0, to: 0, amount: 0 };
     const textures = [];
     const lastFlavour = flavours.length - 1;
 
     function render() {
       frame = 0;
-      if (disposed || !visible || document.hidden || !model.hasLabel()) return;
+      if (disposed || !prepared || !visible || document.hidden) return;
+      if (!width || !height) return;
 
       try {
+        renderer.getSize(renderedSize);
+        if (renderedSize.x !== width || renderedSize.y !== height) {
+          camera.aspect = width / height;
+          camera.updateProjectionMatrix();
+          renderer.setSize(width, height, false);
+        }
         renderer.render(scene, camera);
       } catch (error) {
         fail(error);
@@ -151,7 +163,7 @@ export function createCanScene(host, flavours, { onReady, onError }) {
     }
 
     requestRender = function invalidate() {
-      if (frame || disposed || !visible || document.hidden) return;
+      if (frame || disposed || !prepared || !visible || document.hidden) return;
       frame = requestAnimationFrame(render);
     };
 
@@ -167,59 +179,49 @@ export function createCanScene(host, flavours, { onReady, onError }) {
       applyFlavourBlend();
     }
 
-    function setFlavourPosition(position) {
-      const { from, to, amount } = blendFromPosition(position, lastFlavour);
-      setFlavourBlend(from, to, amount);
-    }
-
-    function loadTextures() {
+    async function prepareScene() {
       const loader = new THREE.TextureLoader();
 
-      for (const [side, source] of Object.entries(media.canDetails)) {
-        track(loader.load(source, (texture) => {
-          if (disposed) {
-            texture.dispose();
-            return;
-          }
-          texture.colorSpace = THREE.SRGBColorSpace;
-          texture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
-          model.setEndTexture(side, texture);
-          requestRender();
-        }, undefined, fail));
-      }
-
-      flavours.forEach((flavour, index) => {
-        function finishTexture(texture) {
-          if (disposed) {
-            texture.dispose();
-            return;
-          }
-
-          texture.colorSpace = THREE.SRGBColorSpace;
-          texture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
-          textures[index] = texture;
-          applyFlavourBlend();
+      async function loadTexture(source) {
+        const texture = await loader.loadAsync(source);
+        if (disposed) {
+          texture.dispose();
+          return null;
         }
 
-        track(loader.load(flavour.texture, finishTexture, undefined, fail));
+        track(texture);
+        texture.colorSpace = THREE.SRGBColorSpace;
+        texture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+        renderer.initTexture(texture);
+        return texture;
+      }
+
+      const endTextures = Object.entries(media.canDetails).map(async ([side, source]) => {
+        const texture = await loadTexture(source);
+        if (texture && !disposed) model.setEndTexture(side, texture);
       });
+      const flavourTextures = flavours.map(async (flavour, index) => {
+        const texture = await loadTexture(flavour.texture);
+        if (texture && !disposed) textures[index] = texture;
+      });
+
+      await Promise.all([...endTextures, ...flavourTextures]);
+      if (disposed) return;
+      applyFlavourBlend();
+      prepared = true;
+      requestRender();
     }
 
     function resize() {
       if (disposed) return;
-      const { width, height } = host.getBoundingClientRect();
-      if (!width || !height) return;
+      const nextWidth = host.clientWidth;
+      const nextHeight = host.clientHeight;
+      if (!nextWidth || !nextHeight) return;
+      if (nextWidth === width && nextHeight === height) return;
 
-      camera.aspect = width / height;
-      camera.updateProjectionMatrix();
-
-      try {
-        renderer.setSize(width, height, false);
-        cancelAnimationFrame(frame);
-        render();
-      } catch (error) {
-        fail(error);
-      }
+      width = nextWidth;
+      height = nextHeight;
+      requestRender();
     }
 
     function setRotation(rotation) {
@@ -246,14 +248,14 @@ export function createCanScene(host, flavours, { onReady, onError }) {
       requestRender();
     }
 
-    loadTextures();
+    prepareScene().catch(fail);
     resizeObserver = new ResizeObserver(resize);
     resizeObserver.observe(host);
     resize();
     renderer.domElement.addEventListener('webglcontextlost', handleContextLost);
     document.addEventListener('visibilitychange', requestRender);
 
-    return { setFlavourBlend, setFlavourPosition, setRotation, setTilt, setPointer, setVisible, dispose };
+    return { setFlavourBlend, setRotation, setTilt, setPointer, setVisible, dispose };
   } catch (error) {
     dispose();
     throw error;

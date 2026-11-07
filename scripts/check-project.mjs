@@ -12,7 +12,7 @@ const flavours = ['blood-orange', 'passionfruit-yuzu', 'blueberry', 'lime-basil'
 
 for (const flavour of flavours) {
   for (const type of ['can', 'fruit', 'wrap', 'cutaway']) {
-    const name = `${flavour}-${type}.webp`;
+    const name = `${flavour}-${type}.png`;
     const info = await sharp(assetPath(name)).metadata();
     assert(info.width >= 500 && info.height >= 500, `${name} is too small.`);
     if (type !== 'wrap') assert(info.hasAlpha, `${name} needs real transparency.`);
@@ -22,12 +22,12 @@ for (const name of ['orange-mascot.webp', 'pour-poster.webp']) await fs.access(a
 console.log('PASS: every bundled media path exists; cans, fruits and cutaways have alpha.');
 
 for (const flavour of flavours) {
-  const intact = await sharp(assetPath(`${flavour}-can.webp`)).metadata();
-  const inside = await sharp(assetPath(`${flavour}-cutaway.webp`)).metadata();
+  const intact = await sharp(assetPath(`${flavour}-can.png`)).metadata();
+  const inside = await sharp(assetPath(`${flavour}-cutaway.png`)).metadata();
   assert.equal(intact.width, inside.width, `${flavour}: cutaway width must match the intact image.`);
   assert.equal(intact.height, inside.height, `${flavour}: cutaway height must match the intact image.`);
-  const intactAlpha = await sharp(assetPath(`${flavour}-can.webp`)).extractChannel('alpha').raw().toBuffer();
-  const insideAlpha = await sharp(assetPath(`${flavour}-cutaway.webp`)).extractChannel('alpha').raw().toBuffer();
+  const intactAlpha = await sharp(assetPath(`${flavour}-can.png`)).extractChannel('alpha').raw().toBuffer();
+  const insideAlpha = await sharp(assetPath(`${flavour}-cutaway.png`)).extractChannel('alpha').raw().toBuffer();
   let totalDifference = 0;
   for (let i = 0; i < intactAlpha.length; i++) totalDifference += Math.abs(intactAlpha[i] - insideAlpha[i]);
   assert(totalDifference / intactAlpha.length < 1, `${flavour}: cutaway silhouette must match the intact image.`);
@@ -35,10 +35,10 @@ for (const flavour of flavours) {
 console.log('PASS: all four cutaway dimensions and alpha silhouettes match their intact cans.');
 
 const app = await read('src/App.jsx');
-const order = ['Hero', 'Mascot', 'PouringFilm', 'Cutaway', 'FlavourRotation', 'FlavourCards', 'PickYourPulp', 'PeoplePulp', 'Footer'];
+const order = ['Hero', 'Mascot', 'HighlightsCarousel', 'Cutaway', 'FlavourRotation', 'FlavourCards', 'PickYourPulp', 'Footer'];
 const positions = order.map((section) => app.search(new RegExp(`<${section}\\b`)));
 assert(positions.every((position, index) => position >= 0 && (!index || position > positions[index - 1])), 'Section order has changed.');
-console.log('PASS: all nine sections are in the required order.');
+console.log('PASS: all eight sections are in the required order.');
 
 const sectionFiles = await fs.readdir(path.join(root, 'src/sections'));
 const componentFiles = await fs.readdir(path.join(root, 'src/components'));
