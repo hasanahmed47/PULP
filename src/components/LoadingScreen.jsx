@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import './LoadingScreen.css';
+import '../styles/LoadingScreen.css'
 
 const exitTimeout = 1200;
 

@@ -1,5 +1,5 @@
 import { maximumQuantity } from '../lib/shoppingBag';
-import './QuantityControl.css';
+import '../styles/QuantityControl.css'
 
 export function QuantityControl({ quantity, onChange, label = 'Quantity' }) {
   function decreaseQuantity() {

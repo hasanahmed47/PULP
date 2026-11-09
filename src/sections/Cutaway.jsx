@@ -24,7 +24,7 @@ export function Cutaway({ onPickFlavour }) {
       aria-labelledby="inside-title"
     >
       <h2 id="inside-title" className="inside-title">
-        <span>IT’S WHAT’S</span>
+        <span>IT'S WHAT'S</span>
         <span>INSIDE.</span>
       </h2>
       <p className="inside-instruction">Move over a can to peek inside. Click or tap to choose it.</p>

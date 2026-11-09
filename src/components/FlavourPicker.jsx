@@ -1,6 +1,6 @@
 import { flavours } from '../data/flavours';
 import { ShopIcon } from './ShopIcon';
-import './FlavourPicker.css';
+import '../styles/FlavourPicker.css'
 
 export function FlavourPicker({ selectedId, onSelect }) {
   function selectFlavour(event) {

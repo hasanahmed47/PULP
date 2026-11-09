@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { ShopIcon } from './ShopIcon';
-import './OrderReview.css';
+import '../styles/OrderReview.css'
 
 export function OrderReview({ items, onClose }) {
   const dialogRef = useRef(null);
@@ -48,7 +48,7 @@ export function OrderReview({ items, onClose }) {
           <li key={flavour.id}>
             <img src={flavour.image} alt="" width="42" height="70" />
             <span>{flavour.name}</span>
-            <span className="order-review__quantity">× {quantity}</span>
+            <span className="order-review__quantity">x {quantity}</span>
           </li>
         ))}
       </ul>

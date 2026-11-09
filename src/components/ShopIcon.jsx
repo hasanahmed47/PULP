@@ -1,4 +1,4 @@
-import './ShopIcon.css';
+import '../styles/ShopIcon.css'
 
 /** SVG path data on a 24x24 grid. Add a new icon by adding one line here. */
 const ICON_PATHS = Object.freeze({

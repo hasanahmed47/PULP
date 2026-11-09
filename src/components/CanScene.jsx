@@ -1,4 +1,14 @@
-import { useCallback, useEffect, useId, useImperativeHandle, useRef, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useImperativeHandle,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
+
+import { CanSplash } from './CanSplash';
 import { flavours } from '../data/flavours';
 import { useCanFallback } from '../hooks/useCanFallback';
 import { useCanRenderer } from '../hooks/useCanRenderer';
@@ -7,14 +17,15 @@ import { useReducedMotion } from '../hooks/useReducedMotion';
 import { useVisibility } from '../hooks/useVisibility';
 import { gsap } from '../lib/animation';
 import { blendFromPosition, clampBlend } from '../lib/flavourBlend';
-import './CanScene.css';
+import '../styles/CanScene.css'
 
-const views = [
+const CAN_VIEWS = [
   { id: 'top', label: 'Top', tilt: Math.PI * 0.42 },
   { id: 'front', label: 'Front', tilt: 0 },
   { id: 'bottom', label: 'Bottom', tilt: -Math.PI * 0.42 },
 ];
-const viewMotion = { duration: 0.45, ease: 'power2.out' };
+
+const VIEW_ANIMATION = { duration: 0.45, ease: 'power2.out' };
 
 function getSpinHint(status, canSpin) {
   if (canSpin) return '↔ Drag to spin · 360°';
@@ -22,9 +33,42 @@ function getSpinHint(status, canSpin) {
   return 'Preparing 360° view';
 }
 
+function CanSceneControls({ controlsRef, hint, helpId, canSpin, view, onViewChange }) {
+  return (
+    <>
+      <div ref={controlsRef} className="can-scene__controls">
+        <span className="can-scene__hint" aria-hidden="true">
+          {hint}
+        </span>
+
+        <div className="can-scene__views" role="group" aria-label="Can viewing angle">
+          {CAN_VIEWS.map(({ id, label }) => (
+            <button
+              key={id}
+              type="button"
+              className="can-scene__view"
+              aria-label={`View ${id} of can`}
+              aria-pressed={view === id}
+              disabled={!canSpin}
+              onClick={() => onViewChange(id)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <span id={helpId} className="sr-only">
+        {canSpin ? 'Drag left or right to rotate. Swipe vertically to scroll.' : hint}
+      </span>
+    </>
+  );
+}
+
 export function CanScene({
   allFlavours = false,
   interactive = false,
+  dropRun = null,
   preload = false,
   className = '',
   onReady,
@@ -36,62 +80,102 @@ export function CanScene({
   const canvasRef = useRef(null);
   const fallbackRef = useRef(null);
   const notifiedRef = useRef(false);
-  const poseRef = useRef({ rotation: 0, spin: 0, tilt: 0, blend: { from: 0, to: 0, amount: 0 }, pointer: [0, 0] });
-  const [active, setActive] = useState(0);
+  const poseRef = useRef({
+    rotation: 0,
+    spin: 0,
+    tilt: 0,
+    blend: { from: 0, to: 0, amount: 0 },
+    pointer: [0, 0],
+  });
+
+  const [activeFlavourIndex, setActiveFlavourIndex] = useState(0);
   const [view, setView] = useState('front');
   const helpId = useId();
+
   const reducedMotion = useReducedMotion();
   const visible = useVisibility(wrapperRef);
-  const { sceneRef, status } = useCanRenderer(canvasRef, poseRef, { allFlavours, interactive, preload, visible });
+  const { sceneRef, status } = useCanRenderer(canvasRef, poseRef, {
+    allFlavours,
+    interactive,
+    preload,
+    visible,
+  });
 
-  const flavour = flavours[active];
+  const flavour = flavours[activeFlavourIndex];
   const failed = status === 'failed';
   const ready = status === 'ready';
   const fallbackStatus = useCanFallback(fallbackRef, flavour.image, failed);
   const settled = ready || (failed && fallbackStatus !== 'loading');
   const canSpin = interactive && ready;
-  const lastFlavour = allFlavours ? flavours.length - 1 : 0;
-  const hint = getSpinHint(status, canSpin);
+  const hasDrop = dropRun != null;
+  const lastFlavourIndex = allFlavours ? flavours.length - 1 : 0;
+  const spinHint = getSpinHint(status, canSpin);
 
   const rotate = useCallback((rotation) => {
     const pose = poseRef.current;
     pose.spin = rotation;
     sceneRef.current?.setRotation(pose.rotation + rotation);
   }, [sceneRef]);
+
   const spin = useCanSpin(rotate, canSpin);
 
-  useEffect(function changeCanView() {
+  // The data-drop attribute is the animation state used by CanScene.css.
+  useLayoutEffect(function playCanDrop() {
+    const scene = wrapperRef.current;
+    if (!scene) return;
+
+    if (dropRun == null) {
+      scene.removeAttribute('data-drop');
+      return;
+    }
+
+    scene.dataset.drop = 'waiting';
+    if (dropRun === 0) return;
+
+    // Restart the CSS animation whenever dropRun changes.
+    void scene.offsetWidth;
+    scene.dataset.drop = 'playing';
+  }, [dropRun]);
+
+  function finishCanDrop(event) {
+    if (event.target !== event.currentTarget) return;
+    wrapperRef.current.dataset.drop = 'landed';
+  }
+
+  useEffect(function animateSelectedView() {
     if (!interactive) return;
+
+    const selectedView = CAN_VIEWS.find((item) => item.id === view);
+    if (!selectedView) return;
+
     const pose = poseRef.current;
-    const selected = views.find((item) => item.id === view);
-    if (pose.tilt === selected.tilt) return;
+    if (pose.tilt === selectedView.tilt) return;
 
     function updateTilt() {
       sceneRef.current?.setTilt(pose.tilt);
     }
 
     if (reducedMotion) {
-      pose.tilt = selected.tilt;
+      pose.tilt = selectedView.tilt;
       updateTilt();
       return;
     }
 
     const tween = gsap.to(pose, {
-      tilt: selected.tilt,
-      ...viewMotion,
+      tilt: selectedView.tilt,
+      ...VIEW_ANIMATION,
       onUpdate: updateTilt,
     });
 
-    return function stopViewChange() {
-      tween.kill();
-    };
+    return () => tween.kill();
   }, [interactive, reducedMotion, sceneRef, view]);
 
+  // Expose only the methods that the parent needs to control the 3D can.
   useImperativeHandle(ref, () => {
     function setFlavourBlend(from, to, amount) {
-      const blend = clampBlend({ from, to, amount }, lastFlavour);
+      const blend = clampBlend({ from, to, amount }, lastFlavourIndex);
       poseRef.current.blend = blend;
-      setActive(blend.amount < 0.5 ? blend.from : blend.to);
+      setActiveFlavourIndex(blend.amount < 0.5 ? blend.from : blend.to);
       sceneRef.current?.setFlavourBlend(blend.from, blend.to, blend.amount);
     }
 
@@ -103,7 +187,7 @@ export function CanScene({
       },
       setFlavourBlend,
       setFlavourPosition(value) {
-        const { from, to, amount } = blendFromPosition(value, lastFlavour);
+        const { from, to, amount } = blendFromPosition(value, lastFlavourIndex);
         setFlavourBlend(from, to, amount);
       },
       setPointer(x, y) {
@@ -111,9 +195,9 @@ export function CanScene({
         sceneRef.current?.setPointer(x, y);
       },
     };
-  }, [lastFlavour, sceneRef]);
+  }, [lastFlavourIndex, sceneRef]);
 
-  useEffect(() => {
+  useEffect(function notifyWhenReady() {
     if (!settled || notifiedRef.current || !onReady) return;
     notifiedRef.current = true;
     onReady();
@@ -133,46 +217,36 @@ export function CanScene({
       aria-describedby={interactive ? helpId : undefined}
     >
       <div ref={stageRef} className="can-scene__stage" {...spin.handlers}>
-        {failed && (
-          <img
-            ref={fallbackRef}
-            className="can-scene__fallback"
-            data-unavailable={fallbackStatus === 'unavailable'}
-            src={flavour.image}
-            alt=""
-            width="600"
-            height="1000"
-            draggable="false"
-          />
-        )}
-        <div ref={canvasRef} className="can-scene__canvas" aria-hidden="true" />
+        {hasDrop && <CanSplash layer="back" />}
+
+        <div className="can-scene__drop" onAnimationEnd={finishCanDrop}>
+          {failed && (
+            <img
+              ref={fallbackRef}
+              className="can-scene__fallback"
+              data-unavailable={fallbackStatus === 'unavailable'}
+              src={flavour.image}
+              alt=""
+              width="600"
+              height="1000"
+              draggable="false"
+            />
+          )}
+          <div ref={canvasRef} className="can-scene__canvas" aria-hidden="true" />
+        </div>
+
+        {hasDrop && <CanSplash layer="front" />}
       </div>
+
       {interactive && (
-        <>
-          <div ref={controlsRef} className="can-scene__controls">
-            <span className="can-scene__hint" aria-hidden="true">
-              {hint}
-            </span>
-            <div className="can-scene__views" role="group" aria-label="Can viewing angle">
-              {views.map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  className="can-scene__view"
-                  aria-label={`View ${item.id} of can`}
-                  aria-pressed={view === item.id}
-                  disabled={!canSpin}
-                  onClick={() => setView(item.id)}
-                >
-                  {item.label}
-                </button>
-              ))}
-            </div>
-          </div>
-          <span id={helpId} className="sr-only">
-            {canSpin ? 'Drag left or right to rotate. Swipe vertically to scroll.' : hint}
-          </span>
-        </>
+        <CanSceneControls
+          controlsRef={controlsRef}
+          hint={spinHint}
+          helpId={helpId}
+          canSpin={canSpin}
+          view={view}
+          onViewChange={setView}
+        />
       )}
     </div>
   );

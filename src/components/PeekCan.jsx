@@ -1,40 +1,72 @@
-import { useId, useRef, useState } from 'react';
-import './PeekCan.css';
+import { useEffect, useId, useRef } from 'react';
+import { useHoverless } from '../hooks/useHoverless';
+import { defaultLensPosition, lensBounds, usePeekLens } from '../hooks/usePeekLens';
+import { useVisibility } from '../hooks/useVisibility';
+import '../styles/PeekCan.css'
 
-const defaultLensPosition = { x: 300, y: 560 };
+const hintViewMargin = '-30% 0px';
 
 function getLensPosition(image, event) {
   const matrix = image?.getScreenCTM();
   if (!matrix) return null;
 
-  const cursor = new DOMPoint(event.clientX, event.clientY);
-  const position = cursor.matrixTransform(matrix.inverse());
+  const pointer = new DOMPoint(event.clientX, event.clientY);
+  const position = pointer.matrixTransform(matrix.inverse());
 
   return {
-    x: Math.max(140, Math.min(460, position.x)),
-    y: Math.max(150, Math.min(850, position.y)),
+    x: Math.max(lensBounds.minX, Math.min(lensBounds.maxX, position.x)),
+    y: Math.max(lensBounds.minY, Math.min(lensBounds.maxY, position.y)),
   };
 }
 
 export function PeekCan({ flavour, selected, onSelect }) {
   const clipId = useId();
+  const buttonRef = useRef(null);
   const imageRef = useRef(null);
-  const [lens, setLens] = useState(null);
+  const hoverless = useHoverless();
+  const inView = useVisibility(buttonRef, hintViewMargin);
+  const { lens, placeLens, glideLens, hideLens, hintLens, cancelHint } = usePeekLens();
   const lensPosition = lens ?? defaultLensPosition;
   const peeking = Boolean(lens);
 
-  function moveLens(event) {
+  useEffect(function hintLensOnTouchDevices() {
+    if (!hoverless || !selected || !inView) return;
+
+    hintLens();
+    return cancelHint;
+  }, [cancelHint, hintLens, hoverless, inView, selected]);
+
+  useEffect(function hideLensWhenDeselected() {
+    if (hoverless && !selected) hideLens();
+  }, [hideLens, hoverless, selected]);
+
+  function followPointer(event) {
     if (event.pointerType === 'touch') return;
-    setLens(getLensPosition(imageRef.current, event));
+
+    const position = getLensPosition(imageRef.current, event);
+    if (position) placeLens(position);
+  }
+
+  function moveLensToTap(event) {
+    if (event.pointerType === 'mouse') return;
+
+    const position = getLensPosition(imageRef.current, event);
+    if (position) glideLens(position);
   }
 
   function focusLens(event) {
     if (!event.currentTarget.matches(':focus-visible')) return;
-    setLens(defaultLensPosition);
+    placeLens(defaultLensPosition);
   }
 
-  function clearLens() {
-    setLens(null);
+  function releasePointer(event) {
+    if (event.pointerType === 'touch') return;
+    hideLens();
+  }
+
+  function releaseFocus() {
+    if (hoverless) return;
+    hideLens();
   }
 
   function selectFlavour() {
@@ -43,6 +75,7 @@ export function PeekCan({ flavour, selected, onSelect }) {
 
   return (
     <button
+      ref={buttonRef}
       className="peek-can"
       type="button"
       data-flavour={flavour.id}
@@ -53,15 +86,16 @@ export function PeekCan({ flavour, selected, onSelect }) {
       aria-controls="inside-detail"
       onClick={selectFlavour}
       onFocus={focusLens}
-      onBlur={clearLens}
-      onPointerLeave={clearLens}
+      onBlur={releaseFocus}
+      onPointerLeave={releasePointer}
     >
       <svg
         ref={imageRef}
         className="peek-can__image"
         viewBox="0 0 600 1000"
         aria-hidden="true"
-        onPointerMove={moveLens}
+        onPointerMove={followPointer}
+        onPointerUp={moveLensToTap}
       >
         <defs>
           <clipPath id={clipId}>

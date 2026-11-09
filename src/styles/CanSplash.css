@@ -1,0 +1,376 @@
+/*
+ * CanSplash
+ * Decorative splash layers shown when a can lands.
+ * All droplet and spike positions are CSS-only so JSX stays presentational.
+ * The numbers below reproduce the original seeded positions and timings.
+ */
+
+/* --- Layout and theme --- */
+.can-splash {
+  --splash-deep: color-mix(in srgb, var(--flavour-colour) 80%, var(--ink));
+  --splash-delay: calc(var(--drop-duration) * var(--drop-hit));
+
+  position: absolute;
+  inset: 0 0 var(--can-controls-space, 0px);
+  container-type: size;
+  pointer-events: none;
+}
+
+/* Ground sits at the 3D can's impact point. 1cqh = 1% of canvas height. */
+.can-splash__ground {
+  position: absolute;
+  top: 87%;
+  left: 50%;
+  width: 0;
+  height: 0;
+}
+
+/* --- Back layer: glow, puddle, rings, splash spikes --- */
+.can-splash__glow {
+  position: absolute;
+  top: -62cqh;
+  left: -50cqh;
+  width: 100cqh;
+  height: 100cqh;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--flavour-colour) 38%, transparent),
+    transparent 68%
+  );
+  opacity: 0;
+}
+
+.can-splash__puddle,
+.can-splash__ring {
+  position: absolute;
+  top: -2.6cqh;
+  left: -36cqh;
+  width: 72cqh;
+  height: 5.2cqh;
+  border-radius: 50%;
+  opacity: 0;
+  transform: scale(0);
+}
+
+.can-splash__puddle {
+  background: var(--flavour-colour);
+}
+
+.can-splash__ring {
+  border: 0.5cqh solid var(--flavour-colour);
+}
+
+.can-splash__spike {
+  position: absolute;
+  bottom: 0.5cqh;
+  left: -1.8cqh;
+  width: 3.6cqh;
+  height: var(--height);
+  background: linear-gradient(var(--flavour-colour), var(--splash-deep));
+  clip-path: polygon(50% 0, 88% 55%, 100% 100%, 0 100%, 12% 55%);
+  transform-origin: 50% 100%;
+  transform: rotate(var(--angle)) scaleY(0);
+}
+
+/* The first four children are glow, puddle and two rings. */
+.can-splash__spike:nth-child(5) {
+  --angle: -68deg;
+  --height: 15cqh;
+  --delay: 0.0544s;
+}
+
+.can-splash__spike:nth-child(6) {
+  --angle: -46deg;
+  --height: 22cqh;
+  --delay: 0.0368s;
+}
+
+.can-splash__spike:nth-child(7) {
+  --angle: -23deg;
+  --height: 28cqh;
+  --delay: 0.0184s;
+}
+
+.can-splash__spike:nth-child(8) {
+  --angle: 0deg;
+  --height: 32cqh;
+  --delay: 0.0000s;
+}
+
+.can-splash__spike:nth-child(9) {
+  --angle: 23deg;
+  --height: 28cqh;
+  --delay: 0.0184s;
+}
+
+.can-splash__spike:nth-child(10) {
+  --angle: 46deg;
+  --height: 22cqh;
+  --delay: 0.0368s;
+}
+
+.can-splash__spike:nth-child(11) {
+  --angle: 68deg;
+  --height: 15cqh;
+  --delay: 0.0544s;
+}
+
+/* --- Front layer: 18 droplets --- */
+.can-splash__drop {
+  position: absolute;
+  bottom: 0.5cqh;
+  left: 0;
+}
+
+.can-splash__drop b {
+  display: block;
+  width: var(--size);
+  height: calc(var(--size) * 1.45);
+  background: var(--flavour-colour);
+  border-radius: 50% 50% 50% 50% / 65% 65% 35% 35%;
+  opacity: 0;
+}
+
+/* Fixed values keep animation variation stable between renders. */
+.can-splash__drop:nth-child(1) {
+  --x: -38.13385cqh;
+  --height: 13.10132cqh;
+  --size: 2.33509cqh;
+  --time: 0.83740s;
+  --delay: 0.06277s;
+}
+
+.can-splash__drop:nth-child(2) {
+  --x: 10.97793cqh;
+  --height: 27.38363cqh;
+  --size: 1.81306cqh;
+  --time: 0.99636s;
+  --delay: 0.02062s;
+}
+
+.can-splash__drop:nth-child(3) {
+  --x: -37.40407cqh;
+  --height: 38.07891cqh;
+  --size: 2.64039cqh;
+  --time: 0.81374s;
+  --delay: 0.05402s;
+}
+
+.can-splash__drop:nth-child(4) {
+  --x: 30.92868cqh;
+  --height: 36.59258cqh;
+  --size: 2.16728cqh;
+  --time: 0.97475s;
+  --delay: 0.06018s;
+}
+
+.can-splash__drop:nth-child(5) {
+  --x: -36.58311cqh;
+  --height: 29.24789cqh;
+  --size: 1.30650cqh;
+  --time: 0.93957s;
+  --delay: 0.00221s;
+}
+
+.can-splash__drop:nth-child(6) {
+  --x: 28.37049cqh;
+  --height: 40.83543cqh;
+  --size: 1.40428cqh;
+  --time: 1.12354s;
+  --delay: 0.01017s;
+}
+
+.can-splash__drop:nth-child(7) {
+  --x: -44.31397cqh;
+  --height: 32.83032cqh;
+  --size: 2.46126cqh;
+  --time: 1.26711s;
+  --delay: 0.00555s;
+}
+
+.can-splash__drop:nth-child(8) {
+  --x: 41.87849cqh;
+  --height: 36.33684cqh;
+  --size: 1.77636cqh;
+  --time: 0.78670s;
+  --delay: 0.01807s;
+}
+
+.can-splash__drop:nth-child(9) {
+  --x: -38.24776cqh;
+  --height: 31.53373cqh;
+  --size: 1.99454cqh;
+  --time: 1.15638s;
+  --delay: 0.09148s;
+}
+
+.can-splash__drop:nth-child(10) {
+  --x: 43.05301cqh;
+  --height: 38.52562cqh;
+  --size: 2.37888cqh;
+  --time: 1.20595s;
+  --delay: 0.03571s;
+}
+
+.can-splash__drop:nth-child(11) {
+  --x: -35.48769cqh;
+  --height: 12.87772cqh;
+  --size: 2.10908cqh;
+  --time: 0.94687s;
+  --delay: 0.01875s;
+}
+
+.can-splash__drop:nth-child(12) {
+  --x: 31.68220cqh;
+  --height: 40.59688cqh;
+  --size: 1.85704cqh;
+  --time: 1.24495s;
+  --delay: 0.02345s;
+}
+
+.can-splash__drop:nth-child(13) {
+  --x: -14.81707cqh;
+  --height: 26.60601cqh;
+  --size: 3.08937cqh;
+  --time: 1.10893s;
+  --delay: 0.01734s;
+}
+
+.can-splash__drop:nth-child(14) {
+  --x: 42.56008cqh;
+  --height: 37.80281cqh;
+  --size: 2.84984cqh;
+  --time: 0.88720s;
+  --delay: 0.05313s;
+}
+
+.can-splash__drop:nth-child(15) {
+  --x: -11.58505cqh;
+  --height: 17.36826cqh;
+  --size: 1.20007cqh;
+  --time: 1.23380s;
+  --delay: 0.05979s;
+}
+
+.can-splash__drop:nth-child(16) {
+  --x: 38.55335cqh;
+  --height: 10.33664cqh;
+  --size: 2.29704cqh;
+  --time: 1.18250s;
+  --delay: 0.08280s;
+}
+
+.can-splash__drop:nth-child(17) {
+  --x: -13.58597cqh;
+  --height: 32.40336cqh;
+  --size: 2.56361cqh;
+  --time: 1.13706s;
+  --delay: 0.03087s;
+}
+
+.can-splash__drop:nth-child(18) {
+  --x: 9.55784cqh;
+  --height: 11.89692cqh;
+  --size: 1.37450cqh;
+  --time: 1.23897s;
+  --delay: 0.00731s;
+}
+
+/* --- Playback: coordinated with CanScene's drop state --- */
+/*
+ * `forwards` avoids displaying the first animation frame during --splash-delay.
+ * `both` caused rings, puddle and droplets to appear before can impact.
+ * Existing base opacity: 0 keeps them invisible until the animation begins.
+ */
+/* CanScene removes data-drop="playing" after the can finishes bouncing. */
+.can-scene[data-drop='playing'] .can-splash__glow {
+  animation: can-splash-glow 1.5s ease-out var(--splash-delay) forwards;
+}
+
+.can-scene[data-drop='playing'] .can-splash__puddle {
+  animation: can-splash-puddle 1.65s ease-out var(--splash-delay) forwards;
+}
+
+.can-scene[data-drop='playing'] .can-splash__ring {
+  animation: can-splash-ring 1.3s ease-out var(--splash-delay) forwards;
+}
+
+.can-scene[data-drop='playing'] .can-splash__ring + .can-splash__ring {
+  animation-delay: calc(var(--splash-delay) + 0.28s);
+}
+
+.can-scene[data-drop='playing'] .can-splash__spike {
+  animation: can-splash-spike 0.95s cubic-bezier(0.2, 0.8, 0.3, 1)
+    calc(var(--splash-delay) + var(--delay)) forwards;
+}
+
+.can-scene[data-drop='playing'] .can-splash__drop {
+  animation: can-splash-x var(--time) linear
+    calc(var(--splash-delay) + var(--delay)) forwards;
+}
+
+.can-scene[data-drop='playing'] .can-splash__drop b {
+  animation: can-splash-y var(--time)
+    calc(var(--splash-delay) + var(--delay)) forwards;
+}
+
+/* --- Keyframes --- */
+@keyframes can-splash-glow {
+  0% { opacity: 0; transform: scale(0.5); }
+  20% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.15); }
+}
+
+@keyframes can-splash-puddle {
+  0% { opacity: 0.95; transform: scale(0); }
+  25% { opacity: 0.95; transform: scale(0.9); }
+  70% { opacity: 0.85; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.05); }
+}
+
+@keyframes can-splash-ring {
+  0% { opacity: 0.9; transform: scale(0.2); }
+  100% { opacity: 0; transform: scale(1.5); }
+}
+
+@keyframes can-splash-spike {
+  0% { transform: rotate(var(--angle)) scaleY(0); }
+  30% { transform: rotate(var(--angle)) scaleY(1); }
+  100% { transform: rotate(var(--angle)) scaleY(0.1); opacity: 0; }
+}
+
+@keyframes can-splash-x {
+  to { transform: translateX(var(--x)); }
+}
+
+/* A droplet rises slowly, then accelerates back toward the ground. */
+@keyframes can-splash-y {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(0.3);
+    animation-timing-function: ease-out;
+  }
+  45% {
+    opacity: 1;
+    transform: translateY(calc(var(--height) * -1)) scale(1);
+    animation-timing-function: ease-in;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(0) scale(0.6);
+  }
+}
+
+/* --- Responsive and accessibility --- */
+@container can-scene (max-width: 420px) {
+  .can-splash {
+    --can-controls-space: var(--can-controls-compact-space);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .can-splash {
+    display: none;
+  }
+}

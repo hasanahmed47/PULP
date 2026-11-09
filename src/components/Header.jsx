@@ -1,4 +1,4 @@
-import './Header.css';
+import '../styles/Header.css'
 import { AnchorLink } from './AnchorLink';
 
 export function Header() {

@@ -31,7 +31,7 @@ export default function App() {
         </AnchorLink>
         <Header />
         <main>
-          <Hero onReady={loading.markCanReady} />
+          <Hero onReady={loading.markCanReady} revealed={loading.revealed} />
           <Mascot />
           <HighlightsCarousel />
           <Cutaway onPickFlavour={setSelectedFlavourId} />

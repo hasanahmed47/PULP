@@ -79,6 +79,17 @@
   z-index: 4;
 }
 
+.hero-replay--mobile {
+  display: none;
+}
+
+.hero-replay--desktop {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+}
+
 .hero-bottom p {
   margin: 0;
   font-size: var(--hero-copy-size);
@@ -138,8 +149,10 @@
 
   .hero-product {
     left: 14%;
-    top: clamp(290px, 43svh, 370px);
-    bottom: 88px;
+    /* Box starts where headline + Explore button end, so the canvas (and can) gets the extra height.
+       TUNE: 2.67 = 3 title lines x line-height ratio, 48px = Explore button + gap. */
+    top: calc(clamp(80px, 13svh, 110px) + 2.67 * clamp(44px, 14vw, 64px) + 48px);
+    bottom: 72px; /* TUNE: keep >= ~60px or the picker touches the bottom copy */
     width: 80%;
     height: auto;
   }
@@ -152,6 +165,17 @@
     font-size: clamp(62px, 16.6vw, 115px);
   }
 
+  .hero-replay--desktop {
+    display: none;
+  }
+
+  .hero-replay--mobile {
+    display: inline-flex;
+    position: absolute;
+    right: 4%;
+    bottom: 0;
+  }
+
   .hero-bottom {
     bottom: 23px;
     gap: 10px;
@@ -161,6 +185,26 @@
   .hero-bottom p,
   .hero-bottom .text-link {
     font-size: 12px;
+  }
+}
+
+/* Short phones (iPhone SE and similar): compact the headline so the can gets more height.
+   Must stay AFTER the (max-width: 767px) block above so it wins. */
+@media (max-width: 767px) and (max-height: 700px) {
+  .hero-intro {
+    top: 72px;
+  }
+
+  .hero-title {
+    font-size: clamp(40px, 12vw, 46px);
+  }
+
+  .hero-explore {
+    margin-top: 12px;
+  }
+
+  .hero-product {
+    top: 250px; /* TUNE: headline block bottom, about 250px at 375x667 */
   }
 }
 
@@ -209,5 +253,30 @@
     top: 820px;
     font-size: 14.5vw;
     right: var(--page-padding);
+  }
+}
+/* Add these to the END of your own Hero.css (do not replace the file). */
+
+.hero-replay--mobile {
+  display: none;
+}
+
+.hero-replay--desktop {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+}
+
+@media (max-width: 767px) {
+  .hero-replay--desktop {
+    display: none;
+  }
+
+  .hero-replay--mobile {
+    display: inline-flex;
+    position: absolute;
+    right: 4%;
+    bottom: 0;
   }
 }

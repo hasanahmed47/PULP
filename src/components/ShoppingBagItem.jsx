@@ -1,6 +1,6 @@
 import { QuantityControl } from './QuantityControl';
 import { ShopIcon } from './ShopIcon';
-import './ShoppingBagItem.css';
+import '../styles/ShoppingBagItem.css'
 
 export function ShoppingBagItem({ flavour, quantity, tab, onQuantityChange, onMove, onRemove }) {
   const collectionName = tab === 'bag' ? 'bag' : 'wishlist';

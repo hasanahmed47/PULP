@@ -35,11 +35,7 @@
   --radius-panel: 28px;
 }
 
-/*
- * --flavour-accent is the flavour colour darkened with ink until it keeps at least 4.5:1
- * contrast on white and on the hero tint (white button text, headline full stop).
- * Raw flavour colours such as yellow are too light for that on their own.
- */
+
 [data-flavour='blood-orange'] {
   --flavour-colour: var(--orange);
   --flavour-pale: var(--orange-pale);

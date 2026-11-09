@@ -3,7 +3,7 @@ import { flavours as allFlavours } from '../data/flavours';
 import { maximumQuantity } from '../lib/shoppingBag';
 import { ShoppingBagItem } from './ShoppingBagItem';
 import { ShopIcon } from './ShopIcon';
-import './ShoppingBag.css';
+import '../styles/ShoppingBag.css'
 
 
 const TABS = [

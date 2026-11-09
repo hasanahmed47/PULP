@@ -51,13 +51,6 @@
   opacity: 1;
 }
 
-@media (hover: none) {
-  .peek-can[data-selected='true'] .peek-can__interior,
-  .peek-can[data-selected='true'] .peek-can__lens {
-    opacity: 1;
-  }
-}
-
 .peek-can__label {
   display: grid;
   align-items: center;
