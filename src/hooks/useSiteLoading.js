@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { media } from '../data/media';
+import { introTime } from '../lib/loadingTimeline';
 
 const imageSources = [
   ...Object.values(media.can),
@@ -9,9 +10,10 @@ const imageSources = [
   media.mascot,
   media.poster,
 ];
-const totalAssets = imageSources.length + 3;
+const preloadCount = imageSources.length + 1;
 const assetTimeout = 12000;
 const entranceDuration = 700;
+const introFallbackDelay = introTime * 1000 + 1000;
 
 function preloadImage(source) {
   const image = new Image();
@@ -20,15 +22,18 @@ function preloadImage(source) {
 }
 
 export function useSiteLoading() {
-  const [settledAssets, setSettledAssets] = useState(0);
+  const [assetsSettled, setAssetsSettled] = useState(false);
   const [canSettled, setCanSettled] = useState(false);
   const [rotationSettled, setRotationSettled] = useState(false);
   const [entranceComplete, setEntranceComplete] = useState(false);
+  const [introEnded, setIntroEnded] = useState(false);
   const [revealed, setRevealed] = useState(false);
+  const [finished, setFinished] = useState(false);
 
   useEffect(function preloadSiteAssets() {
     let cancelled = false;
     const timers = new Set();
+    let pending = preloadCount;
 
     function trackAsset(promise) {
       let settled = false;
@@ -40,7 +45,8 @@ export function useSiteLoading() {
         settled = true;
         window.clearTimeout(timeout);
         timers.delete(timeout);
-        if (!cancelled) setSettledAssets((count) => count + 1);
+        pending -= 1;
+        if (pending === 0 && !cancelled) setAssetsSettled(true);
       }
 
       promise.then(finishAsset, finishAsset);
@@ -50,9 +56,14 @@ export function useSiteLoading() {
       if (!cancelled) setEntranceComplete(true);
     }
 
+    function finishIntroFallback() {
+      if (!cancelled) setIntroEnded(true);
+    }
+
     for (const source of imageSources) trackAsset(preloadImage(source));
     trackAsset(document.fonts.ready);
     timers.add(window.setTimeout(finishEntrance, entranceDuration));
+    timers.add(window.setTimeout(finishIntroFallback, introFallbackDelay));
 
     return function cancelPreloading() {
       cancelled = true;
@@ -75,12 +86,29 @@ export function useSiteLoading() {
     setRotationSettled(true);
   }, []);
 
+  const endIntro = useCallback(function endIntro() {
+    setIntroEnded(true);
+  }, []);
+
   const revealSite = useCallback(function revealSite() {
     setRevealed(true);
   }, []);
-  const completedAssets = settledAssets + Number(canSettled) + Number(rotationSettled);
-  const progress = Math.round(completedAssets / totalAssets * 100);
-  const ready = completedAssets === totalAssets && entranceComplete;
 
-  return { progress, ready, revealed, markCanReady, markRotationReady, revealSite };
+  const finishLoading = useCallback(function finishLoading() {
+    setFinished(true);
+  }, []);
+
+  const ready = assetsSettled && canSettled && rotationSettled && entranceComplete;
+
+  return {
+    ready,
+    introEnded,
+    revealed,
+    finished,
+    markCanReady,
+    markRotationReady,
+    endIntro,
+    revealSite,
+    finishLoading,
+  };
 }

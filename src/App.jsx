@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { SceneStartProvider } from './context/SceneStartContext';
 import { ScrollProvider } from './context/ScrollContext';
 import { AnchorLink } from './components/AnchorLink';
 import { Header } from './components/Header';
@@ -21,36 +22,39 @@ export default function App() {
 
   return (
     <ScrollProvider suspended={!loading.revealed}>
-      <div
-        className="site-content"
-        inert={!loading.revealed}
-        aria-hidden={!loading.revealed}
-      >
-        <AnchorLink className="skip-link" href="#flavours">
-          Skip to flavours
-        </AnchorLink>
-        <Header />
-        <main>
-          <Hero onReady={loading.markCanReady} revealed={loading.revealed} />
-          <Mascot />
-          <HighlightsCarousel />
-          <Cutaway onPickFlavour={setSelectedFlavourId} />
-          <FlavourRotation onReady={loading.markRotationReady} />
-          <FlavourCards onPickFlavour={setSelectedFlavourId} />
-          <PickYourPulp
-            selectedId={selectedFlavourId}
-            onSelectFlavour={setSelectedFlavourId}
+      <SceneStartProvider allowed={loading.introEnded}>
+        <div
+          className="site-content"
+          inert={!loading.revealed}
+          aria-hidden={!loading.revealed}
+        >
+          <AnchorLink className="skip-link" href="#flavours">
+            Skip to flavours
+          </AnchorLink>
+          <Header />
+          <main>
+            <Hero onReady={loading.markCanReady} revealed={loading.revealed} />
+            <Mascot />
+            <HighlightsCarousel />
+            <Cutaway onPickFlavour={setSelectedFlavourId} />
+            <FlavourRotation onReady={loading.markRotationReady} />
+            <FlavourCards onPickFlavour={setSelectedFlavourId} />
+            <PickYourPulp
+              selectedId={selectedFlavourId}
+              onSelectFlavour={setSelectedFlavourId}
+            />
+          </main>
+          <Footer />
+        </div>
+        {!loading.finished && (
+          <LoadingScreen
+            ready={loading.ready}
+            onIntroEnd={loading.endIntro}
+            onReveal={loading.revealSite}
+            onComplete={loading.finishLoading}
           />
-        </main>
-        <Footer />
-      </div>
-      {!loading.revealed && (
-        <LoadingScreen
-          progress={loading.progress}
-          ready={loading.ready}
-          onComplete={loading.revealSite}
-        />
-      )}
+        )}
+      </SceneStartProvider>
     </ScrollProvider>
   );
 }

@@ -1,85 +1,79 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import '../styles/LoadingScreen.css'
 
-const exitTimeout = 1200;
+import { useLoadingTimeline } from '../hooks/useLoadingTimeline';
+import { useMobileViewport } from '../hooks/useMobileViewport';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 
-export function LoadingScreen({ progress, ready, onComplete }) {
-  const [exiting, setExiting] = useState(false);
-  const completedRef = useRef(false);
-  const percentage = Math.max(0, Math.min(100, Math.round(progress)));
+import '../styles/LoadingScreen.css';
 
-  const complete = useCallback(() => {
-    if (completedRef.current) return;
-    completedRef.current = true;
-    onComplete();
-  }, [onComplete]);
+// Each index represents one letter in the PULP logo.
+const GLYPH_INDICES = [0, 1, 2, 3];
 
-  useEffect(() => {
-    if (!ready) return;
-    let exitFrame;
-    const paintFrame = requestAnimationFrame(() => {
-      exitFrame = requestAnimationFrame(() => setExiting(true));
-    });
-    return () => {
-      cancelAnimationFrame(paintFrame);
-      cancelAnimationFrame(exitFrame);
-    };
-  }, [ready]);
+export function LoadingScreen({
+  ready,
+  onIntroEnd,
+  onReveal,
+  onComplete,
+}) {
+  const isMobile = useMobileViewport();
+  const prefersReducedMotion = useReducedMotion();
 
-  useEffect(() => {
-    if (!exiting) return;
-    const timeout = window.setTimeout(complete, exitTimeout);
-    return () => window.clearTimeout(timeout);
-  }, [complete, exiting]);
-
-  function finishExit(event) {
-    if (event.target !== event.currentTarget || !exiting) return;
-    if (event.propertyName !== 'transform' && event.propertyName !== 'opacity') return;
-    complete();
-  }
+  const {
+    stageRef,
+    sheetRef,
+    lettersRef,
+    dimRef,
+    glyphRefs,
+  } = useLoadingTimeline({
+    ready,
+    compact: isMobile,
+    reducedMotion: prefersReducedMotion,
+    onIntroEnd,
+    onReveal,
+    onComplete,
+  });
 
   return (
-    <div
-      className="loading-screen"
-      data-exiting={exiting}
-      onTransitionEnd={finishExit}
-    >
-      <div className="loading-screen__top" aria-hidden="true">
-        <span>THE FRUITY COLLECTION</span>
-        <span>
-          SMALL CAN.<br />
-          BIG FRUIT ENERGY.
-        </span>
-      </div>
-      <div className="loading-screen__art" aria-hidden="true">
-        <span className="loading-screen__citrus" />
-        <div className="wordmark loading-screen__wordmark">
-          PULP<span>®</span>
-        </div>
-        <p>FOUR FLAVOURS. ONE GOOD TIME.</p>
-      </div>
-      <div className="loading-screen__bottom">
-        <div className="loading-screen__meta">
-          <div className="loading-screen__palette" aria-hidden="true">
-            <span />
-            <span />
-            <span />
-            <span />
-          </div>
-          <p role="status">
-            {ready ? 'Your fruity mood is ready.' : 'Loading a little fruit energy.'}
-          </p>
-        </div>
-        <span className="loading-screen__number" aria-hidden="true">
-          {String(percentage).padStart(2, '0')}<span>%</span>
-        </span>
-        <progress
-          className="loading-screen__progress"
-          value={percentage}
-          max="100"
-          aria-label="Loading PULP"
+    <div className="loading-screen">
+      <svg
+        ref={stageRef}
+        className="loading-screen__stage"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <rect
+          ref={dimRef}
+          className="loading-screen__dim"
+          width="100%"
+          height="100%"
+          fillOpacity="0"
         />
-      </div>
+
+        <path
+          ref={sheetRef}
+          className="loading-screen__sheet"
+          fillRule="evenodd"
+        />
+
+        <g
+          ref={lettersRef}
+          className="loading-screen__letters"
+        >
+          {GLYPH_INDICES.map((index) => (
+            <path
+              key={index}
+              ref={(element) => {
+                glyphRefs.current[index] = element;
+              }}
+              className="loading-screen__glyph"
+              fillRule="evenodd"
+            />
+          ))}
+        </g>
+      </svg>
+
+      <p className="loading-screen__status" role="status">
+        {ready ? 'PULP is ready.' : 'Loading PULP.'}
+      </p>
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useSceneStartAllowed } from '../context/SceneStartContext';
 import { flavours } from '../data/flavours';
 
 const firstFrameTimeout = 12000;
@@ -7,6 +8,7 @@ export function useCanRenderer(hostRef, poseRef, { allFlavours, interactive, pre
   const sceneRef = useRef(null);
   const [requested, setRequested] = useState(interactive || preload);
   const [status, setStatus] = useState('loading');
+  const startAllowed = useSceneStartAllowed();
 
   useEffect(() => {
     const needsFirstFrame = status === 'loading';
@@ -15,7 +17,7 @@ export function useCanRenderer(hostRef, poseRef, { allFlavours, interactive, pre
   }, [interactive, preload, status, visible]);
 
   useEffect(() => {
-    if (!requested) return;
+    if (!requested || !startAllowed) return;
     let cancelled = false;
     let awaitingFrame = true;
     let scene;
@@ -90,7 +92,7 @@ export function useCanRenderer(hostRef, poseRef, { allFlavours, interactive, pre
       stopReadinessWatch();
       disposeScene();
     };
-  }, [allFlavours, hostRef, poseRef, requested]);
+  }, [allFlavours, hostRef, poseRef, requested, startAllowed]);
 
   return { sceneRef, status };
 }
