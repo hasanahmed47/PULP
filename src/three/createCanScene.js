@@ -4,6 +4,9 @@ import { createCanModel } from './createCanModel';
 import { media } from '../data/media';
 import { clampBlend } from '../lib/flavourBlend';
 
+const idleTimeout = 2000;
+const idleFallbackDelay = 200;
+
 function configureRenderer(renderer, host) {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -73,7 +76,17 @@ function createShadow(track) {
   return shadow;
 }
 
-export function createCanScene(host, flavours, { onReady, onError }) {
+function waitForIdle() {
+  return new Promise((resolve) => {
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(resolve, { timeout: idleTimeout });
+      return;
+    }
+    window.setTimeout(resolve, idleFallbackDelay);
+  });
+}
+
+export function createCanScene(host, flavours, { onPrepared, onReady, onError }) {
   const renderer = new THREE.WebGLRenderer({
     alpha: true,
     antialias: true,
@@ -167,9 +180,19 @@ export function createCanScene(host, flavours, { onReady, onError }) {
       frame = requestAnimationFrame(render);
     };
 
+    function getLoadedTexture(index) {
+      return textures[index] ?? textures.find(Boolean);
+    }
+
     function applyFlavourBlend() {
       const { from, to, amount } = blend;
-      model.setFlavour(flavours[from], flavours[to], textures[from], textures[to], amount);
+      model.setFlavour(
+        flavours[from],
+        flavours[to],
+        getLoadedTexture(from),
+        getLoadedTexture(to),
+        amount,
+      );
       requestRender();
     }
 
@@ -200,16 +223,29 @@ export function createCanScene(host, flavours, { onReady, onError }) {
         const texture = await loadTexture(source);
         if (texture && !disposed) model.setEndTexture(side, texture);
       });
-      const flavourTextures = flavours.map(async (flavour, index) => {
-        const texture = await loadTexture(flavour.texture);
-        if (texture && !disposed) textures[index] = texture;
-      });
+      async function loadFlavourTexture(index) {
+        const texture = await loadTexture(flavours[index].texture);
+        if (!texture || disposed) return;
 
-      await Promise.all([...endTextures, ...flavourTextures]);
+        textures[index] = texture;
+        if (prepared) applyFlavourBlend();
+      }
+
+      const firstFlavours = [...new Set([blend.from, blend.to])];
+      const laterFlavours = flavours.map((_, index) => index).filter((index) => !firstFlavours.includes(index));
+
+      await Promise.all([...endTextures, ...firstFlavours.map(loadFlavourTexture)]);
       if (disposed) return;
       applyFlavourBlend();
       prepared = true;
       requestRender();
+      onPrepared();
+
+      for (const index of laterFlavours) {
+        await waitForIdle();
+        if (disposed) return;
+        await loadFlavourTexture(index).catch(() => undefined);
+      }
     }
 
     function resize() {

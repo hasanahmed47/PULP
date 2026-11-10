@@ -2,9 +2,11 @@ import { useEffect, useId, useRef } from 'react';
 import { useHoverless } from '../hooks/useHoverless';
 import { defaultLensPosition, lensBounds, usePeekLens } from '../hooks/usePeekLens';
 import { useVisibility } from '../hooks/useVisibility';
+import { useVisibleOnce } from '../hooks/useVisibleOnce';
 import '../styles/PeekCan.css'
 
 const hintViewMargin = '-30% 0px';
+const imageLoadMargin = '1200px 0px';
 
 function getLensPosition(image, event) {
   const matrix = image?.getScreenCTM();
@@ -25,6 +27,7 @@ export function PeekCan({ flavour, selected, onSelect }) {
   const imageRef = useRef(null);
   const hoverless = useHoverless();
   const inView = useVisibility(buttonRef, hintViewMargin);
+  const nearViewport = useVisibleOnce(buttonRef, imageLoadMargin);
   const { lens, placeLens, glideLens, hideLens, hintLens, cancelHint } = usePeekLens();
   const lensPosition = lens ?? defaultLensPosition;
   const peeking = Boolean(lens);
@@ -102,14 +105,18 @@ export function PeekCan({ flavour, selected, onSelect }) {
             <circle cx={lensPosition.x} cy={lensPosition.y} r="150" />
           </clipPath>
         </defs>
-        <image href={flavour.image} width="600" height="1000" />
-        <image
-          className="peek-can__interior"
-          href={flavour.interior}
-          width="600"
-          height="1000"
-          clipPath={`url(#${clipId})`}
-        />
+        {nearViewport && (
+          <>
+            <image href={flavour.image} width="600" height="1000" />
+            <image
+              className="peek-can__interior"
+              href={flavour.interior}
+              width="600"
+              height="1000"
+              clipPath={`url(#${clipId})`}
+            />
+          </>
+        )}
         <circle
           className="peek-can__lens"
           cx={lensPosition.x}

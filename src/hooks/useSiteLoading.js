@@ -1,75 +1,72 @@
 import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import { flavours } from '../data/flavours';
 import { media } from '../data/media';
 import { introTime } from '../lib/loadingTimeline';
 
-const imageSources = [
+const heroSources = [
+  ...Object.values(media.canDetails),
+  flavours[0].texture,
+];
+const backgroundSources = [
   ...Object.values(media.can),
   ...Object.values(media.cutaways),
-  ...Object.values(media.wrap),
   ...Object.values(media.fruit),
   media.mascot,
   media.poster,
 ];
-const preloadCount = imageSources.length + 1;
-const assetTimeout = 12000;
+const fontTimeout = 3000;
 const entranceDuration = 700;
+const loadingDeadline = 8000;
 const introFallbackDelay = introTime * 1000 + 1000;
 
-function preloadImage(source) {
+const prefetchedImages = new Set();
+
+function prefetchImage(source, priority) {
   const image = new Image();
+  image.fetchPriority = priority;
   image.src = source;
-  return image.decode();
+  prefetchedImages.add(image);
+}
+
+function waitForFonts() {
+  return Promise.race([
+    document.fonts.ready,
+    new Promise((resolve) => window.setTimeout(resolve, fontTimeout)),
+  ]);
 }
 
 export function useSiteLoading() {
-  const [assetsSettled, setAssetsSettled] = useState(false);
+  const [fontsSettled, setFontsSettled] = useState(false);
   const [canSettled, setCanSettled] = useState(false);
-  const [rotationSettled, setRotationSettled] = useState(false);
   const [entranceComplete, setEntranceComplete] = useState(false);
+  const [deadlineReached, setDeadlineReached] = useState(false);
   const [introEnded, setIntroEnded] = useState(false);
   const [revealed, setRevealed] = useState(false);
   const [finished, setFinished] = useState(false);
 
-  useEffect(function preloadSiteAssets() {
+  useEffect(function startLoading() {
     let cancelled = false;
-    const timers = new Set();
-    let pending = preloadCount;
+    const timers = [
+      window.setTimeout(() => setEntranceComplete(true), entranceDuration),
+      window.setTimeout(() => setIntroEnded(true), introFallbackDelay),
+      window.setTimeout(() => setDeadlineReached(true), loadingDeadline),
+    ];
 
-    function trackAsset(promise) {
-      let settled = false;
-      const timeout = window.setTimeout(finishAsset, assetTimeout);
-      timers.add(timeout);
+    for (const source of heroSources) prefetchImage(source, 'high');
+    waitForFonts().then(() => {
+      if (!cancelled) setFontsSettled(true);
+    });
 
-      function finishAsset() {
-        if (settled) return;
-        settled = true;
-        window.clearTimeout(timeout);
-        timers.delete(timeout);
-        pending -= 1;
-        if (pending === 0 && !cancelled) setAssetsSettled(true);
-      }
-
-      promise.then(finishAsset, finishAsset);
-    }
-
-    function finishEntrance() {
-      if (!cancelled) setEntranceComplete(true);
-    }
-
-    function finishIntroFallback() {
-      if (!cancelled) setIntroEnded(true);
-    }
-
-    for (const source of imageSources) trackAsset(preloadImage(source));
-    trackAsset(document.fonts.ready);
-    timers.add(window.setTimeout(finishEntrance, entranceDuration));
-    timers.add(window.setTimeout(finishIntroFallback, introFallbackDelay));
-
-    return function cancelPreloading() {
+    return function stopLoading() {
       cancelled = true;
       for (const timer of timers) window.clearTimeout(timer);
     };
   }, []);
+
+  useEffect(function warmBackgroundImages() {
+    if (!finished) return;
+    for (const source of backgroundSources) prefetchImage(source, 'low');
+  }, [finished]);
 
   useLayoutEffect(function syncLoadingState() {
     document.documentElement.dataset.loading = String(!revealed);
@@ -80,10 +77,6 @@ export function useSiteLoading() {
 
   const markCanReady = useCallback(function markCanReady() {
     setCanSettled(true);
-  }, []);
-
-  const markRotationReady = useCallback(function markRotationReady() {
-    setRotationSettled(true);
   }, []);
 
   const endIntro = useCallback(function endIntro() {
@@ -98,7 +91,8 @@ export function useSiteLoading() {
     setFinished(true);
   }, []);
 
-  const ready = assetsSettled && canSettled && rotationSettled && entranceComplete;
+  const heroReady = fontsSettled && canSettled;
+  const ready = entranceComplete && (heroReady || deadlineReached);
 
   return {
     ready,
@@ -106,7 +100,6 @@ export function useSiteLoading() {
     revealed,
     finished,
     markCanReady,
-    markRotationReady,
     endIntro,
     revealSite,
     finishLoading,

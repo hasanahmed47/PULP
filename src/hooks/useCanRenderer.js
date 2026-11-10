@@ -2,7 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import { useSceneStartAllowed } from '../context/SceneStartContext';
 import { flavours } from '../data/flavours';
 
+const textureTimeout = 60000;
 const firstFrameTimeout = 12000;
+const retryDelays = [1000, 2500];
 
 export function useCanRenderer(hostRef, poseRef, { allFlavours, interactive, preload, visible }) {
   const sceneRef = useRef(null);
@@ -20,19 +22,27 @@ export function useCanRenderer(hostRef, poseRef, { allFlavours, interactive, pre
     if (!requested || !startAllowed) return;
     let cancelled = false;
     let awaitingFrame = true;
+    let attempt = 0;
+    let watchdogDelay = textureTimeout;
     let scene;
-    let timeout;
+    let watchdog;
+    let retryTimer;
     setStatus('loading');
 
-    function watchVisibility() {
-      window.clearTimeout(timeout);
+    function armWatchdog(delay) {
+      watchdogDelay = delay;
+      window.clearTimeout(watchdog);
       if (document.hidden || !awaitingFrame || cancelled) return;
-      timeout = window.setTimeout(fail, firstFrameTimeout);
+      watchdog = window.setTimeout(handleFailure, watchdogDelay);
     }
 
-    function stopReadinessWatch() {
-      window.clearTimeout(timeout);
-      document.removeEventListener('visibilitychange', watchVisibility);
+    function rearmWatchdog() {
+      armWatchdog(watchdogDelay);
+    }
+
+    function stopWatching() {
+      window.clearTimeout(watchdog);
+      document.removeEventListener('visibilitychange', rearmWatchdog);
     }
 
     function disposeScene() {
@@ -41,31 +51,43 @@ export function useCanRenderer(hostRef, poseRef, { allFlavours, interactive, pre
       scene = null;
     }
 
-    function fail() {
+    function handleFailure() {
       if (cancelled) return;
-      cancelled = true;
-      stopReadinessWatch();
+      window.clearTimeout(watchdog);
       disposeScene();
+
+      if (attempt < retryDelays.length) {
+        retryTimer = window.setTimeout(loadScene, retryDelays[attempt]);
+        attempt += 1;
+        return;
+      }
+
+      cancelled = true;
+      stopWatching();
       setStatus('failed');
     }
 
     function finishRender() {
       if (cancelled) return;
       awaitingFrame = false;
-      stopReadinessWatch();
+      stopWatching();
       setStatus('ready');
     }
 
     async function loadScene() {
+      armWatchdog(textureTimeout);
+
       try {
         const { createCanScene } = await import('../three/createCanScene');
         if (cancelled) return;
 
         const sceneFlavours = allFlavours ? flavours : [flavours[0]];
-        scene = createCanScene(hostRef.current, sceneFlavours, {
+        const created = createCanScene(hostRef.current, sceneFlavours, {
+          onPrepared: () => armWatchdog(firstFrameTimeout),
           onReady: finishRender,
-          onError: fail,
+          onError: handleFailure,
         });
+        scene = created;
 
         if (cancelled) {
           disposeScene();
@@ -73,23 +95,23 @@ export function useCanRenderer(hostRef, poseRef, { allFlavours, interactive, pre
         }
 
         const pose = poseRef.current;
-        sceneRef.current = scene;
-        scene.setRotation(pose.rotation + pose.spin);
-        scene.setTilt(pose.tilt);
-        scene.setFlavourBlend(pose.blend.from, pose.blend.to, pose.blend.amount);
-        scene.setPointer(...pose.pointer);
+        sceneRef.current = created;
+        created.setRotation(pose.rotation + pose.spin);
+        created.setTilt(pose.tilt);
+        created.setFlavourBlend(pose.blend.from, pose.blend.to, pose.blend.amount);
+        created.setPointer(...pose.pointer);
       } catch {
-        fail();
+        handleFailure();
       }
     }
 
-    document.addEventListener('visibilitychange', watchVisibility);
-    watchVisibility();
+    document.addEventListener('visibilitychange', rearmWatchdog);
     loadScene();
 
     return () => {
       cancelled = true;
-      stopReadinessWatch();
+      window.clearTimeout(retryTimer);
+      stopWatching();
       disposeScene();
     };
   }, [allFlavours, hostRef, poseRef, requested, startAllowed]);

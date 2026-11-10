@@ -7,6 +7,9 @@
   --can-control-target: 44px;
   --drop-duration: 2s;
   --drop-hit: .28; /* share of the drop where the can touches the ground */
+  --can-bleed-top: 0%;
+  --can-bleed-bottom: 0%;
+  --can-ground: 86%;
   width: 100%;
   height: 100%;
   position: relative;
@@ -36,8 +39,7 @@
 .can-scene__drop {
   position: absolute;
   inset: 0;
-  /* Squash and tilt pivot around the can's base, which sits about 86% down the canvas. */
-  transform-origin: 50% 86%;
+  transform-origin: 50% var(--can-ground);
 }
 
 .can-scene[data-controls='true'] .can-scene__drop {
@@ -102,7 +104,7 @@
 
 .can-scene__canvas {
   position: absolute;
-  inset: 0;
+  inset: calc(var(--can-bleed-top) * -1) 0 calc(var(--can-bleed-bottom) * -1);
   visibility: hidden;
   pointer-events: none;
 }

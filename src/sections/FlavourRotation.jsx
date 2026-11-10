@@ -19,7 +19,7 @@ function getFlavourScrollPosition(trigger, index) {
   return destination;
 }
 
-export function FlavourRotation({ onReady }) {
+export function FlavourRotation({ preload = false }) {
   const sectionRef = useRef(null);
   const canRef = useRef(null);
   const triggerRef = useRef(null);
@@ -110,7 +110,7 @@ export function FlavourRotation({ onReady }) {
       </p>
       <div className="rotation-blob organic-shape" aria-hidden="true" />
       <div className="rotation-product">
-        <CanScene ref={canRef} allFlavours preload onReady={onReady} />
+        <CanScene ref={canRef} allFlavours preload={preload} />
       </div>
       <FloatingFruit flavour={flavour.id} className="rotation-fruit--left" />
       <FloatingFruit flavour={flavour.id} className="rotation-fruit--right" />

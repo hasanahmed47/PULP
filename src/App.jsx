@@ -37,7 +37,7 @@ export default function App() {
             <Mascot />
             <HighlightsCarousel />
             <Cutaway onPickFlavour={setSelectedFlavourId} />
-            <FlavourRotation onReady={loading.markRotationReady} />
+            <FlavourRotation preload={loading.finished} />
             <FlavourCards onPickFlavour={setSelectedFlavourId} />
             <PickYourPulp
               selectedId={selectedFlavourId}
