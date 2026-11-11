@@ -20,12 +20,6 @@ const ribbons = {
     aspectRatio: 'xMidYMid slice',
     stripeOffset: { x: -14, y: 0 },
   },
-  mascot: {
-    path: 'M-100 -90 C190 80 45 420 115 670 S480 940 880 1100',
-    viewBox: '0 0 1000 1100',
-    aspectRatio: 'none',
-    stripeOffset: { x: -18, y: 0 },
-  },
   footer: {
     path: 'M-120 650 Q720 -170 1560 650',
     viewBox: '0 0 1440 650',

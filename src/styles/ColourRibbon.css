@@ -52,14 +52,6 @@
   stroke-width: 12;
 }
 
-.colour-ribbon--mascot {
-  left: -6%;
-  top: 0;
-  width: 45%;
-  height: 110%;
-  opacity: .14;
-}
-
 .colour-ribbon--footer {
   left: -4%;
   top: -30px;
@@ -75,11 +67,6 @@
 
   .colour-ribbon--hero-mobile {
     display: block;
-  }
-
-  .colour-ribbon--mascot {
-    width: 70%;
-    left: -30%;
   }
 
   .colour-ribbon--footer {

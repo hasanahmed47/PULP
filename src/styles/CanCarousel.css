@@ -1,0 +1,159 @@
+.can-carousel {
+  --can-slide: .85s;
+  --can-fade: .4s;
+  --can-enter-delay: .2s;
+  --dot-size: 44px;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  overflow: clip;
+}
+
+.can-carousel__cans {
+  position: relative;
+  min-height: 0;
+  margin-block: 4% 1%;
+}
+
+.can-carousel__can {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(var(--shift, 0)) rotate(var(--turn, 0deg)) scale(.86);
+  /* Cans that are leaving fade first so two cans are never both solid. */
+  transition:
+    transform var(--can-slide) cubic-bezier(.65, 0, .35, 1),
+    opacity var(--can-fade) ease;
+}
+
+.can-carousel__can[data-state='before'] {
+  --shift: -40%;
+  --turn: -6deg;
+}
+
+.can-carousel__can[data-state='after'] {
+  --shift: 40%;
+  --turn: 6deg;
+}
+
+.can-carousel__can[data-state='active'] {
+  opacity: 1;
+  transform: none;
+  transition:
+    transform var(--can-slide) cubic-bezier(.22, 1, .36, 1) calc(var(--can-enter-delay) / 4),
+    opacity var(--can-fade) ease var(--can-enter-delay);
+}
+
+.can-carousel__can img {
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  transform-origin: 50% 90%;
+}
+
+.can-carousel__dots {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--count), var(--dot-size));
+  width: calc(var(--count) * var(--dot-size));
+  margin: 0 auto 3%;
+}
+
+.can-carousel__dot {
+  display: grid;
+  place-items: center;
+  width: var(--dot-size);
+  height: var(--dot-size);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+}
+
+.can-carousel__dot::before {
+  content: '';
+  width: 22px;
+  height: 22px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  background: var(--paper);
+  transition: opacity .3s ease, transform .3s ease;
+}
+
+.can-carousel__dot[aria-pressed='true']::before {
+  opacity: 0;
+  transform: scale(.4);
+}
+
+@media (hover: hover) {
+  .can-carousel__dot:not([aria-pressed='true']):hover::before {
+    transform: scale(1.15);
+  }
+}
+
+/* The eye sits over the active dot and glides sideways when the can changes. */
+.can-carousel__eye {
+  position: absolute;
+  inset: 0 auto 0 0;
+  display: grid;
+  place-items: center;
+  width: var(--dot-size);
+  pointer-events: none;
+  transform: translateX(calc(var(--index) * 100%));
+  transition: transform .7s cubic-bezier(.65, 0, .35, 1);
+}
+
+.can-carousel__eye svg {
+  width: 40px;
+  height: 24px;
+  overflow: visible;
+  animation: can-eye-blink .4s ease-in-out .25s;
+}
+
+.can-carousel__eye path {
+  fill: var(--paper);
+  stroke: var(--ink);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.can-carousel__iris {
+  fill: var(--flavour-colour);
+  stroke: var(--ink);
+  stroke-width: 1.5;
+}
+
+.can-carousel__pupil {
+  fill: var(--ink);
+}
+
+@keyframes can-eye-blink {
+  45% {
+    transform: scaleY(.08);
+  }
+}
+
+@media (max-width: 1023px) {
+  .can-carousel__cans {
+    margin-block: 6% 2%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .can-carousel {
+    --can-slide: .01s;
+    --can-fade: .01s;
+    --can-enter-delay: 0s;
+  }
+
+  .can-carousel__eye {
+    transition: none;
+  }
+
+  .can-carousel__eye svg {
+    animation: none;
+  }
+}

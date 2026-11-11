@@ -3,41 +3,28 @@ import { flavours } from '../data/flavours';
 import { media } from '../data/media';
 import { introTime } from '../lib/loadingTimeline';
 
-const placeholderSource = flavours[0].image;
 const heroSources = [
   ...Object.values(media.canDetails),
   flavours[0].texture,
 ];
 const backgroundSources = [
-  media.mascot,
-  media.firstTileDesktopPoster,
-  media.firstTileMobilePoster,
+  ...Object.values(media.can),
+  ...Object.values(media.cutaways),
+  ...Object.values(media.fruit),
   media.poster,
-  media.lifestylePoster,
-  ...flavours.flatMap((flavour) => [
-    media.cutaways[flavour.id],
-    media.fruit[flavour.id],
-  ]),
-  ...flavours.map((flavour) => media.can[flavour.id]),
 ];
-const backgroundConcurrency = 2;
 const fontTimeout = 3000;
 const entranceDuration = 700;
-const softDeadline = 2200;
 const loadingDeadline = 8000;
 const introFallbackDelay = introTime * 1000 + 1000;
 
 const prefetchedImages = new Set();
 
 function prefetchImage(source, priority) {
-  return new Promise((resolve) => {
-    const image = new Image();
-    image.fetchPriority = priority;
-    image.onload = () => resolve(true);
-    image.onerror = () => resolve(false);
-    image.src = source;
-    prefetchedImages.add(image);
-  });
+  const image = new Image();
+  image.fetchPriority = priority;
+  image.src = source;
+  prefetchedImages.add(image);
 }
 
 function waitForFonts() {
@@ -51,8 +38,6 @@ export function useSiteLoading() {
   const [fontsSettled, setFontsSettled] = useState(false);
   const [canSettled, setCanSettled] = useState(false);
   const [entranceComplete, setEntranceComplete] = useState(false);
-  const [placeholderReady, setPlaceholderReady] = useState(false);
-  const [softDeadlineReached, setSoftDeadlineReached] = useState(false);
   const [deadlineReached, setDeadlineReached] = useState(false);
   const [introEnded, setIntroEnded] = useState(false);
   const [revealed, setRevealed] = useState(false);
@@ -63,13 +48,9 @@ export function useSiteLoading() {
     const timers = [
       window.setTimeout(() => setEntranceComplete(true), entranceDuration),
       window.setTimeout(() => setIntroEnded(true), introFallbackDelay),
-      window.setTimeout(() => setSoftDeadlineReached(true), softDeadline),
       window.setTimeout(() => setDeadlineReached(true), loadingDeadline),
     ];
 
-    prefetchImage(placeholderSource, 'high').then((loaded) => {
-      if (!cancelled && loaded) setPlaceholderReady(true);
-    });
     for (const source of heroSources) prefetchImage(source, 'high');
     waitForFonts().then(() => {
       if (!cancelled) setFontsSettled(true);
@@ -83,19 +64,7 @@ export function useSiteLoading() {
 
   useEffect(function warmBackgroundImages() {
     if (!finished) return;
-    let cancelled = false;
-    const queue = [...backgroundSources];
-
-    async function worker() {
-      while (!cancelled && queue.length > 0) {
-        await prefetchImage(queue.shift(), 'low');
-      }
-    }
-
-    for (let lane = 0; lane < backgroundConcurrency; lane += 1) worker();
-    return function stopWarming() {
-      cancelled = true;
-    };
+    for (const source of backgroundSources) prefetchImage(source, 'low');
   }, [finished]);
 
   useLayoutEffect(function syncLoadingState() {
@@ -121,8 +90,7 @@ export function useSiteLoading() {
     setFinished(true);
   }, []);
 
-  const canVisible = canSettled || (softDeadlineReached && placeholderReady);
-  const heroReady = fontsSettled && canVisible;
+  const heroReady = fontsSettled && canSettled;
   const ready = entranceComplete && (heroReady || deadlineReached);
 
   return {

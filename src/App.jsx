@@ -1,11 +1,10 @@
 import { useState } from 'react';
-import { MediaStartProvider } from './context/MediaStartContext';
 import { SceneStartProvider } from './context/SceneStartContext';
 import { ScrollProvider } from './context/ScrollContext';
 import { AnchorLink } from './components/AnchorLink';
 import { Header } from './components/Header';
 import { Hero } from './sections/Hero';
-import { Mascot } from './sections/Mascot';
+import { GoodInsides } from './sections/GoodInsides';
 import HighlightsCarousel from './sections/HighlightsCarousel';
 import { Cutaway } from './sections/Cutaway';
 import { FlavourRotation } from './sections/FlavourRotation';
@@ -24,39 +23,37 @@ export default function App() {
   return (
     <ScrollProvider suspended={!loading.revealed}>
       <SceneStartProvider allowed={loading.introEnded}>
-        <MediaStartProvider allowed={loading.revealed}>
-          <div
-            className="site-content"
-            inert={!loading.revealed}
-            aria-hidden={!loading.revealed}
-          >
-            <AnchorLink className="skip-link" href="#flavours">
-              Skip to flavours
-            </AnchorLink>
-            <Header />
-            <main>
-              <Hero onReady={loading.markCanReady} revealed={loading.revealed} />
-              <Mascot />
-              <HighlightsCarousel />
-              <Cutaway onPickFlavour={setSelectedFlavourId} />
-              <FlavourRotation preload={loading.finished} />
-              <FlavourCards onPickFlavour={setSelectedFlavourId} />
-              <PickYourPulp
-                selectedId={selectedFlavourId}
-                onSelectFlavour={setSelectedFlavourId}
-              />
-            </main>
-            <Footer />
-          </div>
-          {!loading.finished && (
-            <LoadingScreen
-              ready={loading.ready}
-              onIntroEnd={loading.endIntro}
-              onReveal={loading.revealSite}
-              onComplete={loading.finishLoading}
+        <div
+          className="site-content"
+          inert={!loading.revealed}
+          aria-hidden={!loading.revealed}
+        >
+          <AnchorLink className="skip-link" href="#flavours">
+            Skip to flavours
+          </AnchorLink>
+          <Header />
+          <main>
+            <Hero onReady={loading.markCanReady} revealed={loading.revealed} />
+            <GoodInsides />
+            <HighlightsCarousel />
+            <Cutaway onPickFlavour={setSelectedFlavourId} />
+            <FlavourRotation preload={loading.finished} />
+            <FlavourCards onPickFlavour={setSelectedFlavourId} />
+            <PickYourPulp
+              selectedId={selectedFlavourId}
+              onSelectFlavour={setSelectedFlavourId}
             />
-          )}
-        </MediaStartProvider>
+          </main>
+          <Footer />
+        </div>
+        {!loading.finished && (
+          <LoadingScreen
+            ready={loading.ready}
+            onIntroEnd={loading.endIntro}
+            onReveal={loading.revealSite}
+            onComplete={loading.finishLoading}
+          />
+        )}
       </SceneStartProvider>
     </ScrollProvider>
   );
