@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+import { media } from '../data/media';
 import HighlightsCarousel from './HighlightsCarousel';
 
 vi.mock('../hooks/useReducedMotion', () => ({ useReducedMotion: () => true }));
@@ -71,7 +72,7 @@ it('uses custom slides, wraps across five items and survives list shrink in Stri
 it('uses the existing fallback when slides are omitted or empty', () => {
   const { container, rerender } = render(<HighlightsCarousel />);
   expect(container.querySelectorAll('.hl__slide')).toHaveLength(3);
-  expect(container.querySelector('.hl__slide.is-active').textContent).toBe('UNLEASH THE BOLD.');
+  expect(container.querySelector('.hl__slide.is-active video').getAttribute('src')).toBe(media.firstTileDesktopFilm);
   rerender(<HighlightsCarousel slides={[]} />);
   expect(container.querySelectorAll('.hl__slide')).toHaveLength(3);
 });

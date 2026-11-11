@@ -9,6 +9,10 @@ for (const reducedMotion of ['no-preference', 'reduce']) {
 
     const hero = page.locator('#top');
     const intro = hero.locator('.hero-intro');
+    // The shorter loader can finish before the hero entrance animations do.
+    await expect(hero.locator('.hero-line__text').first()).toHaveCSS(
+      'transform', 'none', { timeout: 8000 },
+    );
     const initialIntro = await intro.boundingBox();
 
     await hero.getByRole('link', { name: 'Explore flavours' }).click();
@@ -56,3 +60,40 @@ for (const reducedMotion of ['no-preference', 'reduce']) {
     await page.screenshot({ path: testInfo.outputPath(`back-to-top-${reducedMotion}.png`) });
   });
 }
+
+// Regression: the mobile browser's visible height can grow when its toolbar
+// collapses. A pinned hero must not leave an exposed blank strip underneath.
+test('pinned hero covers the visible viewport without an extra spacer gap', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('.loading-screen')).toHaveCount(0, { timeout: 20000 });
+
+  const hero = page.locator('.hero');
+  const start = await hero.evaluate((element) => {
+    const spacer = element.closest('.pin-spacer');
+    return spacer.getBoundingClientRect().top + window.scrollY;
+  });
+
+  await page.evaluate((top) => window.scrollTo({ top, behavior: 'instant' }), start + 3);
+  await expect(hero).toHaveCSS('position', 'fixed');
+
+  const bounds = await hero.evaluate((element) => {
+    const rect = element.getBoundingClientRect();
+    return {
+      top: rect.top,
+      bottom: rect.bottom,
+      viewport: window.visualViewport?.height || window.innerHeight,
+    };
+  });
+
+  expect(bounds.top).toBeLessThanOrEqual(2);
+  expect(bounds.bottom).toBeGreaterThanOrEqual(bounds.viewport - 2);
+
+  const seam = await hero.evaluate((element) => {
+    const spacer = element.closest('.pin-spacer');
+    const next = spacer?.nextElementSibling;
+    return next ? next.getBoundingClientRect().top - spacer.getBoundingClientRect().bottom : null;
+  });
+  expect(seam).not.toBeNull();
+  expect(Math.abs(seam)).toBeLessThanOrEqual(2);
+});

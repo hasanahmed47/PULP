@@ -3,6 +3,7 @@
 @import './tokens.css';
 
 :root {
+  --viewport-chrome: calc(100lvh - 100svh);
   font-family: var(--font-sans);
   color: var(--ink);
   background: var(--paper);

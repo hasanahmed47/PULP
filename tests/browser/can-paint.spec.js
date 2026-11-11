@@ -27,9 +27,22 @@ test('can frames survive idle pin transitions and offscreen resizing', async ({ 
   await expect(page.locator('.loading-screen')).toHaveCount(0, { timeout: 25000 });
   const viewport = page.viewportSize();
 
+  // The loading screen no longer waits for WebGL. Make sure the renderer
+  // has produced its first frame before checking retained canvas pixels.
+  const heroScene = page.locator('.hero .can-scene');
+  await expect(heroScene).toHaveAttribute('data-ready', 'true', { timeout: 30000 });
+  await expect(heroScene).toHaveAttribute('data-drop', 'landed', { timeout: 10000 });
+
   for (const selector of ['.hero', '.rotation-section']) {
     const section = page.locator(selector);
     const canvas = section.locator('canvas');
+    if (selector === '.rotation-section') {
+      // Lazy-initialized rotation scene starts as it enters the viewport.
+      await section.scrollIntoViewIfNeeded();
+      await expect(section.locator('.can-scene')).toHaveAttribute(
+        'data-ready', 'true', { timeout: 30000 },
+      );
+    }
     const range = await section.evaluate((element) => {
       const spacer = element.closest('.pin-spacer');
       const start = spacer.getBoundingClientRect().top + window.scrollY;

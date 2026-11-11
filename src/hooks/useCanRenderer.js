@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSceneStartAllowed } from '../context/SceneStartContext';
 import { flavours } from '../data/flavours';
+import { loadCanSceneModule } from '../three/loadCanScene';
 
 const textureTimeout = 60000;
 const firstFrameTimeout = 12000;
@@ -78,7 +79,7 @@ export function useCanRenderer(hostRef, poseRef, { allFlavours, interactive, pre
       armWatchdog(textureTimeout);
 
       try {
-        const { createCanScene } = await import('../three/createCanScene');
+        const { createCanScene } = await loadCanSceneModule();
         if (cancelled) return;
 
         const sceneFlavours = allFlavours ? flavours : [flavours[0]];

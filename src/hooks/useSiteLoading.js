@@ -2,6 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { flavours } from '../data/flavours';
 import { media } from '../data/media';
 import { introTime } from '../lib/loadingTimeline';
+import { loadCanSceneModule } from '../three/loadCanScene';
 
 const heroSources = [
   ...Object.values(media.canDetails),
@@ -16,7 +17,8 @@ const backgroundSources = [
 ];
 const fontTimeout = 3000;
 const entranceDuration = 700;
-const loadingDeadline = 8000;
+const sceneModuleDelay = 300;
+const loadingDeadline = 10000;
 const introFallbackDelay = introTime * 1000 + 1000;
 
 const prefetchedImages = new Set();
@@ -50,6 +52,7 @@ export function useSiteLoading() {
       window.setTimeout(() => setEntranceComplete(true), entranceDuration),
       window.setTimeout(() => setIntroEnded(true), introFallbackDelay),
       window.setTimeout(() => setDeadlineReached(true), loadingDeadline),
+      window.setTimeout(loadCanSceneModule, sceneModuleDelay),
     ];
 
     for (const source of heroSources) prefetchImage(source, 'high');

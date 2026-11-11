@@ -4,7 +4,7 @@
   --hero-bottom-offset: 35px;
   --hero-bottom-height: calc(var(--hero-copy-size) * 3);
   --hero-product-gap: 28px;
-  height: 100svh;
+  height: 100lvh;
   min-height: 560px;
   position: relative;
   overflow: clip;
@@ -64,7 +64,7 @@
   position: absolute;
   left: 57%;
   top: 13%;
-  bottom: calc(var(--hero-bottom-offset) + var(--hero-bottom-height) + var(--hero-product-gap));
+  bottom: calc(var(--hero-bottom-offset) + var(--hero-bottom-height) + var(--hero-product-gap) + var(--viewport-chrome));
   width: 36%;
   z-index: 2;
   /* Lets the flavour picker choose one row or two from the width it is given. */
@@ -73,7 +73,7 @@
 
 .hero-bottom {
   position: absolute;
-  bottom: var(--hero-bottom-offset);
+  bottom: calc(var(--hero-bottom-offset) + var(--viewport-chrome));
   left: var(--page-padding);
   right: var(--page-padding);
   z-index: 4;
@@ -136,7 +136,7 @@
     --hero-cta-height: 60px;
     --hero-second-size: clamp(48px, 14.4vw, 74px);
     --hero-copy-reserve: 60px;
-    height: 100svh;
+    height: 100lvh;
     min-height: 640px;
   }
 
@@ -156,7 +156,7 @@
   .hero-product {
     left: 14%;
     top: calc(var(--hero-top) + var(--hero-title-height) + var(--hero-cta-height));
-    bottom: var(--hero-copy-reserve);
+    bottom: calc(var(--hero-copy-reserve) + var(--viewport-chrome));
     width: 80%;
     height: auto;
   }
@@ -187,7 +187,7 @@
   }
 
   .hero-bottom {
-    bottom: 23px;
+    bottom: calc(23px + var(--viewport-chrome));
     gap: 10px;
     align-items: end;
   }

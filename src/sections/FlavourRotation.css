@@ -1,6 +1,6 @@
 .rotation-section {
   position: relative;
-  height: 100svh;
+  height: 100lvh;
   min-height: 560px;
   background: var(--paper);
   overflow: clip;
@@ -65,7 +65,7 @@
 
 .flavour-dots {
   position: absolute;
-  bottom: 5%;
+  bottom: calc(5% + var(--viewport-chrome));
   left: 50%;
   transform: translateX(-50%);
   z-index: 5;
@@ -161,6 +161,6 @@
   }
 
   .flavour-dots {
-    bottom: 6%;
+    bottom: calc(6% + var(--viewport-chrome));
   }
 }
