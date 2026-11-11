@@ -8,6 +8,9 @@ import '@fontsource/dm-sans/latin-600.css';
 import 'lenis/dist/lenis.css';
 import './styles.css';
 import App from './App';
+import { loadCanSceneModule } from './three/loadCanScene';
+
+loadCanSceneModule();
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

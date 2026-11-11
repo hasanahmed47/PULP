@@ -22,10 +22,10 @@ async function expectNoHorizontalOverflow(page) {
   expect(overflow).toBeLessThanOrEqual(1);
 }
 
-test('cold loading reveals the site before slow WebGL textures finish', async ({ page }) => {
+test('slow can textures do not hold the loader and a placeholder covers the gap', async ({ page }) => {
   let releaseTexture;
   const textureGate = new Promise((resolve) => { releaseTexture = resolve; });
-  await page.route('**/blood-orange-wrap.png', async (route) => {
+  await page.route('**/blood-orange-wrap.webp', async (route) => {
     await textureGate;
     await route.continue();
   });
@@ -33,15 +33,16 @@ test('cold loading reveals the site before slow WebGL textures finish', async ({
   try {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await page.addStyleTag({ content: '.loading-screen { transition: none !important; }' });
-    await expect(page.locator('.loading-screen')).toHaveCount(0, { timeout: 20000 });
+    await expect(page.locator('.site-content')).toHaveAttribute('inert');
+    await expect(page.locator('.loading-screen')).toHaveCount(0, { timeout: 15000 });
     await expect(page.locator('.site-content')).not.toHaveAttribute('inert');
-    await expect(page.locator('.hero .can-scene')).toHaveAttribute('data-ready', 'false');
-    await expect(page.locator('.hero .can-scene__fallback')).toHaveCount(1);
+    await expect(page.locator('.hero .can-scene__fallback')).toBeVisible();
+    await expect(page.locator('.hero .can-scene')).not.toHaveAttribute('data-ready', 'true');
   } finally {
     releaseTexture();
   }
 
-  await expect(page.locator('.hero .can-scene')).toHaveAttribute('data-ready', 'true', { timeout: 30000 });
+  await expect(page.locator('.hero .can-scene')).toHaveAttribute('data-ready', 'true', { timeout: 20000 });
   await expect(page.locator('.hero .can-scene__fallback')).toHaveCount(0);
 });
 
@@ -50,7 +51,7 @@ test('manual can rotation works with reduced motion', async ({ page, isMobile })
   await openWebsite(page);
   const can = page.locator('.hero .can-scene');
   await can.scrollIntoViewIfNeeded();
-  await expect(can).toHaveAttribute('data-ready', 'true', { timeout: 30000 });
+  await expect(can).toHaveAttribute('data-ready', 'true');
   const canvas = can.locator('canvas');
   const before = await canvas.screenshot();
   const bounds = await can.boundingBox();
@@ -177,7 +178,7 @@ test('blocked storage and unavailable WebGL still allow shopping', async ({ page
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await openWebsite(page);
   await expect(page.locator('.hero .can-scene__fallback')).toBeVisible();
-  await expect(page.locator('.hero .can-scene')).toHaveAttribute('aria-busy', 'false', { timeout: 15000 });
+  await expect(page.locator('.hero .can-scene')).toHaveAttribute('aria-busy', 'false');
   await page.getByRole('button', { name: 'Add to bag' }).click();
   await expect(page.locator('.pulp-shop__bag-count')).toContainText('1 can');
   await page.emulateMedia({ reducedMotion: 'no-preference' });

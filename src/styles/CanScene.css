@@ -96,6 +96,11 @@
   object-fit: contain;
   transform: rotate(-7deg);
   pointer-events: none;
+  transition: opacity .35s ease;
+}
+
+.can-scene__fallback[data-leaving='true'] {
+  opacity: 0;
 }
 
 .can-scene__fallback[data-unavailable='true'] {
@@ -106,11 +111,14 @@
   position: absolute;
   inset: calc(var(--can-bleed-top) * -1) 0 calc(var(--can-bleed-bottom) * -1);
   visibility: hidden;
+  opacity: 0;
   pointer-events: none;
+  transition: opacity .35s ease;
 }
 
 .can-scene[data-ready='true'] .can-scene__canvas {
   visibility: visible;
+  opacity: 1;
 }
 
 .can-scene canvas {

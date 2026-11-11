@@ -25,12 +25,28 @@ const CAN_VIEWS = [
   { id: 'bottom', label: 'Bottom', tilt: -Math.PI * 0.42 },
 ];
 
+const FALLBACK_LEAVE_DELAY = 500;
 const VIEW_ANIMATION = { duration: 0.45, ease: 'power2.out' };
 
 function getSpinHint(status, canSpin) {
   if (canSpin) return '↔ Drag to spin · 360°';
   if (status === 'failed') return '360° view unavailable';
   return 'Preparing 360° view';
+}
+
+function useFallbackVisibility(ready) {
+  const [mounted, setMounted] = useState(true);
+
+  useEffect(function unmountAfterCrossfade() {
+    if (!ready) {
+      setMounted(true);
+      return;
+    }
+    const timer = window.setTimeout(() => setMounted(false), FALLBACK_LEAVE_DELAY);
+    return () => window.clearTimeout(timer);
+  }, [ready]);
+
+  return mounted;
 }
 
 function CanSceneControls({ controlsRef, hint, helpId, canSpin, view, onViewChange }) {
@@ -104,7 +120,8 @@ export function CanScene({
   const flavour = flavours[activeFlavourIndex];
   const failed = status === 'failed';
   const ready = status === 'ready';
-  const fallbackStatus = useCanFallback(fallbackRef, flavour.image, failed);
+  const showFallback = useFallbackVisibility(ready);
+  const fallbackStatus = useCanFallback(fallbackRef, flavour.image, showFallback);
   const settled = ready || (failed && fallbackStatus !== 'loading');
   const canSpin = interactive && ready;
   const hasDrop = dropRun != null;
@@ -220,10 +237,11 @@ export function CanScene({
         {hasDrop && <CanSplash layer="back" />}
 
         <div className="can-scene__drop" onAnimationEnd={finishCanDrop}>
-          {failed && (
+          {showFallback && (
             <img
               ref={fallbackRef}
               className="can-scene__fallback"
+              data-leaving={ready}
               data-unavailable={fallbackStatus === 'unavailable'}
               src={flavour.image}
               alt=""

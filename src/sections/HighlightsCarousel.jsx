@@ -1,12 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { media } from '../data/media';
+import { useMediaStartAllowed } from '../context/MediaStartContext';
 import { useCarouselDrag } from '../hooks/useCarouselDrag';
 import { useMobileViewport } from '../hooks/useMobileViewport';
 import { useReducedMotion } from '../hooks/useReducedMotion';
+import { useVisibleOnce } from '../hooks/useVisibleOnce';
 import { useVisibility } from '../hooks/useVisibility';
 import './HighlightsCarousel.css';
 
 const FAILED_VIDEO_DELAY_MS = 2500;
+const MEDIA_LOAD_MARGIN = '2500px 0px';
 const MIN_VISIBLE_RATIO = 0.2;
 const VISIBILITY_THRESHOLDS = [0, MIN_VISIBLE_RATIO, 0.5, 0.8, 1];
 
@@ -56,6 +59,9 @@ export default function HighlightsCarousel({ slides: suppliedSlides = defaultSli
   const progressBars = useRef([]);
   const previousIndex = useRef(0);
   const visible = useVisibility(stageRef);
+  const mediaAllowed = useMediaStartAllowed();
+  const mediaNear = useVisibleOnce(stageRef, MEDIA_LOAD_MARGIN);
+  const mediaEnabled = mediaAllowed && mediaNear;
   const running = playing && inView && visible && !filmOpen;
   const controlsVisible = inView && visible && !filmOpen;
 
@@ -187,7 +193,9 @@ export default function HighlightsCarousel({ slides: suppliedSlides = defaultSli
   }
 
   function preloadFor(slideIndex) {
+    if (!mediaEnabled) return 'none';
     if (slideIndex === index && cardsRevealed) return 'auto';
+    if (!inView) return 'none';
     const distance = (slideIndex - index + slides.length) % slides.length;
     if (distance === 0 || distance === 1 || distance === slides.length - 1) return 'metadata';
     return 'none';
@@ -243,8 +251,8 @@ export default function HighlightsCarousel({ slides: suppliedSlides = defaultSli
                     videos.current[slideIndex] = element;
                     return () => { videos.current[slideIndex] = null; };
                   }}
-                  src={slide.videoSrc}
-                  poster={slide.posterSrc}
+                  src={mediaEnabled ? slide.videoSrc : undefined}
+                  poster={mediaEnabled ? slide.posterSrc : undefined}
                   muted
                   playsInline
                   disablePictureInPicture
