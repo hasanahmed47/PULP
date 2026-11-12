@@ -1,67 +1,35 @@
-
-/* ============================================
-   GOOD INSIDES — SECTION FOUNDATION
-   ============================================ */
-
 .spot {
   --spot-pad: clamp(24px, 4svh, 48px);
   --spot-line: 2px;
-  --spot-mono: ui-monospace, 'SFMono-Regular',
-    Menlo, Consolas, 'Liberation Mono', monospace;
-
-  --spot-tint: color-mix(
-    in srgb,
-    var(--flavour-colour) 14%,
-    var(--paper)
-  );
-
+  --spot-mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace;
+  /* A soft wash of the selected can's colour. */
+  --spot-tint: color-mix(in srgb, var(--flavour-colour) 14%, var(--paper));
   --spot-tint-fade: .7s;
   --spot-swap: .2s;
-
   padding-block: var(--spot-pad);
   background-color: var(--spot-tint);
   color: var(--ink);
-
-  transition:
-    background-color var(--spot-tint-fade) ease;
+  transition: background-color var(--spot-tint-fade) ease;
 }
 
 .spot button:focus-visible {
   outline-offset: -5px;
 }
 
-
-/* ============================================
-   MAIN CARD LAYOUT
-   ============================================ */
+/* ---- Card: cells are separated by the card's ink background showing through the grid gaps ---- */
 
 .spot__card {
   display: grid;
-  grid-template-columns:
-    minmax(0, 2fr)
-    minmax(0, 3fr)
-    minmax(0, 2fr);
-
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr) minmax(0, 2fr);
   gap: var(--spot-line);
-
-  height: clamp(
-    560px,
-    calc(100svh - 2 * var(--spot-pad)),
-    780px
-  );
-
+  height: clamp(560px, calc(100svh - 2 * var(--spot-pad)), 780px);
   max-width: 1500px;
   margin-inline: auto;
-
   border: var(--spot-line) solid var(--ink);
   border-radius: 24px;
-
   background: var(--ink);
   overflow: clip;
-
-  font:
-    400 max(11px, min(1.25vw, 1.9svh))
-    / 1.35 var(--spot-mono);
+  font: 400 max(11px, min(1.25vw, 1.9svh)) / 1.35 var(--spot-mono);
 }
 
 .spot__info,
@@ -73,45 +41,28 @@
 }
 
 .spot__info {
-  grid-template-rows:
-    minmax(0, .88fr)
-    minmax(0, 1fr)
-    minmax(0, 1.02fr);
+  grid-template-rows: minmax(0, .88fr) minmax(0, 1fr) minmax(0, 1.02fr);
 }
 
 .spot__side {
-  grid-template-rows:
-    minmax(0, 1.88fr)
-    minmax(0, 1.02fr);
+  grid-template-rows: minmax(0, 1.88fr) minmax(0, 1.02fr);
 }
 
 .spot__bottom {
-  grid-template-columns:
-    minmax(0, 1.5fr)
-    minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
 }
-
-
-/* ============================================
-   SHARED CARD CELLS
-   ============================================ */
 
 .spot__cell {
   min-width: 0;
   min-height: 0;
-
   padding: 1.3em 1.6em;
   overflow: clip;
-
   background-color: var(--spot-tint);
-
-  transition:
-    background-color var(--spot-tint-fade) ease;
+  transition: background-color var(--spot-tint-fade) ease;
 }
 
 .spot__heading {
   margin: 0 0 .8em;
-
   font-size: 1.1em;
   font-weight: 700;
   letter-spacing: .04em;
@@ -120,22 +71,17 @@
 
 .spot__eyebrow {
   margin: 0;
-
   font-size: .95em;
   letter-spacing: .1em;
   text-transform: uppercase;
 }
 
 .spot__eyebrow span {
-  display: block;
   letter-spacing: .06em;
   text-transform: none;
 }
 
-
-/* ============================================
-   FLAVOUR CONTENT TRANSITIONS
-   ============================================ */
+/* ---- Cross-fading copy: old text leaves first, then the new text rises in ---- */
 
 .spot-stack {
   display: grid;
@@ -143,88 +89,40 @@
 
 .spot-stack__layer {
   grid-area: 1 / 1;
-
   opacity: 0;
   transform: translateY(.6em);
-
-  transition:
-    opacity var(--spot-swap) ease,
-    transform var(--spot-swap) ease;
+  transition: opacity var(--spot-swap) ease, transform var(--spot-swap) ease;
 }
 
 .spot-stack__layer[data-active='true'] {
   opacity: 1;
   transform: none;
-
   transition-duration: .4s;
   transition-delay: var(--spot-swap);
 }
 
-
-/* ============================================
-   FLAVOUR NAME & RATING
-   ============================================ */
+/* ---- Name and rating ---- */
 
 .spot__name {
   container-type: inline-size;
-
   display: grid;
   place-items: center;
   text-align: center;
 }
 
 .spot__title {
-  --longest: 12;
-
   margin: 0;
-
   color: #fffaf0;
   font-family: var(--font-display);
-
-  font-size: min(
-    4.6em,
-    calc(100cqw / (var(--longest) * .6))
-  );
-
+  font-size: min(4.6em, calc(100cqw / (var(--longest) * .6)));
   font-weight: 900;
   line-height: .88;
   letter-spacing: .01em;
   text-transform: uppercase;
-
   -webkit-text-stroke: .1em var(--ink);
   paint-order: stroke fill;
-
-  text-shadow:
-    .04em .06em 0 var(--ink);
+  text-shadow: .04em .06em 0 var(--ink);
 }
-
-/* Heading length is supplied by JSX data-longest.
-   All sizing decisions remain in CSS. */
-
-.spot__title[data-longest='1']  { --longest: 1; }
-.spot__title[data-longest='2']  { --longest: 2; }
-.spot__title[data-longest='3']  { --longest: 3; }
-.spot__title[data-longest='4']  { --longest: 4; }
-.spot__title[data-longest='5']  { --longest: 5; }
-.spot__title[data-longest='6']  { --longest: 6; }
-.spot__title[data-longest='7']  { --longest: 7; }
-.spot__title[data-longest='8']  { --longest: 8; }
-.spot__title[data-longest='9']  { --longest: 9; }
-.spot__title[data-longest='10'] { --longest: 10; }
-.spot__title[data-longest='11'] { --longest: 11; }
-.spot__title[data-longest='12'] { --longest: 12; }
-.spot__title[data-longest='13'] { --longest: 13; }
-.spot__title[data-longest='14'] { --longest: 14; }
-.spot__title[data-longest='15'] { --longest: 15; }
-.spot__title[data-longest='16'] { --longest: 16; }
-.spot__title[data-longest='17'] { --longest: 17; }
-.spot__title[data-longest='18'] { --longest: 18; }
-.spot__title[data-longest='19'] { --longest: 19; }
-.spot__title[data-longest='20'] { --longest: 20; }
-.spot__title[data-longest='21'] { --longest: 21; }
-.spot__title[data-longest='22'] { --longest: 22; }
-.spot__title[data-longest='23'] { --longest: 23; }
-.spot__title[data-longest='24'] { --longest: 24; }
 
 .spot__title span {
   display: block;
@@ -234,28 +132,25 @@
   display: flex;
   align-items: center;
   justify-content: center;
-
   gap: .8em;
   margin: .9em 0 0;
 }
 
+/* Secondary product copy is exclusive to the compact mobile/tablet header.
+   On desktop, preserve the original editorial heading and review treatment. */
+.spot__kicker,
+.spot__description {
+  display: none;
+}
 
-/* ============================================
-   NUTRITION INFORMATION
-   ============================================ */
+/* ---- Nutrition ---- */
 
 .spot__nutrition {
   display: grid;
   gap: .5em;
-
   margin: 0;
   padding-top: .8em;
-
-  border-top: 1px solid color-mix(
-    in srgb,
-    var(--ink) 14%,
-    transparent
-  );
+  border-top: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
 }
 
 .spot__nutrition div {
@@ -273,10 +168,7 @@
   font-variant-numeric: tabular-nums;
 }
 
-
-/* ============================================
-   INGREDIENTS & BENEFITS
-   ============================================ */
+/* ---- Ingredients and perks ---- */
 
 .spot__ingredients p {
   margin: 0;
@@ -287,11 +179,9 @@
 .spot__perks {
   display: grid;
   align-content: space-evenly;
-
   gap: .6em;
   margin: 0;
   padding-inline: 1em;
-
   list-style: none;
 }
 
@@ -301,47 +191,33 @@
   gap: .6em;
 }
 
-/* Lucide React icons */
-
 .spot__perks svg {
   flex: none;
-
   width: 2em;
   height: 2em;
-
-  stroke-width: 1.6;
 }
 
 .spot__perks span {
-  font-size: clamp(11px, .75em, 14px);
+  font-size: .64em;
   font-weight: 700;
   letter-spacing: .04em;
   line-height: 1.25;
   text-transform: uppercase;
 }
 
-
-/* ============================================
-   FLAVOUR PICKER
-   ============================================ */
+/* ---- Flavour picker ---- */
 
 .spot__picker {
   display: grid;
-  grid-template-rows:
-    auto minmax(0, 1fr);
-
+  grid-template-rows: auto minmax(0, 1fr);
   gap: 1em;
   text-align: center;
 }
 
 .spot__picks {
   display: grid;
-
-  grid-template-columns:
-    repeat(2, minmax(0, 1fr));
-
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   grid-auto-rows: minmax(0, 1fr);
-
   gap: .8em 1em;
   min-height: 0;
 }
@@ -349,14 +225,11 @@
 .spot-pick {
   display: grid;
   grid-template-rows: auto auto;
-
   align-content: start;
   justify-items: center;
-
   gap: .5em;
   min-width: 0;
   padding: 0;
-
   border: 0;
   background: none;
   color: inherit;
@@ -365,31 +238,20 @@
 
 .spot-pick__disc {
   position: relative;
-
   width: min(100%, 8.4em);
   aspect-ratio: 1;
-
   border: 2px solid var(--ink);
   border-radius: 50%;
-
-  transition:
-    background-color .3s ease,
-    border-color .3s ease,
-    transform .3s ease;
+  transition: background-color .3s ease, border-color .3s ease, transform .3s ease;
 }
 
 .spot-pick__disc img {
   position: absolute;
   inset: 9% 0;
-
   margin: auto;
-
   width: auto;
   height: 82%;
-  object-fit: contain;
-
-  transition:
-    transform .4s cubic-bezier(.22, 1, .36, 1);
+  transition: transform .4s cubic-bezier(.22, 1, .36, 1);
 }
 
 .spot-pick__name {
@@ -397,17 +259,9 @@
   line-height: 1.25;
 }
 
-
-/* Selected flavour */
-
 .spot-pick[aria-pressed='true'] .spot-pick__disc {
   border-color: var(--flavour-accent);
-
-  background-color: color-mix(
-    in srgb,
-    var(--flavour-colour) 22%,
-    var(--paper)
-  );
+  background-color: color-mix(in srgb, var(--flavour-colour) 22%, var(--paper));
 }
 
 .spot-pick[aria-pressed='true'] .spot-pick__disc img {
@@ -418,27 +272,17 @@
   font-weight: 700;
 }
 
-
-/* Hover interactions */
-
 @media (hover: hover) {
-  .spot-pick:not([aria-pressed='true']):hover
-  .spot-pick__disc {
+  .spot-pick:not([aria-pressed='true']):hover .spot-pick__disc {
     transform: translateY(-.25em);
   }
 }
 
-
-/* ============================================
-   PERFECT SERVE
-   ============================================ */
+/* ---- Perfect serve ---- */
 
 .spot__serve {
   display: grid;
-
-  grid-template-rows:
-    minmax(0, 1fr) auto;
-
+  grid-template-rows: minmax(0, 1fr) auto;
   padding: 0;
 }
 
@@ -450,30 +294,23 @@
 
 .spot__serve-body {
   margin-top: .7em;
-
-  animation:
-    spot-serve-in .45s
-    cubic-bezier(.22, 1, .36, 1)
-    both;
+  animation: spot-serve-in .45s cubic-bezier(.22, 1, .36, 1) both;
 }
 
 .spot__serve-body h3 {
   margin: 0 0 .35em;
-
   font-size: 1.25em;
   text-transform: uppercase;
 }
 
 .spot__serve-body p {
   margin: 0;
-
   font-size: .95em;
   line-height: 1.45;
 }
 
 .spot__serve-body .spot__garnish {
   margin-top: .7em;
-
   font-size: .8em;
   letter-spacing: .06em;
   text-transform: uppercase;
@@ -487,171 +324,305 @@
   content: ':';
 }
 
-
-/* ============================================
-   SHAKE BUTTON
-   ============================================ */
-
 .spot__shake {
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   gap: 1em;
   padding: 1em 1.6em;
-
   border: 0;
-  border-top:
-    var(--spot-line) solid var(--ink);
-
-  background-color: color-mix(
-    in srgb,
-    var(--flavour-colour) 45%,
-    var(--spot-tint)
-  );
-
+  border-top: var(--spot-line) solid var(--ink);
+  background-color: color-mix(in srgb, var(--flavour-colour) 45%, var(--spot-tint));
   color: var(--ink);
-
-  font:
-    700 1.15em / 1.35
-    var(--spot-mono);
-
+  font: 700 1.15em / 1.35 var(--spot-mono);
   letter-spacing: .04em;
   text-transform: uppercase;
-
-  transition:
-    background-color .3s ease;
+  transition: background-color .3s ease;
 }
 
 .spot__shake:active {
-  background-color: color-mix(
-    in srgb,
-    var(--flavour-colour) 70%,
-    var(--spot-tint)
-  );
+  background-color: color-mix(in srgb, var(--flavour-colour) 70%, var(--spot-tint));
 }
 
 @media (hover: hover) {
   .spot__shake:hover {
-    background-color: color-mix(
-      in srgb,
-      var(--flavour-colour) 70%,
-      var(--spot-tint)
-    );
+    background-color: color-mix(in srgb, var(--flavour-colour) 70%, var(--spot-tint));
   }
 }
-
-
-/* ============================================
-   SERVE CONTENT ANIMATION
-   ============================================ */
 
 @keyframes spot-serve-in {
   from {
     opacity: 0;
     transform: translateY(.6em);
   }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
-
-/* ============================================
-   TABLET & MOBILE LAYOUT
-   ============================================ */
+/* ---- Responsive editorial composition: compact, not a long desktop stack ---- */
 
 @media (max-width: 1023px) {
   .spot {
-    padding-block: clamp(32px, 8vw, 64px);
+    padding-block: clamp(16px, 3vw, 28px);
   }
 
   .spot__card {
-    grid-template-columns: minmax(0, 1fr);
-
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     height: auto;
-    max-width: 640px;
-
-    font-size: clamp(13px, 3.5vw, 16px);
+    max-width: 720px;
+    font-size: clamp(13px, 1.7vw, 15px);
+    border-radius: 18px;
   }
 
+  /* Flatten desktop columns only at the responsive breakpoint. */
   .spot__info,
   .spot__side {
     display: contents;
   }
 
-  /* Mobile section order */
-
+  /* Heading and can share a short, editorial opening row. */
   .spot__name {
-    order: 1;
+    grid-area: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    position: relative;
+    padding: 1.25em 1.1em;
+    text-align: left;
+  }
+
+  /* The little underline connects the headline to the selected can colour. */
+  .spot__name::after {
+    content: '';
+    position: absolute;
+    left: 1.1em;
+    bottom: .95em;
+    width: 2.6em;
+    height: 3px;
+    border-radius: 99px;
+    background: var(--flavour-colour);
+  }
+
+  .spot__name .spot-stack,
+  .spot__name .spot-stack__layer {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .spot__kicker {
+    display: block;
+    margin: 0 0 .8em;
+    font-size: .68em;
+    font-weight: 700;
+    letter-spacing: .13em;
+    line-height: 1.25;
+    text-transform: uppercase;
+  }
+
+  /* Explicit type sizes are more dependable than narrow-container calculations. */
+  .spot__title {
+    font-size: clamp(32px, 5.7vw, 58px);
+    line-height: .91;
+    letter-spacing: -.02em;
+    -webkit-text-stroke: .055em var(--ink);
+    text-shadow: .035em .055em 0 var(--ink);
+  }
+
+  .spot[data-flavour='passionfruit-yuzu'] .spot__title {
+    font-size: clamp(23px, 4.4vw, 44px);
+  }
+
+  .spot[data-flavour='blueberry'] .spot__title {
+    font-size: clamp(27px, 4.7vw, 46px);
+  }
+
+  .spot__description {
+    display: block;
+    max-width: 21ch;
+    margin: .95em 0 0;
+    font: 500 .88em / 1.35 var(--font-body, 'DM Sans', sans-serif);
+  }
+
+  .spot__rating {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: .15em .65em;
+    margin-top: .9em;
+    padding-bottom: 1em;
+    font-size: .78em;
+    line-height: 1.3;
   }
 
   .spot__stage {
-    order: 2;
+    grid-area: 1 / 2;
+    height: clamp(238px, 43vw, 340px);
+    padding: .7em .35em .3em;
+    --dot-size: clamp(28px, 7.5vw, 40px);
   }
 
+  .spot__stage .can-carousel__cans {
+    margin-block: 2% 1%;
+  }
+
+  .spot__stage .can-carousel__eye svg {
+    width: min(40px, calc(var(--dot-size) - 3px));
+  }
+
+  /* Four flavours in one row, instead of the tall 2x2 mobile grid. */
   .spot__picker {
-    order: 3;
+    grid-area: 2 / 1 / 3 / -1;
+    grid-template-rows: auto auto;
+    gap: .75em;
+    padding: 1em .8em 1.1em;
   }
 
-  .spot__serve {
-    order: 4;
+  .spot__picks {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-auto-rows: auto;
+    gap: .5em;
   }
 
+  .spot-pick {
+    gap: .45em;
+  }
+
+  .spot-pick__disc {
+    width: min(100%, 6em);
+  }
+
+  .spot-pick__name {
+    font-size: .8em;
+    line-height: 1.2;
+  }
+
+  /* Product information comes before the optional serving tips. */
   .spot__facts {
-    order: 5;
+    grid-area: 3 / 1 / 4 / -1;
+    padding: 1em 1.35em 1.1em;
+  }
+
+  .spot__heading {
+    margin-bottom: .5em;
+  }
+
+  .spot__nutrition {
+    gap: .35em;
+    padding-top: .65em;
   }
 
   .spot__bottom {
-    order: 6;
+    grid-area: 4 / 1 / 5 / -1;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
   }
 
-  /* Can presentation */
-
-  .spot__stage {
-    height: clamp(380px, 100vw, 560px);
+  .spot__ingredients {
+    padding: 1em 1.35em;
   }
 
-  /* Flavour selection */
-
-  .spot__picker {
-    padding-block: 1.6em;
+  .spot__perks {
+    gap: .45em;
+    padding: .75em .85em;
   }
 
-  .spot__picks {
-    grid-template-columns:
-      repeat(4, minmax(0, 1fr));
-
-    gap: .6em;
+  .spot__perks svg {
+    width: 1.8em;
+    height: 1.8em;
   }
 
-  /* Serving details */
+  .spot__perks span {
+    font-size: .75em;
+  }
+
+  .spot__serve {
+    grid-area: 5 / 1 / 6 / -1;
+  }
 
   .spot__serve-copy {
-    padding-block: 1.4em;
+    padding: 1em 1.35em;
+  }
+
+  .spot__serve-body {
+    margin-top: .45em;
+  }
+
+  .spot__serve-body .spot__garnish {
+    margin-top: .4em;
+  }
+
+  .spot__shake {
+    padding: .9em 1.3em;
   }
 }
-
-
-/* ============================================
-   SMALL MOBILE SCREENS
-   ============================================ */
 
 @media (max-width: 560px) {
-  .spot__picks {
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
+  .spot__name {
+    padding: 1.2em .95em 1.5em;
+  }
 
-    gap: 1.2em 1em;
+  .spot__name::after {
+    left: .95em;
+    bottom: .8em;
+  }
+
+  .spot__title {
+    font-size: clamp(31px, 9vw, 43px);
+  }
+
+  .spot[data-flavour='passionfruit-yuzu'] .spot__title {
+    font-size: clamp(19px, 5.65vw, 28px);
+  }
+
+  .spot[data-flavour='blueberry'] .spot__title {
+    font-size: clamp(23px, 6.7vw, 34px);
+  }
+
+  .spot__kicker {
+    font-size: .67em;
+  }
+
+  .spot__description {
+    font-size: .83em;
+  }
+
+  .spot__rating {
+    font-size: .72em;
+  }
+
+  .spot__bottom {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Keep all three badges, but use one compact strip on phones. */
+  .spot__perks {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: center;
+    gap: .3em;
+    padding: .7em .5em;
+  }
+
+  .spot__perks li {
+    flex-direction: column;
+    gap: .35em;
+    text-align: center;
+  }
+
+  .spot__perks span {
+    font-size: .75em;
   }
 }
 
+@media (max-width: 360px) {
+  .spot__stage {
+    height: 225px;
+  }
 
-/* ============================================
-   REDUCED MOTION ACCESSIBILITY
-   ============================================ */
+  .spot__picker {
+    padding-inline: .55em;
+  }
+
+  .spot__title {
+    -webkit-text-stroke: .065em var(--ink);
+  }
+}
 
 @media (prefers-reduced-motion: reduce) {
   .spot {

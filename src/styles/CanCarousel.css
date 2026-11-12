@@ -1,10 +1,15 @@
 .can-carousel {
-  --can-slide: .85s;
-  --can-fade: .4s;
-  --can-enter-delay: .2s;
+  --can-slide: 0.85s;
+  --can-fade: 0.4s;
+  --can-enter-delay: 0.2s;
+
   --dot-size: 44px;
+  --eye-slide: 0.7s;
+  --slide-ease: cubic-bezier(0.65, 0, 0.35, 1);
+
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
+  min-width: 0;
   overflow: clip;
 }
 
@@ -17,124 +22,210 @@
 .can-carousel__can {
   position: absolute;
   inset: 0;
+
   display: flex;
   justify-content: center;
+
   opacity: 0;
   pointer-events: none;
-  transform: translateX(var(--shift, 0)) rotate(var(--turn, 0deg)) scale(.86);
-  /* Cans that are leaving fade first so two cans are never both solid. */
+
+  transform:
+    translateX(var(--shift, 0%))
+    rotate(var(--turn, 0deg))
+    scale(0.86);
+
   transition:
-    transform var(--can-slide) cubic-bezier(.65, 0, .35, 1),
+    transform var(--can-slide) var(--slide-ease),
     opacity var(--can-fade) ease;
 }
 
+/* Previous can exits to the left. */
 .can-carousel__can[data-state='before'] {
   --shift: -40%;
   --turn: -6deg;
 }
 
+/* Next can waits on the right. */
 .can-carousel__can[data-state='after'] {
   --shift: 40%;
   --turn: 6deg;
 }
 
+/* Active can enters smoothly. */
 .can-carousel__can[data-state='active'] {
   opacity: 1;
   transform: none;
+
   transition:
-    transform var(--can-slide) cubic-bezier(.22, 1, .36, 1) calc(var(--can-enter-delay) / 4),
+    transform var(--can-slide)
+      cubic-bezier(0.22, 1, 0.36, 1)
+      calc(var(--can-enter-delay) / 4),
     opacity var(--can-fade) ease var(--can-enter-delay);
 }
 
 .can-carousel__can img {
-  height: 100%;
+  display: block;
   width: auto;
+  height: 100%;
   max-width: 100%;
+
   object-fit: contain;
   transform-origin: 50% 90%;
 }
 
+/* =========================================
+   FLAVOUR NAVIGATION
+   ========================================= */
+
 .can-carousel__dots {
   position: relative;
-  display: grid;
-  grid-template-columns: repeat(var(--count), var(--dot-size));
-  width: calc(var(--count) * var(--dot-size));
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: max-content;
   margin: 0 auto 3%;
 }
 
 .can-carousel__dot {
   display: grid;
   place-items: center;
+
+  flex: 0 0 var(--dot-size);
+
   width: var(--dot-size);
   height: var(--dot-size);
   padding: 0;
+
   border: 0;
-  background: none;
+  background: transparent;
   color: var(--ink);
+
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .can-carousel__dot::before {
   content: '';
+
   width: 22px;
   height: 22px;
+
   border: 2px solid currentColor;
   border-radius: 50%;
   background: var(--paper);
-  transition: opacity .3s ease, transform .3s ease;
+
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
 }
 
+/* Hide the dot behind the active eye. */
 .can-carousel__dot[aria-pressed='true']::before {
   opacity: 0;
-  transform: scale(.4);
+  transform: scale(0.4);
 }
 
-@media (hover: hover) {
+.can-carousel__dot:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: -3px;
+  border-radius: 50%;
+}
+
+@media (hover: hover) and (pointer: fine) {
   .can-carousel__dot:not([aria-pressed='true']):hover::before {
     transform: scale(1.15);
   }
 }
 
-/* The eye sits over the active dot and glides sideways when the can changes. */
+/* =========================================
+   LUCIDE EYE INDICATOR
+   ========================================= */
+
 .can-carousel__eye {
   position: absolute;
   inset: 0 auto 0 0;
+
   display: grid;
   place-items: center;
+
   width: var(--dot-size);
+  height: var(--dot-size);
+
   pointer-events: none;
-  transform: translateX(calc(var(--index) * 100%));
-  transition: transform .7s cubic-bezier(.65, 0, .35, 1);
+  z-index: 1;
+
+  transform: translateX(0);
+
+  transition:
+    transform var(--eye-slide) var(--slide-ease);
 }
 
-.can-carousel__eye svg {
+/* The eye follows the selected flavour. */
+.can-carousel__eye[data-index='0'] {
+  transform: translateX(0);
+}
+
+.can-carousel__eye[data-index='1'] {
+  transform: translateX(100%);
+}
+
+.can-carousel__eye[data-index='2'] {
+  transform: translateX(200%);
+}
+
+.can-carousel__eye[data-index='3'] {
+  transform: translateX(300%);
+}
+
+/* Lucide React Eye icon */
+.can-carousel__eye-icon {
+  display: block;
+
   width: 40px;
   height: 24px;
+
   overflow: visible;
-  animation: can-eye-blink .4s ease-in-out .25s;
+  color: var(--ink);
+
+  stroke: currentColor;
+  stroke-width: 1.75;
+
+  transform-origin: center;
+  animation: can-eye-blink 0.4s ease-in-out 0.25s;
 }
 
-.can-carousel__eye path {
+/* Eye shape */
+.can-carousel__eye-icon path {
   fill: var(--paper);
   stroke: var(--ink);
-  stroke-width: 2;
-  stroke-linejoin: round;
 }
 
-.can-carousel__iris {
-  fill: var(--flavour-colour);
+/* Coloured iris */
+.can-carousel__eye-icon circle {
+  fill: var(--flavour-colour, #ed252a);
   stroke: var(--ink);
-  stroke-width: 1.5;
 }
 
-.can-carousel__pupil {
-  fill: var(--ink);
-}
+/* =========================================
+   EYE BLINK ANIMATION
+   ========================================= */
 
 @keyframes can-eye-blink {
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+
   45% {
-    transform: scaleY(.08);
+    transform: scaleY(0.08);
   }
 }
+
+/* =========================================
+   TABLET & MOBILE
+   ========================================= */
 
 @media (max-width: 1023px) {
   .can-carousel__cans {
@@ -142,18 +233,23 @@
   }
 }
 
+/* =========================================
+   ACCESSIBILITY
+   ========================================= */
+
 @media (prefers-reduced-motion: reduce) {
   .can-carousel {
-    --can-slide: .01s;
-    --can-fade: .01s;
+    --can-slide: 0.01s;
+    --can-fade: 0.01s;
     --can-enter-delay: 0s;
+    --eye-slide: 0s;
   }
 
-  .can-carousel__eye {
-    transition: none;
-  }
-
-  .can-carousel__eye svg {
+  .can-carousel__eye-icon {
     animation: none;
+  }
+
+  .can-carousel__dot::before {
+    transition: none;
   }
 }

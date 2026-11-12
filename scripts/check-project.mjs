@@ -35,7 +35,7 @@ for (const flavour of flavours) {
 console.log('PASS: all four cutaway dimensions and alpha silhouettes match their intact cans.');
 
 const app = await read('src/App.jsx');
-const order = ['Hero', 'Mascot', 'HighlightsCarousel', 'Cutaway', 'FlavourRotation', 'FlavourCards', 'PickYourPulp', 'Footer'];
+const order = ['Hero', 'GoodInsides', 'HighlightsCarousel', 'Cutaway', 'FlavourRotation', 'FlavourCards', 'PickYourPulp', 'Footer'];
 const positions = order.map((section) => app.search(new RegExp(`<${section}\\b`)));
 assert(positions.every((position, index) => position >= 0 && (!index || position > positions[index - 1])), 'Section order has changed.');
 console.log('PASS: all eight sections are in the required order.');
