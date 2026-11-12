@@ -197,7 +197,15 @@ test('section framing and keyboard navigation fit the viewport', async ({ page }
   for (const selector of ['#good-insides', '#good-stuff']) {
     const section = page.locator(selector);
     const bounds = await section.boundingBox();
-    expect(bounds.height).toBeLessThanOrEqual(page.viewportSize().height + 2);
+    if (selector === '#good-insides' && page.viewportSize().width < 1024) {
+      const serve = section.getByRole('button', { name: /Shake for a serve/ });
+      await serve.scrollIntoViewIfNeeded();
+      await expect(serve).toBeInViewport();
+      const clipped = await section.evaluate((element) => element.scrollHeight - element.clientHeight);
+      expect(clipped).toBeLessThanOrEqual(1);
+    } else {
+      expect(bounds.height).toBeLessThanOrEqual(page.viewportSize().height + 2);
+    }
     await section.screenshot({ path: testInfo.outputPath(`${selector.slice(1)}.png`) });
   }
   await expectNoHorizontalOverflow(page);

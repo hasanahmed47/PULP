@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef } from 'react';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import { gsap } from '../lib/animation';
-import '../styles/ColourRibbon.css'
+import '../styles/ColourRibbon.css';
 
 const drawDuration = 1.6;
 const drawEase = 'power2.inOut';

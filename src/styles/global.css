@@ -48,11 +48,11 @@ a {
 button,
 a,
 [tabindex] {
-  outline-offset: 7px;
+  outline-offset: 0.4375rem;
 }
 
 :focus-visible {
-  outline: 3px solid var(--blue);
+  outline: 0.1875rem solid var(--blue);
 }
 
 [tabindex='-1']:focus {
@@ -80,7 +80,7 @@ img {
 .headline {
   font-family: var(--font-display);
   font-weight: 900;
-  font-size: clamp(76px, 9.3vw, 150px);
+  font-size: clamp(4.75rem, 9.3vw, 9.375rem);
   line-height: .89;
   letter-spacing: -.027em;
   text-transform: uppercase;
@@ -116,15 +116,15 @@ img {
 }
 
 .pill {
-  border: 1px solid currentColor;
-  border-radius: 999px;
+  border: 0.0625rem solid currentColor;
+  border-radius: var(--radius-pill);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 18px;
-  min-height: 48px;
-  padding: 11px 25px;
-  font-size: 15px;
+  gap: 1.125rem;
+  min-height: 3rem;
+  padding: 0.6875rem 1.5625rem;
+  font-size: 0.9375rem;
   font-weight: 500;
   transition: background-color .2s, color .2s;
 }
@@ -140,7 +140,7 @@ img {
   transform: rotate(-12deg);
 }
 
-@media (max-width: 767px) {
+@media (max-width: 47.9375rem) {
   .headline {
     font-size: 16vw;
   }

@@ -59,26 +59,21 @@ export function useLoadingTimeline({
     });
   }, []);
 
-  
-const fireDueMilestones = useCallback(function fireDueMilestones() {
-  const { time } = clock.current;
+  const fireDueMilestones = useCallback(function fireDueMilestones() {
+    const { time } = clock.current;
 
-  if (!introEnded.current && time >= introTime) {
-    introEnded.current = true;
-    onIntroEnd();
-  }
+    if (!introEnded.current && time >= introTime) {
+      introEnded.current = true;
+      onIntroEnd();
+    }
 
-  if (!revealed.current && time >= revealTime) {
-    revealed.current = true;
-
-    // Mark the loading screen as exiting before revealing the site.
-    const loadingScreen = stageRef.current?.closest('.loading-screen');
-    loadingScreen?.setAttribute('data-exiting', 'true');
-
-    onReveal();
-  }
-}, [onIntroEnd, onReveal]);
-
+    if (!revealed.current && time >= revealTime) {
+      revealed.current = true;
+      const loadingScreen = stageRef.current?.closest('.loading-screen');
+      loadingScreen?.setAttribute('data-exiting', 'true');
+      onReveal();
+    }
+  }, [onIntroEnd, onReveal]);
 
   useLayoutEffect(function trackViewport() {
     const stage = stageRef.current;

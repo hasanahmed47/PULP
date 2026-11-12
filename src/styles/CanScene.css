@@ -1,19 +1,17 @@
 .can-scene {
-  --can-controls-space: 64px;
-  --can-controls-compact-space: 40px;
-  --can-controls-height: 52px;
-  --can-controls-compact-height: 32px;
+  --can-controls-space: 4rem;
+  --can-controls-compact-space: 2.5rem;
+  --can-controls-height: 3.25rem;
+  --can-controls-compact-height: 2rem;
   --can-controls-duration: .2s;
-  --can-control-target: 44px;
+  --can-control-target: 2.75rem;
   --drop-duration: 2s;
-  --drop-hit: .28; /* share of the drop where the can touches the ground */
-  --can-bleed-top: 0%;
-  --can-bleed-bottom: 0%;
+  --drop-hit: .28;
   --can-ground: 86%;
   width: 100%;
   height: 100%;
   position: relative;
-  border-radius: 24px;
+  border-radius: 1.5rem;
 }
 
 .can-scene[data-controls='true'] {
@@ -32,18 +30,21 @@
 }
 
 .can-scene__stage {
-  position: absolute;
-  inset: 0;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  isolation: isolate;
+}
+
+.can-scene[data-controls='true'] .can-scene__stage {
+  height: calc(100% - var(--can-controls-space));
 }
 
 .can-scene__drop {
   position: absolute;
   inset: 0;
+  z-index: 1;
   transform-origin: 50% var(--can-ground);
-}
-
-.can-scene[data-controls='true'] .can-scene__drop {
-  bottom: var(--can-controls-space);
 }
 
 .can-scene[data-drop='waiting'] .can-scene__drop {
@@ -109,7 +110,7 @@
 
 .can-scene__canvas {
   position: absolute;
-  inset: calc(var(--can-bleed-top) * -1) 0 calc(var(--can-bleed-bottom) * -1);
+  inset: 0;
   visibility: hidden;
   opacity: 0;
   pointer-events: none;
@@ -139,18 +140,18 @@
   width: max-content;
   max-width: 100%;
   min-height: var(--can-controls-height);
-  padding: 3px 8px;
-  border: 1px solid var(--color-border);
-  border-radius: 999px;
+  padding: 0.1875rem 0.5rem;
+  border: 0.0625rem solid var(--color-border);
+  border-radius: var(--radius-pill);
   background: var(--color-paper);
   cursor: default;
 }
 
 .can-scene__hint {
   color: var(--color-ink);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 600;
-  line-height: 16px;
+  line-height: 1rem;
   letter-spacing: .06em;
   text-transform: uppercase;
   white-space: nowrap;
@@ -161,18 +162,18 @@
 .can-scene__views {
   display: flex;
   padding-left: calc(var(--space-sm) / 2);
-  border-left: 1px solid var(--color-border);
+  border-left: 0.0625rem solid var(--color-border);
 }
 
 .can-scene__view {
   min-width: var(--can-control-target);
   min-height: var(--can-control-target);
-  padding: 0 8px;
+  padding: 0 0.5rem;
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: transparent;
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: .04em;
   transition: color var(--can-controls-duration), background-color var(--can-controls-duration);
@@ -192,8 +193,8 @@
 }
 
 .can-scene__view:focus-visible {
-  outline: 2px solid var(--blue);
-  outline-offset: 2px;
+  outline: 0.125rem solid var(--blue);
+  outline-offset: 0.125rem;
 }
 
 @media (hover: hover) {
@@ -207,8 +208,8 @@
   color: var(--color-muted);
 }
 
-@container can-scene (max-width: 420px) {
-  .can-scene__drop {
+@container can-scene (max-width: 26.25rem) {
+  .can-scene__stage {
     --can-controls-space: var(--can-controls-compact-space);
   }
 

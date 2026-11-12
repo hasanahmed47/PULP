@@ -12,7 +12,6 @@ const flavours = [
 ];
 const flavourIds = new Set(flavours.map((flavour) => flavour.id));
 
-/** Wires the component to the real reducer, so these tests cover UI and rules together. */
 function Harness({ initial, onStatus }) {
   const [state, dispatch] = useReducer(
     (current, action) => updateShoppingBag(current, action, flavourIds),
@@ -39,7 +38,7 @@ function setup(initial = { items: {}, wishlist: [] }) {
 const tab = (name) => screen.getByRole('tab', { name });
 
 describe('ShoppingBag', () => {
-  // Not automatic unless Vitest runs with `globals: true`.
+
   afterEach(cleanup);
 
   it('shows the empty message for the active tab', async () => {
@@ -59,7 +58,7 @@ describe('ShoppingBag', () => {
     expect(tab(/wishlist/i).getAttribute('aria-selected')).toBe('true');
     expect(document.activeElement).toBe(tab(/wishlist/i));
 
-    await user.keyboard('{ArrowRight}'); // wraps to the first tab
+    await user.keyboard('{ArrowRight}');
     expect(document.activeElement).toBe(tab(/your bag/i));
 
     await user.keyboard('{End}');

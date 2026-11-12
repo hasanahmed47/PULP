@@ -1,11 +1,9 @@
-
 import { useLoadingTimeline } from '../hooks/useLoadingTimeline';
 import { useMobileViewport } from '../hooks/useMobileViewport';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
 import '../styles/LoadingScreen.css';
 
-// Each index represents one letter in the PULP logo.
 const GLYPH_INDICES = [0, 1, 2, 3];
 
 export function LoadingScreen({

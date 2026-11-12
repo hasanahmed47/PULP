@@ -24,11 +24,11 @@
 
 @keyframes fruit-drift {
   from {
-    transform: translateY(-8px) rotate(-3deg);
+    transform: translateY(-0.5rem) rotate(-3deg);
   }
 
   to {
-    transform: translateY(9px) rotate(3deg);
+    transform: translateY(0.5625rem) rotate(3deg);
   }
 }
 

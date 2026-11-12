@@ -10,7 +10,7 @@ await fs.mkdir(source, { recursive: true });
 const files = (await fs.readdir(source)).filter((name) => /\.(png|jpe?g|tiff?|webp)$/i.test(name));
 
 if (!files.length) {
-  console.log('Add your images to public/media/source first. Use the filenames in ASSET_PROMPTS.md.');
+  console.log('Add your images to public/media/source first. Use the filenames in src/data/media.js.');
   process.exit(0);
 }
 

@@ -1,5 +1,5 @@
 import { flavours } from '../data/flavours';
-import '../styles/HeroFlavourPicker.css'
+import '../styles/HeroFlavourPicker.css';
 
 export function HeroFlavourPicker({ selectedIndex, onSelect, ref }) {
   return (

@@ -1,8 +1,8 @@
 .spot {
-  --spot-pad: clamp(24px, 4svh, 48px);
-  --spot-line: 2px;
-  --spot-mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace;
-  /* A soft wash of the selected can's colour. */
+  --spot-pad: clamp(1.5rem, 4svh, 3rem);
+  --spot-line: 0.125rem;
+  --spot-mono: var(--font-mono);
+
   --spot-tint: color-mix(in srgb, var(--flavour-colour) 14%, var(--paper));
   --spot-tint-fade: .7s;
   --spot-swap: .2s;
@@ -13,23 +13,21 @@
 }
 
 .spot button:focus-visible {
-  outline-offset: -5px;
+  outline-offset: -0.3125rem;
 }
-
-/* ---- Card: cells are separated by the card's ink background showing through the grid gaps ---- */
 
 .spot__card {
   display: grid;
   grid-template-columns: minmax(0, 2fr) minmax(0, 3fr) minmax(0, 2fr);
   gap: var(--spot-line);
-  height: clamp(560px, calc(100svh - 2 * var(--spot-pad)), 780px);
-  max-width: 1500px;
+  height: clamp(35rem, calc(100svh - 2 * var(--spot-pad)), 48.75rem);
+  max-width: 93.75rem;
   margin-inline: auto;
   border: var(--spot-line) solid var(--ink);
-  border-radius: 24px;
+  border-radius: 1.5rem;
   background: var(--ink);
   overflow: clip;
-  font: 400 max(11px, min(1.25vw, 1.9svh)) / 1.35 var(--spot-mono);
+  font: 400 max(0.6875rem, min(1.25vw, 1.9svh)) / 1.35 var(--spot-mono);
 }
 
 .spot__info,
@@ -81,8 +79,6 @@
   text-transform: none;
 }
 
-/* ---- Cross-fading copy: old text leaves first, then the new text rises in ---- */
-
 .spot-stack {
   display: grid;
 }
@@ -101,8 +97,6 @@
   transition-delay: var(--spot-swap);
 }
 
-/* ---- Name and rating ---- */
-
 .spot__name {
   container-type: inline-size;
   display: grid;
@@ -111,8 +105,9 @@
 }
 
 .spot__title {
+  --longest: 6;
   margin: 0;
-  color: #fffaf0;
+  color: var(--cream);
   font-family: var(--font-display);
   font-size: min(4.6em, calc(100cqw / (var(--longest) * .6)));
   font-weight: 900;
@@ -128,6 +123,18 @@
   display: block;
 }
 
+.spot__title[data-flavour='passionfruit-yuzu'] {
+  --longest: 11;
+}
+
+.spot__title[data-flavour='blueberry'] {
+  --longest: 9;
+}
+
+.spot__title[data-flavour='lime-basil'] {
+  --longest: 5;
+}
+
 .spot__rating {
   display: flex;
   align-items: center;
@@ -136,21 +143,17 @@
   margin: .9em 0 0;
 }
 
-/* Secondary product copy is exclusive to the compact mobile/tablet header.
-   On desktop, preserve the original editorial heading and review treatment. */
 .spot__kicker,
 .spot__description {
   display: none;
 }
-
-/* ---- Nutrition ---- */
 
 .spot__nutrition {
   display: grid;
   gap: .5em;
   margin: 0;
   padding-top: .8em;
-  border-top: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
+  border-top: 0.0625rem solid color-mix(in srgb, var(--ink) 14%, transparent);
 }
 
 .spot__nutrition div {
@@ -167,8 +170,6 @@
 .spot__nutrition dd {
   font-variant-numeric: tabular-nums;
 }
-
-/* ---- Ingredients and perks ---- */
 
 .spot__ingredients p {
   margin: 0;
@@ -205,8 +206,6 @@
   text-transform: uppercase;
 }
 
-/* ---- Flavour picker ---- */
-
 .spot__picker {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
@@ -240,7 +239,7 @@
   position: relative;
   width: min(100%, 8.4em);
   aspect-ratio: 1;
-  border: 2px solid var(--ink);
+  border: 0.125rem solid var(--ink);
   border-radius: 50%;
   transition: background-color .3s ease, border-color .3s ease, transform .3s ease;
 }
@@ -277,8 +276,6 @@
     transform: translateY(-.25em);
   }
 }
-
-/* ---- Perfect serve ---- */
 
 .spot__serve {
   display: grid;
@@ -357,28 +354,24 @@
   }
 }
 
-/* ---- Responsive editorial composition: compact, not a long desktop stack ---- */
-
-@media (max-width: 1023px) {
+@media (max-width: 63.9375rem) {
   .spot {
-    padding-block: clamp(16px, 3vw, 28px);
+    padding-block: clamp(1rem, 3vw, 1.75rem);
   }
 
   .spot__card {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     height: auto;
-    max-width: 720px;
-    font-size: clamp(13px, 1.7vw, 15px);
-    border-radius: 18px;
+    max-width: 45rem;
+    font-size: clamp(0.8125rem, 1.7vw, 0.9375rem);
+    border-radius: 1.125rem;
   }
 
-  /* Flatten desktop columns only at the responsive breakpoint. */
   .spot__info,
   .spot__side {
     display: contents;
   }
 
-  /* Heading and can share a short, editorial opening row. */
   .spot__name {
     grid-area: 1 / 1;
     display: flex;
@@ -390,15 +383,14 @@
     text-align: left;
   }
 
-  /* The little underline connects the headline to the selected can colour. */
   .spot__name::after {
     content: '';
     position: absolute;
     left: 1.1em;
     bottom: .95em;
     width: 2.6em;
-    height: 3px;
-    border-radius: 99px;
+    height: 0.1875rem;
+    border-radius: 6.1875rem;
     background: var(--flavour-colour);
   }
 
@@ -418,9 +410,8 @@
     text-transform: uppercase;
   }
 
-  /* Explicit type sizes are more dependable than narrow-container calculations. */
   .spot__title {
-    font-size: clamp(32px, 5.7vw, 58px);
+    font-size: clamp(2rem, 5.7vw, 3.625rem);
     line-height: .91;
     letter-spacing: -.02em;
     -webkit-text-stroke: .055em var(--ink);
@@ -428,11 +419,11 @@
   }
 
   .spot[data-flavour='passionfruit-yuzu'] .spot__title {
-    font-size: clamp(23px, 4.4vw, 44px);
+    font-size: clamp(1.4375rem, 4.4vw, 2.75rem);
   }
 
   .spot[data-flavour='blueberry'] .spot__title {
-    font-size: clamp(27px, 4.7vw, 46px);
+    font-size: clamp(1.6875rem, 4.7vw, 2.875rem);
   }
 
   .spot__description {
@@ -454,9 +445,9 @@
 
   .spot__stage {
     grid-area: 1 / 2;
-    height: clamp(238px, 43vw, 340px);
+    height: clamp(14.875rem, 43vw, 21.25rem);
     padding: .7em .35em .3em;
-    --dot-size: clamp(28px, 7.5vw, 40px);
+    --dot-size: clamp(1.75rem, 7.5vw, 2.5rem);
   }
 
   .spot__stage .can-carousel__cans {
@@ -464,10 +455,9 @@
   }
 
   .spot__stage .can-carousel__eye svg {
-    width: min(40px, calc(var(--dot-size) - 3px));
+    width: min(2.5rem, calc(var(--dot-size) - 0.1875rem));
   }
 
-  /* Four flavours in one row, instead of the tall 2x2 mobile grid. */
   .spot__picker {
     grid-area: 2 / 1 / 3 / -1;
     grid-template-rows: auto auto;
@@ -494,7 +484,6 @@
     line-height: 1.2;
   }
 
-  /* Product information comes before the optional serving tips. */
   .spot__facts {
     grid-area: 3 / 1 / 4 / -1;
     padding: 1em 1.35em 1.1em;
@@ -553,7 +542,7 @@
   }
 }
 
-@media (max-width: 560px) {
+@media (max-width: 35rem) {
   .spot__name {
     padding: 1.2em .95em 1.5em;
   }
@@ -564,15 +553,15 @@
   }
 
   .spot__title {
-    font-size: clamp(31px, 9vw, 43px);
+    font-size: clamp(1.9375rem, 9vw, 2.6875rem);
   }
 
   .spot[data-flavour='passionfruit-yuzu'] .spot__title {
-    font-size: clamp(19px, 5.65vw, 28px);
+    font-size: clamp(1.1875rem, 5.65vw, 1.75rem);
   }
 
   .spot[data-flavour='blueberry'] .spot__title {
-    font-size: clamp(23px, 6.7vw, 34px);
+    font-size: clamp(1.4375rem, 6.7vw, 2.125rem);
   }
 
   .spot__kicker {
@@ -591,7 +580,6 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
-  /* Keep all three badges, but use one compact strip on phones. */
   .spot__perks {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     align-items: center;
@@ -610,9 +598,9 @@
   }
 }
 
-@media (max-width: 360px) {
+@media (max-width: 22.5rem) {
   .spot__stage {
-    height: 225px;
+    height: 14.0625rem;
   }
 
   .spot__picker {

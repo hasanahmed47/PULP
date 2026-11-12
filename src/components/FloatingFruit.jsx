@@ -1,4 +1,4 @@
-import '../styles/FloatingFruit.css'
+import '../styles/FloatingFruit.css';
 import { media } from '../data/media';
 
 export function FloatingFruit({ flavour, className = '', eager = false }) {

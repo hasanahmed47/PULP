@@ -2,14 +2,14 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  min-height: 44px;
-  padding: 0 18px;
-  border: 1px solid var(--ink);
-  border-radius: 999px;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0 1.125rem;
+  border: 0.0625rem solid var(--ink);
+  border-radius: var(--radius-pill);
   background-color: var(--ink);
   color: var(--paper);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 600;
   line-height: 1;
   transition: background-color .2s, border-color .2s;
@@ -21,8 +21,8 @@
 }
 
 .replay-drop__icon {
-  width: 14px;
-  height: 14px;
+  width: 0.875rem;
+  height: 0.875rem;
   fill: none;
   stroke: currentColor;
   stroke-width: 2.4;
@@ -31,15 +31,15 @@
 }
 
 .replay-drop--round {
-  width: 48px;
-  height: 48px;
+  width: 3rem;
+  height: 3rem;
   min-height: 0;
   padding: 0;
 }
 
 .replay-drop--round .replay-drop__icon {
-  width: 20px;
-  height: 20px;
+  width: 1.25rem;
+  height: 1.25rem;
 }
 
 .replay-drop--round .replay-drop__label {

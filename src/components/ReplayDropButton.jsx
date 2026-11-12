@@ -1,4 +1,5 @@
-import '../styles/ReplayDropButton.css'
+import { RotateCcw } from 'lucide-react';
+import '../styles/ReplayDropButton.css';
 
 export function ReplayDropButton({ className = '', round = false, onClick }) {
   return (
@@ -8,9 +9,7 @@ export function ReplayDropButton({ className = '', round = false, onClick }) {
       aria-label="Replay can drop"
       onClick={onClick}
     >
-      <svg className="replay-drop__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v5h-5" />
-      </svg>
+      <RotateCcw className="replay-drop__icon" aria-hidden="true" focusable="false" />
       <span className="replay-drop__label">Replay drop</span>
     </button>
   );

@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { ArrowUpRight } from 'lucide-react';
 import { CanScene } from '../components/CanScene';
 import { HeroFlavourPicker } from '../components/HeroFlavourPicker';
 import { AnchorLink } from '../components/AnchorLink';
@@ -9,18 +10,18 @@ import { useReducedMotion } from '../hooks/useReducedMotion';
 import { useVisibility } from '../hooks/useVisibility';
 import { gsap } from '../lib/animation';
 import { planFlavourBlend } from '../lib/flavourBlend';
-import './Hero.css';
+import '../styles/Hero.css';
 
 const heroMotion = {
   flavourDuration: 0.6,
   flavourEase: 'power1.inOut',
-  mobileBreakpoint: 768,
+  mobileQuery: '(max-width: 47.9375rem)',
   mobileTravel: 0.35,
   desktopTravel: 0.46,
   scrollDistance: 1.5,
   turn: Math.PI * 2,
   scrollDuration: 1,
-  textOffset: 25,
+  textOffset: '1.5625rem',
   introExit: { duration: 0.27, at: 0.06 },
   secondEntrance: { duration: 0.25, at: 0.58 },
   controlsExit: 0.15,
@@ -37,9 +38,9 @@ const heroIntro = {
     at: 0,
   },
   risers: [
-    { selector: '.hero-explore', y: 24, duration: 0.7, at: 0.55 },
-    { selector: '.hero-flavour-picker__chip', y: 18, duration: 0.6, stagger: 0.08, at: 0.9 },
-    { selector: '.hero-bottom', y: 14, duration: 0.7, at: 1.15 },
+    { selector: '.hero-explore', y: '1.5rem', duration: 0.7, at: 0.55 },
+    { selector: '.hero-flavour-picker__chip', y: '1.125rem', duration: 0.6, stagger: 0.08, at: 0.9 },
+    { selector: '.hero-bottom', y: '.875rem', duration: 0.7, at: 1.15 },
   ],
 };
 
@@ -57,7 +58,7 @@ export function Hero({ onReady, revealed = false }) {
   const canRef = useRef(null);
   const flavourBlend = useRef({ from: 0, to: 0, amount: 1 });
   const [active, setActive] = useState(0);
-  // 0 = can waits above the frame, 1+ = drop played that many times (see CanScene's dropRun).
+
   const [dropRun, setDropRun] = useState(0);
   const reducedMotion = useReducedMotion();
   const visible = useVisibility(sectionRef);
@@ -106,7 +107,7 @@ export function Hero({ onReady, revealed = false }) {
 
     function getProductOffset() {
       const section = sectionRef.current;
-      const travelRatio = window.innerWidth < heroMotion.mobileBreakpoint
+      const travelRatio = window.matchMedia(heroMotion.mobileQuery).matches
         ? heroMotion.mobileTravel : heroMotion.desktopTravel;
       const gutter = parseFloat(getComputedStyle(section).paddingLeft);
       const availableTravel = Math.max(0, productRef.current.offsetLeft - gutter);
@@ -142,7 +143,7 @@ export function Hero({ onReady, revealed = false }) {
       }, 0);
       timeline.to('.hero-intro', {
         autoAlpha: 0,
-        y: -heroMotion.textOffset,
+        y: `-${heroMotion.textOffset}`,
         duration: heroMotion.introExit.duration,
       }, heroMotion.introExit.at);
       timeline.fromTo(
@@ -279,7 +280,7 @@ export function Hero({ onReady, revealed = false }) {
           </span>
         </h1>
         <AnchorLink className="pill hero-explore" href="#flavours">
-          Explore flavours <span aria-hidden="true">↗</span>
+          Explore flavours <ArrowUpRight className="hero-explore__icon" aria-hidden="true" />
         </AnchorLink>
         {!reducedMotion && (
           <ReplayDropButton className="hero-replay hero-replay--mobile" round onClick={replayDrop} />

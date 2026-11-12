@@ -212,7 +212,6 @@ export function createCanScene(
       amount: 0,
     };
 
-    // Render only when the scene or viewport changes.
     function render() {
       animationFrame = 0;
 
@@ -343,7 +342,6 @@ export function createCanScene(
         }
       });
 
-      // Load the active blend before background textures.
       const initialFlavourIndices = [
         ...new Set([
           currentBlend.from,
@@ -370,7 +368,6 @@ export function createCanScene(
       requestRender();
       onPrepared();
 
-      // Load other flavours when the browser is idle.
       for (const index of remainingFlavourIndices) {
         await waitForIdle();
 

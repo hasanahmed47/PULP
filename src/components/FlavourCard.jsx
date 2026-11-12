@@ -1,4 +1,4 @@
-import '../styles/FlavourCard.css'
+import '../styles/FlavourCard.css';
 import { useEffect, useRef } from 'react';
 import { FloatingFruit } from './FloatingFruit';
 import { AnchorLink } from './AnchorLink';

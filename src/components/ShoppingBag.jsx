@@ -3,8 +3,7 @@ import { flavours as allFlavours } from '../data/flavours';
 import { maximumQuantity } from '../lib/shoppingBag';
 import { ShoppingBagItem } from './ShoppingBagItem';
 import { ShopIcon } from './ShopIcon';
-import '../styles/ShoppingBag.css'
-
+import '../styles/ShoppingBag.css';
 
 const TABS = [
   {
@@ -23,7 +22,6 @@ const TABS = [
 
 const noop = () => {};
 
-/** WAI-ARIA tabs keyboard model: returns the index to move to, or null if the key is not ours. */
 function getNextTabIndex(key, currentIndex) {
   switch (key) {
     case 'ArrowRight':
@@ -39,21 +37,6 @@ function getNextTabIndex(key, currentIndex) {
   }
 }
 
-/**
- * @typedef {object} Bag
- * @property {Record<string, number>} items      flavour id -> quantity
- * @property {string[]} wishlist                 saved flavour ids
- * @property {number} totalQuantity
- * @property {(id: string, quantity: number) => void} updateQuantity
- * @property {(id: string) => void} toggleFavourite
- * @property {(id: string) => void} moveToBag
- *
- * @param {object} props
- * @param {Bag} props.bag
- * @param {Array<{ id: string, name: string }>} [props.flavours]  defaults to the catalogue; pass your own in tests
- * @param {() => void} [props.onReview]
- * @param {(message: string) => void} [props.onStatus]           announced to screen readers by the parent
- */
 export function ShoppingBag({ bag, flavours = allFlavours, onReview = noop, onStatus = noop }) {
   const [activeTab, setActiveTab] = useState(TABS[0].id);
   const [focusRequest, setFocusRequest] = useState(null);
@@ -64,7 +47,6 @@ export function ShoppingBag({ bag, flavours = allFlavours, onReview = noop, onSt
   const panelId = `${baseId}-panel`;
   const getTabId = (id) => `${baseId}-${id}-tab`;
 
-  // Derived during render, never stored in state, so it cannot go out of sync with `bag`.
   const collections = {
     bag: flavours.filter((flavour) => bag.items[flavour.id]),
     wishlist: flavours.filter((flavour) => bag.wishlist.includes(flavour.id)),
@@ -73,7 +55,6 @@ export function ShoppingBag({ bag, flavours = allFlavours, onReview = noop, onSt
   const activeConfig = TABS.find((tab) => tab.id === activeTab);
   const displayedFlavours = collections[activeTab];
 
-  // Runs after the list has re-rendered, so the DOM already reflects the removal.
   useEffect(() => {
     if (!focusRequest) return;
     const removeButtons = panelRef.current?.querySelectorAll('.shopping-bag-item__remove') ?? [];
@@ -87,7 +68,7 @@ export function ShoppingBag({ bag, flavours = allFlavours, onReview = noop, onSt
   }
 
   function handleTabKeyDown(event) {
-    // Alt+Arrow is the browser's back/forward; never hijack modified keys.
+
     if (event.altKey || event.ctrlKey || event.metaKey) return;
 
     const currentIndex = TABS.findIndex(({ id }) => tabRefs.current[id] === event.target);
@@ -111,13 +92,11 @@ export function ShoppingBag({ bag, flavours = allFlavours, onReview = noop, onSt
       onStatus(`${flavour.name} removed from your wishlist.`);
     }
 
-    // Keep the keyboard user's place in the list: focus the item that slides into this
-    // position, or the tab itself when the list is now empty.
     setFocusRequest({ index, tab: activeTab });
   }
 
   function moveFlavour(flavour) {
-    // The reducer also refuses to exceed the limit; this check exists so we can tell the user why.
+
     if ((bag.items[flavour.id] ?? 0) >= maximumQuantity) {
       onStatus(`Your bag already has the maximum of ${maximumQuantity} cans of ${flavour.name}.`);
       return;

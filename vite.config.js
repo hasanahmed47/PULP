@@ -5,10 +5,10 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   base: './',
-test: {
-  environment: 'jsdom',
-  include: ['src/**/*.test.{js,jsx}'],
-},
+  test: {
+    environment: 'jsdom',
+    include: ['src/**/*.test.{js,jsx}'],
+  },
   server: { allowedHosts: ['terminal.local'] },
   build: {
     target: 'es2022',

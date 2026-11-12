@@ -1,6 +1,6 @@
 import { flavours } from '../data/flavours';
 import { FlavourCard } from '../components/FlavourCard';
-import './FlavourCards.css';
+import '../styles/FlavourCards.css';
 
 export function FlavourCards({ onPickFlavour }) {
   return (

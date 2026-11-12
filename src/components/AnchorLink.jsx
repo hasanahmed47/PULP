@@ -1,4 +1,4 @@
-import '../styles/AnchorLink.css'
+import '../styles/AnchorLink.css';
 import { useScroll } from '../context/ScrollContext';
 
 function isModifiedClick(event) {

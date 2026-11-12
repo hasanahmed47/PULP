@@ -4,7 +4,7 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: calc(var(--space-sm) * 2 / 3);
   width: 100%;
-  max-width: 400px;
+  max-width: 25rem;
   margin-inline: auto;
 }
 
@@ -13,13 +13,13 @@
   align-items: center;
   justify-content: center;
   gap: calc(var(--space-sm) * 2 / 3);
-  min-height: 44px;
+  min-height: 2.75rem;
   padding: calc(var(--space-sm) * 2 / 3) var(--space-sm);
-  border: 1px solid var(--line);
-  border-radius: 999px;
+  border: 0.0625rem solid var(--line);
+  border-radius: var(--radius-pill);
   background-color: var(--paper);
   color: var(--ink);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 600;
   line-height: 1.25;
   text-align: center;
@@ -38,15 +38,14 @@
 }
 
 .hero-flavour-picker__dot {
-  flex: 0 0 10px;
-  height: 10px;
+  flex: 0 0 0.625rem;
+  height: 0.625rem;
   border-radius: 50%;
   background-color: var(--flavour-colour);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--paper) 45%, transparent);
+  box-shadow: 0 0 0 0.0625rem color-mix(in srgb, var(--paper) 45%, transparent);
 }
 
-/* The nearest container is .hero-product: with enough width the chips sit on one row. */
-@container (min-width: 500px) {
+@container (min-width: 31.25rem) {
   .hero-flavour-picker {
     display: flex;
     flex-wrap: wrap;
@@ -55,7 +54,7 @@
   }
 
   .hero-flavour-picker__chip {
-    padding-inline: 10px;
+    padding-inline: 0.625rem;
   }
 }
 

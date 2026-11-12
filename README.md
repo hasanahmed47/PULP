@@ -61,6 +61,8 @@ npm run build
 
 ## Project Structure
 
+Source responsibilities, function inputs/outputs, styling rules and retained browser-unit exceptions are documented in [docs/FILES.md](docs/FILES.md). All application CSS, including global styles and design tokens, lives in `src/styles/`.
+
 ```text
 src/
 ├── components/   # Reusable UI and shopping elements

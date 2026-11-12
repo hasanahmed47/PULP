@@ -17,7 +17,7 @@ import { useReducedMotion } from '../hooks/useReducedMotion';
 import { useVisibility } from '../hooks/useVisibility';
 import { gsap } from '../lib/animation';
 import { blendFromPosition, clampBlend } from '../lib/flavourBlend';
-import '../styles/CanScene.css'
+import '../styles/CanScene.css';
 
 const CAN_VIEWS = [
   { id: 'top', label: 'Top', tilt: Math.PI * 0.42 },
@@ -136,7 +136,6 @@ export function CanScene({
 
   const spin = useCanSpin(rotate, canSpin);
 
-  // The data-drop attribute is the animation state used by CanScene.css.
   useLayoutEffect(function playCanDrop() {
     const scene = wrapperRef.current;
     if (!scene) return;
@@ -149,7 +148,6 @@ export function CanScene({
     scene.dataset.drop = 'waiting';
     if (dropRun === 0) return;
 
-    // Restart the CSS animation whenever dropRun changes.
     void scene.offsetWidth;
     scene.dataset.drop = 'playing';
   }, [dropRun]);
@@ -187,7 +185,6 @@ export function CanScene({
     return () => tween.kill();
   }, [interactive, reducedMotion, sceneRef, view]);
 
-  // Expose only the methods that the parent needs to control the 3D can.
   useImperativeHandle(ref, () => {
     function setFlavourBlend(from, to, amount) {
       const blend = clampBlend({ from, to, amount }, lastFlavourIndex);

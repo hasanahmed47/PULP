@@ -1,31 +1,21 @@
-/*
- * CanSplash
- * Decorative splash layers shown when a can lands.
- * All droplet and spike positions are CSS-only so JSX stays presentational.
- * The numbers below reproduce the original seeded positions and timings.
- */
-
-/* --- Layout and theme --- */
 .can-splash {
   --splash-deep: color-mix(in srgb, var(--flavour-colour) 80%, var(--ink));
   --splash-delay: calc(var(--drop-duration) * var(--drop-hit));
 
   position: absolute;
-  inset: 0 0 var(--can-controls-space, 0px);
+  inset: 0;
   container-type: size;
   pointer-events: none;
 }
 
-/* Ground sits at the 3D can's impact point. 1cqh = 1% of canvas height. */
 .can-splash__ground {
   position: absolute;
-  top: 87%;
+  top: var(--can-ground);
   left: 50%;
   width: 0;
   height: 0;
 }
 
-/* --- Back layer: glow, puddle, rings, splash spikes --- */
 .can-splash__glow {
   position: absolute;
   top: -62cqh;
@@ -73,7 +63,6 @@
   transform: rotate(var(--angle)) scaleY(0);
 }
 
-/* The first four children are glow, puddle and two rings. */
 .can-splash__spike:nth-child(5) {
   --angle: -68deg;
   --height: 15cqh;
@@ -116,7 +105,6 @@
   --delay: 0.0544s;
 }
 
-/* --- Front layer: 18 droplets --- */
 .can-splash__drop {
   position: absolute;
   bottom: 0.5cqh;
@@ -132,7 +120,6 @@
   opacity: 0;
 }
 
-/* Fixed values keep animation variation stable between renders. */
 .can-splash__drop:nth-child(1) {
   --x: -38.13385cqh;
   --height: 13.10132cqh;
@@ -277,13 +264,6 @@
   --delay: 0.00731s;
 }
 
-/* --- Playback: coordinated with CanScene's drop state --- */
-/*
- * `forwards` avoids displaying the first animation frame during --splash-delay.
- * `both` caused rings, puddle and droplets to appear before can impact.
- * Existing base opacity: 0 keeps them invisible until the animation begins.
- */
-/* CanScene removes data-drop="playing" after the can finishes bouncing. */
 .can-scene[data-drop='playing'] .can-splash__glow {
   animation: can-splash-glow 1.5s ease-out var(--splash-delay) forwards;
 }
@@ -315,7 +295,6 @@
     calc(var(--splash-delay) + var(--delay)) forwards;
 }
 
-/* --- Keyframes --- */
 @keyframes can-splash-glow {
   0% { opacity: 0; transform: scale(0.5); }
   20% { opacity: 1; transform: scale(1); }
@@ -344,7 +323,6 @@
   to { transform: translateX(var(--x)); }
 }
 
-/* A droplet rises slowly, then accelerates back toward the ground. */
 @keyframes can-splash-y {
   0% {
     opacity: 1;
@@ -362,11 +340,12 @@
   }
 }
 
-/* --- Responsive and accessibility --- */
-@container can-scene (max-width: 420px) {
-  .can-splash {
-    --can-controls-space: var(--can-controls-compact-space);
-  }
+.can-splash--back {
+  z-index: 0;
+}
+
+.can-splash--front {
+  z-index: 2;
 }
 
 @media (prefers-reduced-motion: reduce) {

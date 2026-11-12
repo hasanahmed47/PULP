@@ -54,13 +54,13 @@
 
 .colour-ribbon--footer {
   left: -4%;
-  top: -30px;
+  top: -1.875rem;
   width: 108%;
-  height: 570px;
+  height: 35.625rem;
   opacity: .13;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 47.9375rem) {
   .colour-ribbon--hero {
     display: none;
   }
@@ -70,7 +70,7 @@
   }
 
   .colour-ribbon--footer {
-    height: 330px;
-    top: -5px;
+    height: 20.625rem;
+    top: -0.3125rem;
   }
 }

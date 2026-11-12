@@ -1,10 +1,10 @@
-﻿.inside-section {
-  --inside-can-height: min(42svh, 460px);
+.inside-section {
+  --inside-can-height: min(42svh, 28.75rem);
   display: flex;
   flex-direction: column;
   justify-content: center;
   min-height: 100svh;
-  padding: clamp(24px, 4svh, 48px) var(--page-gutter);
+  padding: clamp(1.5rem, 4svh, 3rem) var(--page-gutter);
   background: var(--paper);
   color: var(--ink);
 }
@@ -12,7 +12,7 @@
 .inside-title {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(48px, min(7vw, 9svh), 112px);
+  font-size: clamp(3rem, min(7vw, 9svh), 7rem);
   font-weight: 900;
   line-height: .92;
   letter-spacing: -.025em;
@@ -24,9 +24,9 @@
 }
 
 .inside-instruction {
-  margin: 12px 0 0;
+  margin: 0.75rem 0 0;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.5;
   text-align: center;
 }
@@ -35,10 +35,10 @@
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   align-items: end;
-  gap: clamp(16px, 3vw, 48px);
+  gap: clamp(1rem, 3vw, 3rem);
   width: 100%;
-  max-width: 1200px;
-  margin: clamp(16px, 3svh, 32px) auto 0;
+  max-width: 75rem;
+  margin: clamp(1rem, 3svh, 2rem) auto 0;
 }
 
 .inside-detail {
@@ -47,14 +47,14 @@
   justify-content: space-between;
   gap: var(--space-md);
   width: 100%;
-  max-width: 1200px;
-  margin: clamp(16px, 3svh, 32px) auto 0;
+  max-width: 75rem;
+  margin: clamp(1rem, 3svh, 2rem) auto 0;
 }
 
 .inside-detail-eyebrow {
-  margin: 0 0 5px;
+  margin: 0 0 0.3125rem;
   color: var(--muted);
-  font-size: 9px;
+  font-size: 0.5625rem;
   font-weight: 600;
   letter-spacing: .12em;
 }
@@ -62,16 +62,16 @@
 .inside-detail-copy h3 {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(24px, 3svh, 32px);
+  font-size: clamp(1.5rem, 3svh, 2rem);
   font-weight: 800;
   line-height: 1;
   text-transform: uppercase;
 }
 
 .inside-detail-description {
-  margin: 5px 0 0;
+  margin: 0.3125rem 0 0;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.4;
 }
 
@@ -80,20 +80,20 @@
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  gap: 20px;
-  min-height: 44px;
-  padding: 11px 20px;
-  border: 1px solid var(--ink);
-  border-radius: 100px;
+  gap: 1.25rem;
+  min-height: 2.75rem;
+  padding: 0.6875rem 1.25rem;
+  border: 0.0625rem solid var(--ink);
+  border-radius: 6.25rem;
   background: var(--ink);
   color: var(--paper);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 500;
   transition: background-color 180ms ease, color 180ms ease;
 }
 
 .inside-pick span {
-  font-size: 18px;
+  font-size: 1.125rem;
   line-height: 1;
 }
 
@@ -121,43 +121,43 @@
 }
 
 @keyframes inside-arrive {
-  from { opacity: 0; transform: translateY(16px); }
+  from { opacity: 0; transform: translateY(1rem); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 56.25rem) {
   .inside-section {
-    --inside-can-height: min(22svh, 300px, 54vw);
-    padding-block: clamp(24px, 3svh, 36px);
+    --inside-can-height: min(22svh, 18.75rem, 54vw);
+    padding-block: clamp(1.5rem, 3svh, 2.25rem);
   }
 
   .inside-title {
-    font-size: clamp(48px, min(14vw, 9svh), 88px);
+    font-size: clamp(3rem, min(14vw, 9svh), 5.5rem);
   }
 
   .inside-gallery {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    max-width: 600px;
-    gap: 16px 24px;
-    margin-top: 16px;
+    max-width: 37.5rem;
+    gap: 1rem 1.5rem;
+    margin-top: 1rem;
   }
 
   .inside-detail {
-    max-width: 600px;
-    gap: 16px;
-    margin-top: 20px;
+    max-width: 37.5rem;
+    gap: 1rem;
+    margin-top: 1.25rem;
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 30rem) {
   .inside-instruction {
-    max-width: 260px;
-    margin: 10px auto 0;
-    font-size: 11px;
+    max-width: 16.25rem;
+    margin: 0.625rem auto 0;
+    font-size: 0.6875rem;
   }
 
   .inside-gallery {
-    column-gap: 16px;
+    column-gap: 1rem;
   }
 
   .inside-detail-copy {
@@ -165,9 +165,9 @@
   }
 
   .inside-pick {
-    gap: 8px;
-    padding-inline: 12px;
-    font-size: 11px;
+    gap: 0.5rem;
+    padding-inline: 0.75rem;
+    font-size: 0.6875rem;
   }
 }
 

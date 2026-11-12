@@ -2,22 +2,22 @@
   display: inline-flex;
   align-items: center;
   flex: 0 0 auto;
-  border: 1px solid var(--line);
-  border-radius: 999px;
+  border: 0.0625rem solid var(--line);
+  border-radius: var(--radius-pill);
   background: var(--paper);
 }
 
 .quantity-control button {
   display: grid;
   place-items: center;
-  width: 44px;
-  height: 44px;
+  width: 2.75rem;
+  height: 2.75rem;
   padding: 0;
   border: 0;
   border-radius: 50%;
   background: transparent;
   color: var(--ink);
-  font-size: 22px;
+  font-size: 1.375rem;
   transition: background 160ms ease;
 }
 
@@ -30,8 +30,8 @@
 }
 
 .quantity-control output {
-  min-width: 28px;
+  min-width: 1.75rem;
   text-align: center;
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-variant-numeric: tabular-nums;
 }

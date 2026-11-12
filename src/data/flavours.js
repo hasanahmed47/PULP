@@ -10,12 +10,12 @@ export const flavours = [
     printBrightness: 0.3,
   },
   {
-   id: 'passionfruit-yuzu',
-  name: 'Passionfruit Yuzu',
-  lines: ['Passionfruit', 'Yuzu'],
-  description: 'Tropical fruit. Tangy yuzu.',
-  colour: '#FFD52A',
-  printBrightness: 0.3,
+    id: 'passionfruit-yuzu',
+    name: 'Passionfruit Yuzu',
+    lines: ['Passionfruit', 'Yuzu'],
+    description: 'Tropical fruit. Tangy yuzu.',
+    colour: '#FFD52A',
+    printBrightness: 0.3,
   },
   {
     id: 'blueberry',
@@ -23,7 +23,7 @@ export const flavours = [
     lines: ['Blueberry'],
     description: 'Bright, juicy blueberry.',
     colour: '#2257F5',
-     printBrightness: 0.3,
+    printBrightness: 0.3,
   },
   {
     id: 'lime-basil',
@@ -31,7 +31,7 @@ export const flavours = [
     lines: ['Lime', 'Basil'],
     description: 'Zesty lime. Fresh basil.',
     colour: '#23B447',
-     printBrightness: 0.3,
+    printBrightness: 0.3,
   },
 ].map((flavour) => ({
   ...flavour,

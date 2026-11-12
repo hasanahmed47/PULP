@@ -3,7 +3,7 @@ import { AnchorLink } from '../components/AnchorLink';
 import { PeekCan } from '../components/PeekCan';
 import { flavours } from '../data/flavours';
 import { useVisibility } from '../hooks/useVisibility';
-import './Cutaway.css';
+import '../styles/Cutaway.css';
 
 export function Cutaway({ onPickFlavour }) {
   const sectionRef = useRef(null);

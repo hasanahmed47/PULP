@@ -1,12 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { media } from '../data/media';
-import { useMediaStartAllowed } from '../context/MediaStartContext';
 import { useCarouselDrag } from '../hooks/useCarouselDrag';
 import { useMobileViewport } from '../hooks/useMobileViewport';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import { useVisibleOnce } from '../hooks/useVisibleOnce';
 import { useVisibility } from '../hooks/useVisibility';
-import './HighlightsCarousel.css';
+import '../styles/HighlightsCarousel.css';
 
 const FAILED_VIDEO_DELAY_MS = 2500;
 const MEDIA_LOAD_MARGIN = '2500px 0px';
@@ -59,9 +58,7 @@ export default function HighlightsCarousel({ slides: suppliedSlides = defaultSli
   const progressBars = useRef([]);
   const previousIndex = useRef(0);
   const visible = useVisibility(stageRef);
-  const mediaAllowed = useMediaStartAllowed();
-  const mediaNear = useVisibleOnce(stageRef, MEDIA_LOAD_MARGIN);
-  const mediaEnabled = mediaAllowed && mediaNear;
+  const mediaEnabled = useVisibleOnce(stageRef, MEDIA_LOAD_MARGIN);
   const running = playing && inView && visible && !filmOpen;
   const controlsVisible = inView && visible && !filmOpen;
 

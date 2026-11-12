@@ -1,5 +1,3 @@
-// Sample product facts for the "Good insides" section.
-// Swap in the real values here; nothing else needs to change.
 export const flavourDetails = {
   'blood-orange': {
     rating: 5,

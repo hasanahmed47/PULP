@@ -3,7 +3,7 @@ import { useHoverless } from '../hooks/useHoverless';
 import { defaultLensPosition, lensBounds, usePeekLens } from '../hooks/usePeekLens';
 import { useVisibility } from '../hooks/useVisibility';
 import { useVisibleOnce } from '../hooks/useVisibleOnce';
-import '../styles/PeekCan.css'
+import '../styles/PeekCan.css';
 
 const hintViewMargin = '-30% 0px';
 const imageLoadMargin = '1200px 0px';

@@ -1,17 +1,17 @@
 .flavour-card {
   position: sticky;
-  top: calc(20px + var(--card-index) * 18px);
+  top: calc(1.25rem + var(--card-index) * 1.125rem);
   z-index: calc(2 + var(--card-index));
   display: grid;
   grid-template-columns: 1fr 1.12fr;
   align-items: center;
   height: 80svh;
-  min-height: 500px;
-  max-height: 950px;
+  min-height: 31.25rem;
+  max-height: 59.375rem;
   padding: 5%;
-  margin-bottom: 55px;
-  border: 1px solid var(--flavour-colour);
-  border-radius: 32px;
+  margin-bottom: 3.4375rem;
+  border: 0.0625rem solid var(--flavour-colour);
+  border-radius: 2rem;
   background: var(--paper);
   overflow: hidden;
 }
@@ -26,24 +26,24 @@
 }
 
 .card-copy .headline {
-  font-size: clamp(60px, min(8.8vw, 16svh), 142px);
+  font-size: clamp(3.75rem, min(8.8vw, 16svh), 8.875rem);
 }
 
 .flavour-card[data-flavour='passionfruit-yuzu'] .card-copy .headline {
-  font-size: clamp(54px, min(7.8vw, 14svh), 125px);
+  font-size: clamp(3.375rem, min(7.8vw, 14svh), 7.8125rem);
 }
 
 .card-copy > p {
-  font-size: 17px;
+  font-size: 1.0625rem;
   line-height: 1.5;
-  margin: 28px 0 0;
+  margin: 1.75rem 0 0;
 }
 
 .card-art {
   position: relative;
   width: 100%;
   height: 100%;
-  perspective: 900px;
+  perspective: 56.25rem;
 }
 
 .card-blob {
@@ -63,7 +63,7 @@
   height: 100%;
   object-fit: contain;
   transform: rotate(var(--can-tilt));
-  filter: drop-shadow(4px 22px 12px rgba(35,20,10,.1));
+  filter: drop-shadow(0.25rem 1.375rem 0.75rem rgba(35,20,10,.1));
 }
 
 .card-fruit--top {
@@ -82,14 +82,14 @@
   transform: rotate(-20deg);
 }
 
-@media (max-height: 600px) and (min-width: 768px) {
+@media (max-height: 37.5rem) and (min-width: 48rem) {
   .flavour-card {
     position: relative;
     top: auto;
   }
 }
 
-@media (max-width: 1100px) and (min-width: 768px) {
+@media (max-width: 68.75rem) and (min-width: 48rem) {
   .card-copy .headline {
     font-size: 9vw;
   }
@@ -99,18 +99,18 @@
   }
 }
 
-@media (max-width: 767px) {
+@media (max-width: 47.9375rem) {
   .flavour-card {
-    min-height: 720px;
+    min-height: 45rem;
     height: 88svh;
-    max-height: 850px;
+    max-height: 53.125rem;
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    padding: 34px 26px 20px;
-    border-radius: 26px;
-    margin-bottom: 38px;
-    top: calc(12px + var(--card-index) * 13px);
+    padding: 2.125rem 1.625rem 1.25rem;
+    border-radius: 1.625rem;
+    margin-bottom: 2.375rem;
+    top: calc(0.75rem + var(--card-index) * 0.8125rem);
   }
 
   .card-copy .headline {
@@ -122,14 +122,14 @@
   }
 
   .card-copy > p {
-    font-size: 14px;
-    margin-top: 18px;
+    font-size: 0.875rem;
+    margin-top: 1.125rem;
   }
 
   .card-art {
     flex: 1;
-    min-height: 340px;
-    margin-top: 18px;
+    min-height: 21.25rem;
+    margin-top: 1.125rem;
   }
 
   .card-blob {
@@ -153,14 +153,14 @@
   }
 }
 
-@media (max-width: 370px) {
+@media (max-width: 23.125rem) {
   .flavour-card {
-    padding-inline: 20px;
-    min-height: 670px;
+    padding-inline: 1.25rem;
+    min-height: 41.875rem;
   }
 
   .card-copy > p {
-    font-size: 12px;
+    font-size: 0.75rem;
   }
 }
 
@@ -181,7 +181,7 @@
 }
 
 .card-shop-link {
-  margin-top: 22px;
+  margin-top: 1.375rem;
 }
 
 @media (prefers-reduced-motion: reduce) {

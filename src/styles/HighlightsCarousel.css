@@ -1,13 +1,13 @@
 .hl {
-  --hl-space-top: clamp(72px, 10vw, 160px);
-  --hl-heading-gap: clamp(36px, 5vw, 80px);
+  --hl-space-top: clamp(4.5rem, 10vw, 10rem);
+  --hl-heading-gap: clamp(2.25rem, 5vw, 5rem);
   --hl-card-w: 86%;
   --hl-gap: var(--space-md);
-  --hl-radius: 32px;
-  --hl-card-h: clamp(380px, 40vw, 80svh);
-  --hl-ctl: 56px;
-  --hl-pip: 8px;
-  --hl-pip-active: 48px;
+  --hl-radius: 2rem;
+  --hl-card-h: clamp(23.75rem, 40vw, 80svh);
+  --hl-ctl: 3.5rem;
+  --hl-pip: 0.5rem;
+  --hl-pip-active: 3rem;
   --hl-heading-duration: 700ms;
   --hl-card-duration: 850ms;
   --hl-card-delay: 220ms;
@@ -26,7 +26,7 @@
   padding-inline: calc((100% - var(--hl-card-w)) / 2);
   margin-bottom: var(--hl-heading-gap);
   opacity: 0;
-  transform: translateY(32px);
+  transform: translateY(2rem);
   transition: opacity var(--hl-heading-duration) ease-out, transform var(--hl-heading-duration) var(--hl-ease);
 }
 
@@ -62,7 +62,7 @@
 
 .hl__film:hover {
   text-decoration: underline;
-  text-underline-offset: 4px;
+  text-underline-offset: 0.25rem;
 }
 
 .hl__stage {
@@ -76,7 +76,7 @@
   -webkit-user-select: none;
   cursor: grab;
   opacity: 0;
-  transform: translateY(40px);
+  transform: translateY(2.5rem);
   transition: opacity var(--hl-card-duration) ease-out, transform var(--hl-card-duration) var(--hl-ease);
   transition-delay: var(--hl-card-delay);
 }
@@ -141,8 +141,8 @@
 .hl__title {
   position: absolute;
   z-index: 2;
-  top: clamp(24px, 3.4vw, 56px);
-  left: clamp(24px, 3.4vw, 56px);
+  top: clamp(1.5rem, 3.4vw, 3.5rem);
+  left: clamp(1.5rem, 3.4vw, 3.5rem);
   right: var(--space-md);
   max-width: 12em;
   margin: 0;
@@ -164,11 +164,11 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 10px;
+  gap: 0.625rem;
   pointer-events: none;
   opacity: 0;
   visibility: hidden;
-  transform: translateY(28px) scale(0.88);
+  transform: translateY(1.75rem) scale(0.88);
   transform-origin: center bottom;
   transition: opacity 250ms ease-out, transform var(--hl-chip-duration) var(--hl-ease), visibility 0s linear 250ms;
 }
@@ -185,11 +185,11 @@
 .hl__dots,
 .hl__arrows {
   height: var(--hl-ctl);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   color: var(--ink);
   background: color-mix(in srgb, var(--line) 80%, transparent);
-  -webkit-backdrop-filter: blur(20px) saturate(1.6);
-  backdrop-filter: blur(20px) saturate(1.6);
+  -webkit-backdrop-filter: blur(1.25rem) saturate(1.6);
+  backdrop-filter: blur(1.25rem) saturate(1.6);
 }
 
 .hl__controls.is-visible > * {
@@ -221,15 +221,15 @@
 }
 
 .hl__btn svg {
-  width: 23px;
-  height: 23px;
+  width: 1.4375rem;
+  height: 1.4375rem;
 }
 
 .hl__btn svg,
 .hl__arrows svg,
 .hl__pip {
   opacity: 0;
-  transform: translateY(6px) scale(0.8);
+  transform: translateY(0.375rem) scale(0.8);
   transition: opacity 250ms ease-out, transform 450ms var(--hl-ease);
 }
 
@@ -244,14 +244,14 @@
 .hl__dots {
   display: flex;
   align-items: center;
-  padding-inline: 12px;
+  padding-inline: 0.75rem;
 }
 
 .hl__dot {
   height: var(--hl-ctl);
   display: grid;
   place-items: center;
-  padding: 0 8px;
+  padding: 0 0.5rem;
   border: 0;
   background: none;
 }
@@ -260,7 +260,7 @@
   display: block;
   width: var(--hl-pip);
   height: var(--hl-pip);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   overflow: hidden;
   background: var(--muted);
   transition: width 600ms var(--hl-ease), opacity 250ms ease-out, transform 450ms var(--hl-ease);
@@ -306,32 +306,32 @@
 }
 
 .hl__progress::-webkit-progress-value {
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--ink);
 }
 
 .hl__progress::-moz-progress-bar {
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--ink);
 }
 
 .hl__arrows {
   display: flex;
   align-items: center;
-  padding-inline: 4px;
+  padding-inline: 0.25rem;
 }
 
 .hl__arrow {
-  width: 44px;
-  height: 44px;
+  width: 2.75rem;
+  height: 2.75rem;
   border-radius: 50%;
   background: none;
   color: inherit;
 }
 
 .hl__arrow svg {
-  width: 20px;
-  height: 20px;
+  width: 1.25rem;
+  height: 1.25rem;
   fill: none;
   stroke: currentColor;
   stroke-width: 2;
@@ -341,28 +341,28 @@
 
 .hl__status {
   position: absolute;
-  width: 1px;
-  height: 1px;
+  width: 0.0625rem;
+  height: 0.0625rem;
   padding: 0;
-  margin: -1px;
+  margin: -0.0625rem;
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
 }
 
 .hl__dialog {
-  width: min(92vw, 1100px);
+  width: min(92vw, 68.75rem);
   margin: auto;
   padding: 0;
   border: 0;
-  border-radius: 20px;
+  border-radius: 1.25rem;
   overflow: hidden;
   background: var(--ink);
 }
 
 .hl__dialog::backdrop {
   background: color-mix(in srgb, var(--ink) 75%, transparent);
-  backdrop-filter: blur(6px);
+  backdrop-filter: blur(0.375rem);
 }
 
 .hl__dialog video {
@@ -376,34 +376,34 @@
   top: var(--space-sm);
   right: var(--space-sm);
   z-index: 2;
-  width: 44px;
-  height: 44px;
+  width: 2.75rem;
+  height: 2.75rem;
   border: 0;
   border-radius: 50%;
   background: color-mix(in srgb, var(--ink) 70%, transparent);
   color: var(--paper);
-  font-size: 28px;
+  font-size: 1.75rem;
   line-height: 1;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(0.625rem);
 }
 
 .hl button:focus-visible {
-  outline: 3px solid var(--orange);
-  outline-offset: 3px;
+  outline: 0.1875rem solid var(--orange);
+  outline-offset: 0.1875rem;
 }
 
 .hl__stage:focus-visible {
-  outline: 3px solid var(--orange);
-  outline-offset: -3px;
+  outline: 0.1875rem solid var(--orange);
+  outline-offset: -0.1875rem;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 64rem) {
   .hl {
     --hl-card-w: 88%;
-    --hl-gap: 18px;
+    --hl-gap: 1.125rem;
     --hl-radius: var(--radius-panel);
-    --hl-card-h: clamp(360px, 64vw, 70svh);
-    --hl-ctl: 52px;
+    --hl-card-h: clamp(22.5rem, 64vw, 70svh);
+    --hl-ctl: 3.25rem;
   }
 
   .hl__stage {
@@ -425,18 +425,18 @@
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 40rem) {
   .hl {
-    --hl-gap: 10px;
-    --hl-radius: 22px;
-    --hl-card-h: clamp(420px, 118vw, 78svh);
-    --hl-ctl: 44px;
-    --hl-pip-active: 36px;
+    --hl-gap: 0.625rem;
+    --hl-radius: 1.375rem;
+    --hl-card-h: clamp(26.25rem, 118vw, 78svh);
+    --hl-ctl: 2.75rem;
+    --hl-pip-active: 2.25rem;
   }
 
   .hl__head {
     flex-direction: column;
-    gap: 8px;
+    gap: 0.5rem;
   }
 
   .hl__film {
@@ -448,11 +448,11 @@
   }
 
   .hl__controls {
-    gap: 8px;
+    gap: 0.5rem;
   }
 
   .hl__dots {
-    padding-inline: 10px;
+    padding-inline: 0.625rem;
   }
 
   .hl__arrows {

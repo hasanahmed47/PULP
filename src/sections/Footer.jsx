@@ -1,4 +1,4 @@
-import './Footer.css';
+import '../styles/Footer.css';
 import { useEffect, useRef, useState } from 'react';
 import { AnchorLink } from '../components/AnchorLink';
 import { FloatingFruit } from '../components/FloatingFruit';

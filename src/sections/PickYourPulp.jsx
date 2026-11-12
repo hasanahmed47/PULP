@@ -8,7 +8,7 @@ import { OrderReview } from '../components/OrderReview';
 import { QuantityControl } from '../components/QuantityControl';
 import { ShoppingBag } from '../components/ShoppingBag';
 import { ShopIcon } from '../components/ShopIcon';
-import './PickYourPulp.css';
+import '../styles/PickYourPulp.css';
 
 export function PickYourPulp({ selectedId, onSelectFlavour }) {
   const [quantity, setQuantity] = useState(1);

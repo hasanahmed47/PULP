@@ -1,11 +1,11 @@
 .hero {
   --hero-colour-duration: .4s;
-  --hero-copy-size: 17px;
-  --hero-bottom-offset: 35px;
+  --hero-copy-size: 1.0625rem;
+  --hero-bottom-offset: 2.1875rem;
   --hero-bottom-height: calc(var(--hero-copy-size) * 3);
-  --hero-product-gap: 28px;
+  --hero-product-gap: 1.75rem;
   height: 100lvh;
-  min-height: 560px;
+  min-height: 35rem;
   position: relative;
   overflow: clip;
   isolation: isolate;
@@ -31,11 +31,11 @@
 }
 
 .hero-title {
-  font-size: clamp(60px, min(10.4vw, 16svh), 170px);
+  font-size: clamp(3.75rem, min(10.4vw, 16svh), 10.625rem);
 }
 
 .hero-explore {
-  margin-top: 30px;
+  margin-top: 1.875rem;
   background-color: var(--ink);
   color: var(--paper);
   border-color: var(--ink);
@@ -47,6 +47,12 @@
   border-color: var(--flavour-accent);
 }
 
+.hero-explore__icon {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex-shrink: 0;
+}
+
 .hero-second {
   position: absolute;
   left: 51%;
@@ -54,7 +60,7 @@
   z-index: 2;
   opacity: 0;
   pointer-events: none;
-  font-size: clamp(54px, min(8.8vw, 15svh), 148px);
+  font-size: clamp(3.375rem, min(8.8vw, 15svh), 9.25rem);
 }
 
 .hero-product {
@@ -67,7 +73,7 @@
   bottom: calc(var(--hero-bottom-offset) + var(--hero-bottom-height) + var(--hero-product-gap) + var(--viewport-chrome));
   width: 36%;
   z-index: 2;
-  /* Lets the flavour picker choose one row or two from the width it is given. */
+
   container-type: inline-size;
 }
 
@@ -96,18 +102,18 @@
   line-height: 1.5;
 }
 
-@media (min-width: 1800px) {
+@media (min-width: 112.5rem) {
   .hero-intro {
     top: 25%;
   }
 
   .hero-product {
-    max-width: 690px;
+    max-width: 43.125rem;
     left: 60%;
   }
 }
 
-@media (max-width: 1100px) and (min-width: 768px) {
+@media (max-width: 68.75rem) and (min-width: 48rem) {
   .hero-intro {
     top: 25%;
   }
@@ -128,16 +134,16 @@
   }
 }
 
-@media (max-width: 767px) {
+@media (max-width: 47.9375rem) {
   .hero {
-    --hero-top: clamp(72px, 11svh, 96px);
-    --hero-title-size: clamp(40px, 12.4vw, 60px);
+    --hero-top: clamp(4.5rem, 11svh, 6rem);
+    --hero-title-size: clamp(2.5rem, 12.4vw, 3.75rem);
     --hero-title-height: calc(var(--hero-title-size) * 2.67);
-    --hero-cta-height: 60px;
-    --hero-second-size: clamp(48px, 14.4vw, 74px);
-    --hero-copy-reserve: 60px;
+    --hero-cta-height: 3.75rem;
+    --hero-second-size: clamp(3rem, 14.4vw, 4.625rem);
+    --hero-copy-reserve: 3.75rem;
     height: 100lvh;
-    min-height: 640px;
+    min-height: 40rem;
   }
 
   .hero-intro {
@@ -150,7 +156,7 @@
   }
 
   .hero-explore {
-    margin-top: 16px;
+    margin-top: 1rem;
   }
 
   .hero-product {
@@ -159,12 +165,6 @@
     bottom: calc(var(--hero-copy-reserve) + var(--viewport-chrome));
     width: 80%;
     height: auto;
-  }
-
-  .hero-product .can-scene {
-    --can-bleed-top: 4%;
-    --can-bleed-bottom: 14%;
-    --can-ground: 98%;
   }
 
   .hero-second {
@@ -187,27 +187,27 @@
   }
 
   .hero-bottom {
-    bottom: calc(23px + var(--viewport-chrome));
-    gap: 10px;
+    bottom: calc(1.4375rem + var(--viewport-chrome));
+    gap: 0.625rem;
     align-items: end;
   }
 
   .hero-bottom p,
   .hero-bottom .text-link {
-    font-size: 12px;
+    font-size: 0.75rem;
   }
 }
 
-@media (max-width: 767px) and (max-height: 700px) {
+@media (max-width: 47.9375rem) and (max-height: 43.75rem) {
   .hero {
-    --hero-top: 68px;
-    --hero-title-size: clamp(38px, 11.4vw, 46px);
-    --hero-cta-height: 54px;
-    --hero-second-size: clamp(44px, 13vw, 56px);
+    --hero-top: 4.25rem;
+    --hero-title-size: clamp(2.375rem, 11.4vw, 2.875rem);
+    --hero-cta-height: 3.375rem;
+    --hero-second-size: clamp(2.75rem, 13vw, 3.5rem);
   }
 
   .hero-explore {
-    margin-top: 12px;
+    margin-top: 0.75rem;
   }
 }
 
@@ -219,41 +219,41 @@
   }
 
   .hero {
-    height: 1100px;
+    height: 68.75rem;
   }
 
   .hero-intro {
-    top: 170px;
+    top: 10.625rem;
   }
 
   .hero-product {
-    top: 140px;
-    height: 560px;
+    top: 8.75rem;
+    height: 35rem;
   }
 
   .hero-second {
-    top: 740px;
+    top: 46.25rem;
     font-size: 6.1vw;
     opacity: 1;
   }
 }
 
-@media (prefers-reduced-motion: reduce) and (max-width: 767px) {
+@media (prefers-reduced-motion: reduce) and (max-width: 47.9375rem) {
   .hero {
-    height: 1130px;
+    height: 70.625rem;
   }
 
   .hero-intro {
-    top: 110px;
+    top: 6.875rem;
   }
 
   .hero-product {
-    top: 370px;
-    height: 440px;
+    top: 23.125rem;
+    height: 27.5rem;
   }
 
   .hero-second {
-    top: 820px;
+    top: 51.25rem;
     font-size: 14.5vw;
     right: var(--page-padding);
   }

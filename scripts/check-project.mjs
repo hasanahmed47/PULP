@@ -18,7 +18,10 @@ for (const flavour of flavours) {
     if (type !== 'wrap') assert(info.hasAlpha, `${name} needs real transparency.`);
   }
 }
-for (const name of ['orange-mascot.webp', 'pour-poster.webp']) await fs.access(assetPath(name));
+const mediaSource = await read('src/data/media.js');
+for (const [, name] of mediaSource.matchAll(/asset\('([^']+)'\)/g)) {
+  await fs.access(assetPath(name));
+}
 console.log('PASS: every bundled media path exists; cans, fruits and cutaways have alpha.');
 
 for (const flavour of flavours) {
@@ -53,7 +56,6 @@ for (const [, target] of combined.matchAll(/href="#([^"]+)"/g)) assert(ids.has(t
 console.log('PASS: every section navigation link has a destination.');
 
 if (process.argv.includes('--release')) {
-  const mediaSource = (await read('src/data/media.js')).replace(/\/\/[^\n]*/g, '');
   const film = mediaSource.match(/\bfilm:\s*asset\(['"]([^'"]+)['"]\)/)?.[1];
   assert(film, 'Final film not configured. Add your H264 MP4 and set media.film. The included animated illustration is not a native 4K video.');
   await fs.access(assetPath(film));
@@ -70,5 +72,5 @@ if (process.argv.includes('--release')) {
   assert(duration >= 5 && duration <= 8.5, 'Expected an approximately six-second film.');
   console.log('PASS: configured film is silent 3840×2160 H264/yuv420p. Verify native generation and visual consistency manually.');
 } else {
-  console.log('NOTE: this source handoff includes vector artwork and an animated pouring illustration. Final Higgsfield media is supplied separately.');
+  console.log('PASS: every configured runtime media file exists. Use check:release to validate the film master.');
 }

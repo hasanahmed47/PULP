@@ -6,6 +6,9 @@
 
 :root {
   --font-body: var(--font-sans);
+  --font-mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace;
+  --black: #000;
+  --cream: #fffaf0;
   --ink: #171719;
   --paper: #fff;
   --blue: #2257f5;
@@ -28,13 +31,13 @@
   --color-muted: var(--muted);
   --page-gutter: 5vw;
   --page-padding: var(--page-gutter);
-  --section-space: clamp(72px, 8vw, 128px);
-  --space-sm: 12px;
-  --space-md: 24px;
-  --space-lg: 40px;
-  --radius-panel: 28px;
+  --section-space: clamp(4.5rem, 8vw, 8rem);
+  --space-sm: 0.75rem;
+  --space-md: 1.5rem;
+  --space-lg: 2.5rem;
+  --radius-panel: 1.75rem;
+  --radius-pill: 62.4375rem;
 }
-
 
 [data-flavour='blood-orange'] {
   --flavour-colour: var(--orange);
@@ -64,9 +67,9 @@
   --can-tilt: 11deg;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 47.9375rem) {
   :root {
     --page-gutter: 6vw;
-    --radius-panel: 20px;
+    --radius-panel: 1.25rem;
   }
 }

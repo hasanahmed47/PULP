@@ -50,7 +50,7 @@ it('switches name, nutrition, ingredients, picker and eye together', async () =>
   expect(within(section).getByText(ingredients).closest('[aria-hidden]').getAttribute('aria-hidden')).toBe('false');
   expect(within(section).getByRole('button', { name: target.name }).getAttribute('aria-pressed')).toBe('true');
   expect(within(section).getByRole('button', { name: `Show ${target.name}` }).getAttribute('aria-pressed')).toBe('true');
-  expect(section.querySelector('.can-carousel__eye').style.getPropertyValue('--index')).toBe('2');
+  expect(section.querySelector('.can-carousel__eye').dataset.index).toBe('2');
   expect(section.querySelectorAll('[aria-pressed="true"]')).toHaveLength(2);
 });
 

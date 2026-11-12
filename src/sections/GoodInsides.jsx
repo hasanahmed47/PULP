@@ -1,8 +1,9 @@
 import { Fragment, useState } from 'react';
+import { Droplet, Leaf, WheatOff } from 'lucide-react';
 import { CanCarousel } from '../components/CanCarousel';
 import { flavours } from '../data/flavours';
 import { flavourDetails } from '../data/flavourDetails';
-import './GoodInsides.css';
+import '../styles/GoodInsides.css';
 
 const NUTRITION_ROWS = [
   ['calories', 'Calories'],
@@ -17,36 +18,21 @@ function renderStars(rating) {
   return '★'.repeat(filled) + '☆'.repeat(5 - filled);
 }
 
-function Icon({ children }) {
-  return (
-    <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
-      {children}
-    </svg>
-  );
-}
-
 const PERKS = [
   {
     label: 'Real fruit juice',
-    icon: <Icon><path d="M6 26C6 14 13 6 26 6c0 12-8 20-20 20Z" /><path d="M6 26 18 14" /></Icon>,
+    icon: <Leaf aria-hidden="true" />,
   },
   {
     label: 'No artificial colours',
-    icon: <Icon><path d="M16 4c5 6 8 10 8 14a8 8 0 0 1-16 0c0-4 3-8 8-14Z" /><path d="M12 19a4 4 0 0 0 4 4" /></Icon>,
+    icon: <Droplet aria-hidden="true" />,
   },
   {
     label: 'Gluten free',
-    icon: (
-      <Icon>
-        <circle cx="16" cy="16" r="12" />
-        <path d="M16 23V10m0 4c-2.5 0-4-1.5-4-3.5 2.5 0 4 1.5 4 3.5Zm0 0c2.5 0 4-1.5 4-3.5-2.5 0-4 1.5-4 3.5Zm0 5c-2.5 0-4-1.5-4-3.5 2.5 0 4 1.5 4 3.5Zm0 0c2.5 0 4-1.5 4-3.5-2.5 0-4 1.5-4 3.5ZM7 25 25 7" />
-      </Icon>
-    ),
+    icon: <WheatOff aria-hidden="true" />,
   },
 ];
 
-// Every flavour's copy sits in the same grid cell and only the active one is visible,
-// so switching can cross-fade without the layout jumping.
 function FlavourStack({ activeId, className = '', render }) {
   return (
     <div className={`spot-stack ${className}`}>
@@ -55,7 +41,7 @@ function FlavourStack({ activeId, className = '', render }) {
 
         return (
           <div key={flavour.id} className="spot-stack__layer" data-active={active} aria-hidden={!active} inert={!active}>
-            {render(flavour, flavourDetails[flavour.id])}
+            {render({ flavour, details: flavourDetails[flavour.id] })}
           </div>
         );
       })}
@@ -97,9 +83,9 @@ export function GoodInsides() {
             <p className="spot__kicker">Meet your flavour</p>
             <FlavourStack
               activeId={flavour.id}
-              render={(item, details) => (
+              render={({ flavour: item, details }) => (
                 <>
-                  <h2 className="spot__title" style={{ '--longest': Math.max(...item.lines.map((line) => line.length)) }}>
+                  <h2 className="spot__title" data-flavour={item.id}>
                     {item.lines.map((line) => (
                       <Fragment key={line}><span>{line}</span>{' '}</Fragment>
                     ))}
@@ -118,7 +104,7 @@ export function GoodInsides() {
             <h3 className="spot__heading">Nutrition &amp; details</h3>
             <FlavourStack
               activeId={flavour.id}
-              render={(item, details) => (
+              render={({ details }) => (
                 <dl className="spot__nutrition">
                   {NUTRITION_ROWS.map(([key, label]) => (
                     <div key={key}>
@@ -136,7 +122,7 @@ export function GoodInsides() {
               <h3 className="spot__heading">Ingredients</h3>
               <FlavourStack
                 activeId={flavour.id}
-                render={(item, details) => <p>{details.ingredients}</p>}
+                render={({ details }) => <p>{details.ingredients}</p>}
               />
             </div>
             <ul className="spot__cell spot__perks">

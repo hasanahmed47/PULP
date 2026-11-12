@@ -14,7 +14,7 @@ import { Footer } from './sections/Footer';
 import { LoadingScreen } from './components/LoadingScreen';
 import { useSiteLoading } from './hooks/useSiteLoading';
 import { flavours } from './data/flavours';
-import './App.css';
+import './styles/App.css';
 
 export default function App() {
   const loading = useSiteLoading();

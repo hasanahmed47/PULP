@@ -6,7 +6,7 @@ import { useScroll } from '../context/ScrollContext';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import { useVisibility } from '../hooks/useVisibility';
 import { gsap } from '../lib/animation';
-import './FlavourRotation.css';
+import '../styles/FlavourRotation.css';
 
 function getFlavourScrollPosition(trigger, index) {
   const lastIndex = flavours.length - 1;
