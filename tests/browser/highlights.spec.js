@@ -2,7 +2,9 @@ import { test, expect } from '@playwright/test';
 
 async function openCarousel(page) {
   await page.goto('/');
-  await expect(page.locator('.loading-screen')).toHaveCount(0, { timeout: 25000 });
+  await expect(page.locator('.site-content')).toHaveAttribute('aria-hidden', 'false', { timeout: 25000 });
+  await page.locator('.deferred-highlights').scrollIntoViewIfNeeded();
+  await expect(page.locator('.hl__stage')).toBeAttached();
   await page.locator('.hl__stage').evaluate((stage) => {
     const bounds = stage.getBoundingClientRect();
     window.scrollTo({ top: window.scrollY + bounds.top, behavior: 'instant' });
@@ -20,11 +22,35 @@ async function showRemainingPortion(page, portion) {
   }, portion);
 }
 
-test('playback crosses the 20% visibility boundary and preserves manual pause', async ({ page }, testInfo) => {
+test('completed videos advance automatically and wrap to the first slide', async ({ page }) => {
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await openCarousel(page);
+  await showRemainingPortion(page, 0.18);
+  for (const nextIndex of [1, 2, 0]) {
+    const activeVideo = page.locator('.hl__slide.is-active video');
+    await expect.poll(() => activeVideo.evaluate((video) => video.readyState)).toBeGreaterThanOrEqual(2);
+    await expect.poll(() => activeVideo.evaluate((video) => video.paused)).toBe(false);
+    await activeVideo.evaluate((video) => { video.currentTime = video.duration - 0.25; });
+    await expect(page.locator('.hl__track')).toHaveAttribute('data-index', String(nextIndex));
+  }
+  await expect.poll(() => page.locator('.hl__slide.is-active video').evaluate((video) => video.paused)).toBe(false);
+  await page.getByRole('button', { name: 'Pause carousel', exact: true }).click();
+  await expect.poll(() => page.locator('.hl__slide.is-active video').evaluate((video) => video.paused)).toBe(true);
+  expect(errors).toEqual([]);
+});
+
+test('playback tolerates small scrolls and preserves manual pause', async ({ page }, testInfo) => {
+  const errors = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  await openCarousel(page);
+  await page.locator('.hl__dot').first().click();
   const video = page.locator('.hl__slide.is-active video');
+  await video.evaluate((element) => {
+    element.currentTime = 0;
+    element.playbackRate = 0.1;
+  });
+  await page.getByRole('button', { name: 'Play carousel', exact: true }).click();
   await expect.poll(() => video.evaluate((element) => element.paused)).toBe(false);
 
   await showRemainingPortion(page, 0.22);
@@ -33,14 +59,21 @@ test('playback crosses the 20% visibility boundary and preserves manual pause', 
   await expect.poll(() => video.evaluate((element) => element.currentTime)).toBeGreaterThan(before);
 
   await showRemainingPortion(page, 0.18);
+  await expect(page.locator('.hl__controls')).toHaveClass(/is-visible/);
+  await expect.poll(() => video.evaluate((element) => element.currentTime)).toBeGreaterThan(before + 0.3);
+  await expect.poll(() => video.evaluate((element) => element.paused)).toBe(false);
+
+  await showRemainingPortion(page, 0.02);
   await expect.poll(() => video.evaluate((element) => element.paused)).toBe(true);
   await expect(page.locator('.hl__controls')).not.toHaveClass(/is-visible/);
 
+  await showRemainingPortion(page, 0.12);
+  await expect(page.locator('.hl__controls')).not.toHaveClass(/is-visible/);
   await showRemainingPortion(page, 0.22);
   await expect.poll(() => video.evaluate((element) => element.paused)).toBe(false);
   await showRemainingPortion(page, 1);
   await page.getByRole('button', { name: 'Pause carousel', exact: true }).click();
-  await showRemainingPortion(page, 0.18);
+  await showRemainingPortion(page, 0.02);
   await expect(page.locator('.hl__controls')).not.toHaveClass(/is-visible/);
   await showRemainingPortion(page, 1);
   await expect(page.getByRole('button', { name: 'Play carousel', exact: true })).toBeVisible();

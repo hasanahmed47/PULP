@@ -1,5 +1,6 @@
 .hl {
   --hl-space-top: clamp(4.5rem, 10vw, 10rem);
+  --hl-space-bottom: clamp(3rem, 6vw, 6rem);
   --hl-heading-gap: clamp(2.25rem, 5vw, 5rem);
   --hl-card-w: 86%;
   --hl-gap: var(--space-md);
@@ -43,6 +44,7 @@
 }
 
 .hl__film {
+  min-height: 2.75rem;
   display: inline-flex;
   align-items: center;
   gap: 0.45em;
@@ -248,6 +250,7 @@
 }
 
 .hl__dot {
+  min-width: 2.75rem;
   height: var(--hl-ctl);
   display: grid;
   place-items: center;
@@ -366,6 +369,8 @@
 }
 
 .hl__dialog video {
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
   display: block;
   width: 100%;
   max-height: 84svh;

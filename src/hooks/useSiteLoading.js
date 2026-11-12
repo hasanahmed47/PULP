@@ -7,31 +7,15 @@ const heroSources = [
   ...Object.values(media.canDetails),
   flavours[0].texture,
 ];
-const backgroundSources = [
-  ...Object.values(media.can),
-  ...Object.values(media.cutaways),
-  ...Object.values(media.fruit),
-  media.poster,
-];
 const fontTimeout = 3000;
 const entranceDuration = 700;
 const loadingDeadline = 8000;
 const introFallbackDelay = introTime * 1000 + 1000;
 
-const prefetchedImages = new Set();
-
 function prefetchImage(source, priority) {
   const image = new Image();
   image.fetchPriority = priority;
   image.src = source;
-  prefetchedImages.add(image);
-}
-
-function waitForFonts() {
-  return Promise.race([
-    document.fonts.ready,
-    new Promise((resolve) => window.setTimeout(resolve, fontTimeout)),
-  ]);
 }
 
 export function useSiteLoading() {
@@ -45,14 +29,17 @@ export function useSiteLoading() {
 
   useEffect(function startLoading() {
     let cancelled = false;
+    const fontTimer = window.setTimeout(() => setFontsSettled(true), fontTimeout);
     const timers = [
+      fontTimer,
       window.setTimeout(() => setEntranceComplete(true), entranceDuration),
       window.setTimeout(() => setIntroEnded(true), introFallbackDelay),
       window.setTimeout(() => setDeadlineReached(true), loadingDeadline),
     ];
 
     for (const source of heroSources) prefetchImage(source, 'high');
-    waitForFonts().then(() => {
+    document.fonts.ready.then(() => {
+      window.clearTimeout(fontTimer);
       if (!cancelled) setFontsSettled(true);
     });
 
@@ -61,11 +48,6 @@ export function useSiteLoading() {
       for (const timer of timers) window.clearTimeout(timer);
     };
   }, []);
-
-  useEffect(function warmBackgroundImages() {
-    if (!finished) return;
-    for (const source of backgroundSources) prefetchImage(source, 'low');
-  }, [finished]);
 
   useLayoutEffect(function syncLoadingState() {
     document.documentElement.dataset.loading = String(!revealed);

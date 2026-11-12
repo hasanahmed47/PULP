@@ -447,7 +447,7 @@
     grid-area: 1 / 2;
     height: clamp(14.875rem, 43vw, 21.25rem);
     padding: .7em .35em .3em;
-    --dot-size: clamp(1.75rem, 7.5vw, 2.5rem);
+    --dot-size: 2.75rem;
   }
 
   .spot__stage .can-carousel__cans {
@@ -543,6 +543,14 @@
 }
 
 @media (max-width: 35rem) {
+  .spot__card {
+    grid-template-columns: minmax(0, 1fr) minmax(11rem, 1fr);
+  }
+
+  .spot__stage {
+    padding-inline: 0;
+  }
+
   .spot__name {
     padding: 1.2em .95em 1.5em;
   }

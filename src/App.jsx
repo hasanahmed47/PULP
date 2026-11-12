@@ -5,7 +5,7 @@ import { AnchorLink } from './components/AnchorLink';
 import { Header } from './components/Header';
 import { Hero } from './sections/Hero';
 import { GoodInsides } from './sections/GoodInsides';
-import HighlightsCarousel from './sections/HighlightsCarousel';
+import HighlightsCarousel from './components/DeferredHighlights';
 import { Cutaway } from './sections/Cutaway';
 import { FlavourRotation } from './sections/FlavourRotation';
 import { FlavourCards } from './sections/FlavourCards';
@@ -37,7 +37,7 @@ export default function App() {
             <GoodInsides />
             <HighlightsCarousel />
             <Cutaway onPickFlavour={setSelectedFlavourId} />
-            <FlavourRotation preload={loading.finished} />
+            <FlavourRotation />
             <FlavourCards onPickFlavour={setSelectedFlavourId} />
             <PickYourPulp
               selectedId={selectedFlavourId}

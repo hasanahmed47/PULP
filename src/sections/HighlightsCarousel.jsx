@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { media } from '../data/media';
 import { useCarouselDrag } from '../hooks/useCarouselDrag';
+import { useCarouselPlayback } from '../hooks/useCarouselPlayback';
 import { useMobileViewport } from '../hooks/useMobileViewport';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import { useVisibleOnce } from '../hooks/useVisibleOnce';
@@ -8,13 +9,14 @@ import { useVisibility } from '../hooks/useVisibility';
 import '../styles/HighlightsCarousel.css';
 
 const FAILED_VIDEO_DELAY_MS = 2500;
-const MEDIA_LOAD_MARGIN = '2500px 0px';
-const MIN_VISIBLE_RATIO = 0.2;
-const VISIBILITY_THRESHOLDS = [0, MIN_VISIBLE_RATIO, 0.5, 0.8, 1];
+const MEDIA_LOAD_MARGIN = '600px 0px';
+const playbackVisibility = { enterRatio: 0.2, exitRatio: 0.05, exitDelay: 250 };
 
 const defaultSlides = [
   {
     id: 'bold',
+    title: 'BOLD FRUIT. BIG FLAVOUR.',
+    hideTitle: true,
     videoSrc: media.firstTileDesktopFilm,
     posterSrc: media.firstTileDesktopPoster,
     mobileVideoSrc: media.firstTileMobileFilm,
@@ -45,7 +47,6 @@ export default function HighlightsCarousel({ slides: suppliedSlides = defaultSli
   const index = Math.min(selectedIndex, slideCount - 1);
   const activeSlide = slides[index];
   const [playing, setPlaying] = useState(() => !reducedMotion);
-  const [inView, setInView] = useState(false);
   const [headingRevealed, setHeadingRevealed] = useState(false);
   const [cardsRevealed, setCardsRevealed] = useState(false);
   const [filmOpen, setFilmOpen] = useState(false);
@@ -56,11 +57,24 @@ export default function HighlightsCarousel({ slides: suppliedSlides = defaultSli
   const dialogRef = useRef(null);
   const videos = useRef([]);
   const progressBars = useRef([]);
-  const previousIndex = useRef(0);
-  const visible = useVisibility(stageRef);
+  const visible = useVisibility(stageRef, '0px', playbackVisibility);
   const mediaEnabled = useVisibleOnce(stageRef, MEDIA_LOAD_MARGIN);
-  const running = playing && inView && visible && !filmOpen;
-  const controlsVisible = inView && visible && !filmOpen;
+  const running = playing && visible && !filmOpen;
+  const controlsVisible = visible && !filmOpen;
+
+  const handleBlockedPlayback = useCallback(() => setPlaying(false), []);
+  const handleVideoFailure = useCallback((source) => {
+    setFailed((current) => ({ ...current, [source]: true }));
+  }, []);
+
+  useCarouselPlayback(
+    videos,
+    index,
+    mediaEnabled ? activeSlide.videoSrc : undefined,
+    running,
+    handleBlockedPlayback,
+    handleVideoFailure,
+  );
 
   const advanceSlide = useCallback(function advanceSlide(direction) {
     setIndex((current) => (Math.min(current, slideCount - 1) + direction + slideCount) % slideCount);
@@ -92,15 +106,6 @@ export default function HighlightsCarousel({ slides: suppliedSlides = defaultSli
     return () => observer.disconnect();
   }, []);
 
-  useEffect(function observeCarouselVisibility() {
-    const observer = new IntersectionObserver(([entry]) => {
-      setInView(entry.isIntersecting && entry.intersectionRatio >= MIN_VISIBLE_RATIO);
-    }, { rootMargin: '0px', threshold: VISIBILITY_THRESHOLDS });
-
-    observer.observe(stageRef.current);
-    return () => observer.disconnect();
-  }, []);
-
   useEffect(function centerActiveSlide() {
     const viewport = viewportRef.current;
     let previousWidth = viewport.clientWidth;
@@ -123,33 +128,6 @@ export default function HighlightsCarousel({ slides: suppliedSlides = defaultSli
     observer.observe(viewport);
     return () => observer.disconnect();
   }, [index, slideCount, reducedMotion]);
-
-  useEffect(function synchronizePlayback() {
-    let cancelled = false;
-    const activeVideo = videos.current[index];
-    const arrived = previousIndex.current !== index;
-    previousIndex.current = index;
-
-    for (const video of videos.current) {
-      if (video && video !== activeVideo) video.pause();
-    }
-
-    if (!activeVideo) return;
-    if (arrived) activeVideo.currentTime = 0;
-
-    if (running) {
-      activeVideo.play().catch((error) => {
-        if (!cancelled && error.name === 'NotAllowedError') setPlaying(false);
-      });
-    } else {
-      activeVideo.pause();
-    }
-
-    return function stopPlayback() {
-      cancelled = true;
-      activeVideo.pause();
-    };
-  }, [index, running, activeSlide.id, activeSlide.videoSrc]);
 
   useEffect(function synchronizeProgress() {
     let frame;
@@ -187,15 +165,6 @@ export default function HighlightsCarousel({ slides: suppliedSlides = defaultSli
     if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return;
     event.preventDefault();
     chooseSlide(index + (event.key === 'ArrowRight' ? 1 : -1));
-  }
-
-  function preloadFor(slideIndex) {
-    if (!mediaEnabled) return 'none';
-    if (slideIndex === index && cardsRevealed) return 'auto';
-    if (!inView) return 'none';
-    const distance = (slideIndex - index + slides.length) % slides.length;
-    if (distance === 0 || distance === 1 || distance === slides.length - 1) return 'metadata';
-    return 'none';
   }
 
   return (
@@ -252,14 +221,15 @@ export default function HighlightsCarousel({ slides: suppliedSlides = defaultSli
                   poster={mediaEnabled ? slide.posterSrc : undefined}
                   muted
                   playsInline
+                  loop={slideCount === 1}
                   disablePictureInPicture
-                  preload={preloadFor(slideIndex)}
+                  preload="metadata"
                   onEnded={() => {
                     if (slideIndex === index && running) advanceSlide(1);
                   }}
-                  onError={() => setFailed((current) => ({ ...current, [slide.videoSrc]: true }))}
+                  onError={() => handleVideoFailure(slide.videoSrc)}
                 />
-                <h3 className="hl__title">{slide.title}</h3>
+                {!slide.hideTitle && <h3 className="hl__title">{slide.title}</h3>}
               </article>
             ))}
           </div>
@@ -337,7 +307,7 @@ export default function HighlightsCarousel({ slides: suppliedSlides = defaultSli
             <button type="button" className="hl__close" aria-label="Close film" onClick={() => setFilmOpen(false)}>
               &times;
             </button>
-            <video src={media.film} controls autoPlay playsInline />
+            <video src={media.film} controls autoPlay playsInline muted loop preload="metadata" aria-label="PULP brand film" />
           </>
         )}
       </dialog>

@@ -34,15 +34,18 @@ function createLabelMaterial(track) {
 }
 
 function addCanEnds(addMesh, silver, endMaterials) {
+  const collarGeometry = new THREE.CylinderGeometry(0.54, 0.54, 0.04, 80, 1, true);
+  const rimGeometry = new THREE.TorusGeometry(0.54, 0.034, 12, 80);
+  const discGeometry = new THREE.CircleGeometry(0.535, 80);
   for (const height of [-1.65, 1.65]) {
-    addMesh(new THREE.CylinderGeometry(0.54, 0.54, 0.04, 80, 1, true), silver, height);
-    const rim = addMesh(new THREE.TorusGeometry(0.54, 0.034, 12, 80), silver, height);
+    addMesh(collarGeometry, silver, height);
+    const rim = addMesh(rimGeometry, silver, height);
     rim.rotation.x = Math.PI / 2;
   }
 
-  const top = addMesh(new THREE.CircleGeometry(0.535, 80), endMaterials.top, 1.657);
+  const top = addMesh(discGeometry, endMaterials.top, 1.657);
   top.rotation.x = -Math.PI / 2;
-  const bottom = addMesh(new THREE.CircleGeometry(0.535, 80), endMaterials.bottom, -1.657);
+  const bottom = addMesh(discGeometry, endMaterials.bottom, -1.657);
   bottom.rotation.x = Math.PI / 2;
 }
 

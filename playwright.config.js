@@ -17,9 +17,16 @@ export default defineConfig({
     { name: 'desktop', use: { viewport: { width: 1440, height: 1000 } } },
     { name: 'tablet', use: { viewport: { width: 768, height: 1000 } } },
     { name: 'mobile', use: { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true } },
+    {
+      name: 'iphone-se',
+      testMatch: /(?:hero-layout|highlights|prelaunch)\.spec\.js/,
+      use: { viewport: { width: 375, height: 667 }, isMobile: true, hasTouch: true },
+    },
   ],
   webServer: {
-    command: 'npm run dev -- --host 127.0.0.1 --port 4173 --strictPort',
+    command: process.env.PLAYWRIGHT_PREVIEW
+      ? 'npm run preview -- --host 127.0.0.1 --port 4173 --strictPort'
+      : 'npm run dev -- --host 127.0.0.1 --port 4173 --strictPort',
     url: 'http://127.0.0.1:4173',
     reuseExistingServer: false,
   },

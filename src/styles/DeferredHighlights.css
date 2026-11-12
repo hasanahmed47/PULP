@@ -1,0 +1,7 @@
+.deferred-highlights {
+  min-width: 0;
+}
+
+.deferred-highlights__placeholder {
+  height: var(--hl-card-h);
+}

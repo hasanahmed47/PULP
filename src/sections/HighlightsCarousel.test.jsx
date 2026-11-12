@@ -76,3 +76,29 @@ it('uses the existing fallback when slides are omitted or empty', () => {
   rerender(<HighlightsCarousel slides={[]} />);
   expect(container.querySelectorAll('.hl__slide')).toHaveLength(3);
 });
+
+it('advances completed active clips, wraps the slideshow and respects manual pause', () => {
+  const { container } = render(<HighlightsCarousel slides={customSlides.slice(0, 2)} />);
+  const videos = container.querySelectorAll('video');
+  const track = container.querySelector('.hl__track');
+  expect(videos[0].loop).toBe(false);
+  fireEvent.ended(videos[0]);
+  expect(track.dataset.index).toBe('0');
+
+  fireEvent.click(screen.getByRole('button', { name: 'Play carousel' }));
+  fireEvent.ended(videos[1]);
+  expect(track.dataset.index).toBe('0');
+  fireEvent.ended(videos[0]);
+  expect(track.dataset.index).toBe('1');
+  fireEvent.ended(videos[1]);
+  expect(track.dataset.index).toBe('0');
+
+  fireEvent.click(screen.getByRole('button', { name: 'Pause carousel' }));
+  fireEvent.ended(videos[0]);
+  expect(track.dataset.index).toBe('0');
+});
+
+it('loops the video only when the carousel has one slide', () => {
+  const { container } = render(<HighlightsCarousel slides={customSlides.slice(0, 1)} />);
+  expect(container.querySelector('video').loop).toBe(true);
+});

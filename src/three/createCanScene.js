@@ -10,7 +10,8 @@ const MAX_PIXEL_RATIO = 1.75;
 const MAX_ANISOTROPY = 8;
 
 function configureRenderer(renderer, host) {
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, MAX_PIXEL_RATIO));
+  const pixelRatioLimit = window.matchMedia('(pointer: coarse)').matches ? 1.5 : MAX_PIXEL_RATIO;
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, pixelRatioLimit));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.2;

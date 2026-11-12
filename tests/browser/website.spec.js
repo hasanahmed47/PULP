@@ -251,6 +251,8 @@ test('anchor navigation preserves browser history and avoids duplicate entries',
 test('keyboard anchor navigation cleans up temporary focus attributes', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await openWebsite(page);
+  await page.locator('.deferred-highlights').scrollIntoViewIfNeeded();
+  await expect(page.locator('#hl-heading')).toBeAttached();
   const link = page.locator('.hero-bottom .text-link');
   const target = page.locator('#hl-heading');
   await expect(target).not.toHaveAttribute('tabindex');

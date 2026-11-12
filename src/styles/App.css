@@ -1,5 +1,10 @@
 html {
   scrollbar-gutter: stable;
+  overflow-x: hidden;
+}
+
+.site-content {
+  overflow-x: clip;
 }
 
 html[data-loading='true'] {

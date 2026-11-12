@@ -15,6 +15,7 @@ import { useCanRenderer } from '../hooks/useCanRenderer';
 import { useCanSpin } from '../hooks/useCanSpin';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import { useVisibility } from '../hooks/useVisibility';
+import { useVisibleOnce } from '../hooks/useVisibleOnce';
 import { gsap } from '../lib/animation';
 import { blendFromPosition, clampBlend } from '../lib/flavourBlend';
 import '../styles/CanScene.css';
@@ -110,10 +111,11 @@ export function CanScene({
 
   const reducedMotion = useReducedMotion();
   const visible = useVisibility(wrapperRef);
+  const approaching = useVisibleOnce(wrapperRef, '600px 0px');
   const { sceneRef, status } = useCanRenderer(canvasRef, poseRef, {
     allFlavours,
     interactive,
-    preload,
+    preload: preload || approaching,
     visible,
   });
 

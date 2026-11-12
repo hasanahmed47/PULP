@@ -54,6 +54,17 @@ test('can and splash share bounds through replay, resizing and larger text', asy
   expect(coverage.height).toBeGreaterThan(0.7);
   expect(coverage.height).toBeLessThan(0.85);
   expect(Math.abs(coverage.ground - 0.86)).toBeLessThan(0.04);
+  const initialViewport = page.viewportSize();
+  if (initialViewport.width <= 400 && initialViewport.height <= 700) {
+    const stage = await scene.locator('.can-scene__stage').boundingBox();
+    expect(coverage.height * stage.height).toBeGreaterThan(200);
+    const fontSize = await page.locator('.hero-title').evaluate((element) => parseFloat(getComputedStyle(element).fontSize));
+    expect(fontSize).toBeLessThanOrEqual(34);
+    const picker = await page.locator('.hero-flavour-picker').boundingBox();
+    const bottom = await page.locator('.hero-bottom').boundingBox();
+    expect(picker.y + picker.height).toBeLessThanOrEqual(bottom.y);
+    expect(bottom.y + bottom.height).toBeLessThanOrEqual(initialViewport.height);
+  }
   await page.screenshot({ path: testInfo.outputPath('hero.png') });
 
   const replay = page.getByRole('button', { name: 'Replay can drop' });
