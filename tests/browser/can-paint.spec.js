@@ -27,8 +27,6 @@ test('can frames survive idle pin transitions and offscreen resizing', async ({ 
   await expect(page.locator('.loading-screen')).toHaveCount(0, { timeout: 25000 });
   const viewport = page.viewportSize();
 
-  // The loading screen no longer waits for WebGL. Make sure the renderer
-  // has produced its first frame before checking retained canvas pixels.
   const heroScene = page.locator('.hero .can-scene');
   await expect(heroScene).toHaveAttribute('data-ready', 'true', { timeout: 30000 });
   await expect(heroScene).toHaveAttribute('data-drop', 'landed', { timeout: 10000 });
@@ -37,7 +35,6 @@ test('can frames survive idle pin transitions and offscreen resizing', async ({ 
     const section = page.locator(selector);
     const canvas = section.locator('canvas');
     if (selector === '.rotation-section') {
-      // Lazy-initialized rotation scene starts as it enters the viewport.
       await section.scrollIntoViewIfNeeded();
       await expect(section.locator('.can-scene')).toHaveAttribute(
         'data-ready', 'true', { timeout: 30000 },
@@ -71,5 +68,23 @@ test('can frames survive idle pin transitions and offscreen resizing', async ({ 
     await expectRetainedCan(canvas);
   }
 
+  expect(errors).toEqual([]);
+});
+
+test('replaces a lost WebGL context with one working canvas', async ({ page }) => {
+  const errors = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  await page.goto('/');
+  await expect(page.locator('.loading-screen')).toHaveCount(0, { timeout: 25000 });
+  const scene = page.locator('.hero .can-scene');
+  await expect(scene).toHaveAttribute('data-ready', 'true', { timeout: 30000 });
+  await expect(scene).toHaveAttribute('data-drop', 'landed');
+  await scene.locator('canvas').evaluate((canvas) => {
+    canvas.getContext('webgl2').getExtension('WEBGL_lose_context').loseContext();
+  });
+  await expect(scene).toHaveAttribute('data-ready', 'false');
+  await expect(scene).toHaveAttribute('data-ready', 'true', { timeout: 30000 });
+  await expect(scene.locator('canvas')).toHaveCount(1);
+  await expectRetainedCan(scene.locator('canvas'));
   expect(errors).toEqual([]);
 });

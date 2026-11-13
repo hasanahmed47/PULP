@@ -1,6 +1,9 @@
 .pulp-shop {
+  --line: color-mix(in srgb, var(--blue) 14%, var(--paper));
+  --surface: var(--surface-blue);
   color: var(--ink);
-  background: var(--paper);
+  background: var(--surface-blue);
+  padding-block: var(--section-space);
   scroll-margin-top: 1.5rem;
 }
 

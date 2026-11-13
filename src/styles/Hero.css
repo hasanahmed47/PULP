@@ -198,7 +198,7 @@
   }
 }
 
-@media (max-width: 47.9375rem) and (max-height: 43.75rem) {
+@media (max-width: 47.9375rem) and (max-height: 43.75rem) and (prefers-reduced-motion: reduce) {
   .hero {
     --hero-top: 4.25rem;
     --hero-title-size: clamp(2.375rem, 11.4vw, 2.875rem);
@@ -211,23 +211,24 @@
   }
 }
 
-@media (max-width: 25rem) and (max-height: 43.75rem) and (prefers-reduced-motion: no-preference) {
+@media (max-width: 47.9375rem) and (prefers-reduced-motion: no-preference) {
   .hero {
-    --hero-title-size: clamp(1.875rem, 8.5vw, 2.125rem);
-    --hero-cta-height: 3.25rem;
+    --hero-height-space: clamp(0rem, calc(4.52svh - 1.875rem), 0.5rem);
+    --hero-title-size: clamp(1.875rem, min(12.4vw, calc(9.3svh - 1.875rem)), 3.75rem);
+    --hero-cta-height: calc(3.25rem + var(--hero-height-space));
   }
 
   .hero-explore {
-    min-height: 2.75rem;
-    margin-top: 0.5rem;
+    min-height: calc(2.75rem + var(--hero-height-space) / 2);
+    margin-top: calc(0.5rem + var(--hero-height-space));
   }
 
   .hero-product {
-    gap: 0.25rem;
+    gap: calc(0.25rem + var(--hero-height-space) / 2);
   }
 
   .hero-product .can-scene {
-    --can-controls-compact-space: 2rem;
+    --can-controls-compact-space: calc(2rem + var(--hero-height-space));
   }
 
   .hero-bottom {

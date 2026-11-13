@@ -10,7 +10,7 @@ import './styles/global.css';
 import App from './App';
 import { loadCanSceneModule } from './three/loadCanScene';
 
-loadCanSceneModule();
+loadCanSceneModule().catch(() => undefined);
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

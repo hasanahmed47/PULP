@@ -24,6 +24,7 @@ export function useCanRenderer(hostRef, poseRef, { allFlavours, interactive, pre
     let cancelled = false;
     let awaitingFrame = true;
     let attempt = 0;
+    let generation = 0;
     let watchdogDelay = textureTimeout;
     let scene;
     let watchdog;
@@ -54,17 +55,19 @@ export function useCanRenderer(hostRef, poseRef, { allFlavours, interactive, pre
 
     function handleFailure() {
       if (cancelled) return;
-      window.clearTimeout(watchdog);
+      generation += 1;
+      stopWatching();
+      window.clearTimeout(retryTimer);
       disposeScene();
 
       if (attempt < retryDelays.length) {
+        setStatus('loading');
         retryTimer = window.setTimeout(loadScene, retryDelays[attempt]);
         attempt += 1;
         return;
       }
 
       cancelled = true;
-      stopWatching();
       setStatus('failed');
     }
 
@@ -76,41 +79,54 @@ export function useCanRenderer(hostRef, poseRef, { allFlavours, interactive, pre
     }
 
     async function loadScene() {
+      const currentGeneration = ++generation;
+      awaitingFrame = true;
+      document.addEventListener('visibilitychange', rearmWatchdog);
       armWatchdog(textureTimeout);
+
+      function isCurrentAttempt() {
+        return !cancelled && generation === currentGeneration;
+      }
 
       try {
         const { createCanScene } = await loadCanSceneModule();
-        if (cancelled) return;
+        if (!isCurrentAttempt()) return;
 
         const sceneFlavours = allFlavours ? flavours : [flavours[0]];
         const created = createCanScene(hostRef.current, sceneFlavours, {
-          onPrepared: () => armWatchdog(firstFrameTimeout),
-          onReady: finishRender,
-          onError: handleFailure,
+          onPrepared: () => {
+            if (isCurrentAttempt()) armWatchdog(firstFrameTimeout);
+          },
+          onReady: () => {
+            if (isCurrentAttempt()) finishRender();
+          },
+          onError: () => {
+            if (isCurrentAttempt()) handleFailure();
+          },
         });
-        scene = created;
 
-        if (cancelled) {
-          disposeScene();
+        if (!isCurrentAttempt()) {
+          created.dispose();
           return;
         }
 
         const pose = poseRef.current;
+        scene = created;
         sceneRef.current = created;
         created.setRotation(pose.rotation + pose.spin);
         created.setTilt(pose.tilt);
         created.setFlavourBlend(pose.blend.from, pose.blend.to, pose.blend.amount);
         created.setPointer(...pose.pointer);
       } catch {
-        handleFailure();
+        if (isCurrentAttempt()) handleFailure();
       }
     }
 
-    document.addEventListener('visibilitychange', rearmWatchdog);
     loadScene();
 
     return () => {
       cancelled = true;
+      generation += 1;
       window.clearTimeout(retryTimer);
       stopWatching();
       disposeScene();

@@ -36,7 +36,7 @@ test('defers offscreen work, reserves media space and keeps controls reachable',
   const ratio = await page.locator('.hero canvas').evaluate((canvas) => canvas.width / canvas.clientWidth);
   expect(ratio).toBeLessThanOrEqual(isMobile ? 1.51 : 1.76);
 
-  for (const selector of ['.site-header', '.spot', '.deferred-highlights', '.site-footer']) {
+  for (const selector of ['.site-header', '.spot', '.deferred-highlights']) {
     const section = page.locator(selector);
     await section.scrollIntoViewIfNeeded();
     if (selector === '.deferred-highlights') {

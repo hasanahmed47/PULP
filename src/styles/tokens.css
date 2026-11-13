@@ -12,6 +12,10 @@
   --ink: #171719;
   --paper: #fff;
   --blue: #2257f5;
+  --footer-blue-deep: #06117a;
+  --footer-blue-mid: #0b24b8;
+  --footer-blue-glow: #3a6bff;
+  --surface-blue: color-mix(in srgb, var(--blue) 7%, var(--paper));
   --yellow: #ffdf4b;
   --muted: #66666b;
   --line: #e4e4e5;

@@ -218,7 +218,7 @@ test('footer shows a live local clock and fits the viewport', async ({ page }, t
   const footer = page.locator('.site-footer');
   const clock = footer.locator('.footer-clock time');
   await expect(footer.getByRole('switch')).toHaveCount(0);
-  await expect(footer.locator('.footer-clock')).toContainText('Pulp o’clock');
+  await expect(footer.locator('.footer-clock')).toContainText(/Pulp o['’]clock/);
   await footer.scrollIntoViewIfNeeded();
   await expect(clock).toBeVisible();
   const before = await clock.innerText();

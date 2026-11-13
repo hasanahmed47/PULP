@@ -10,7 +10,7 @@ import { Cutaway } from './sections/Cutaway';
 import { FlavourRotation } from './sections/FlavourRotation';
 import { FlavourCards } from './sections/FlavourCards';
 import { PickYourPulp } from './sections/PickYourPulp';
-import { Footer } from './sections/Footer';
+import { Footer } from './components/Footer/Footer';
 import { LoadingScreen } from './components/LoadingScreen';
 import { useSiteLoading } from './hooks/useSiteLoading';
 import { flavours } from './data/flavours';
