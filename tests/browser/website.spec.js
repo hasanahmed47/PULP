@@ -215,7 +215,7 @@ test('footer shows a live local clock and fits the viewport', async ({ page }, t
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.clock.install({ time: new Date('2026-10-28T12:00:30Z') });
   await openWebsite(page);
-  const footer = page.locator('.site-footer');
+  const footer = page.getByRole('contentinfo');
   const clock = footer.locator('.footer-clock time');
   await expect(footer.getByRole('switch')).toHaveCount(0);
   await expect(footer.locator('.footer-clock')).toContainText(/Pulp o['’]clock/);

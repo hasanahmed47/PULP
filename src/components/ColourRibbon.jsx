@@ -20,12 +20,6 @@ const ribbons = {
     aspectRatio: 'xMidYMid slice',
     stripeOffset: { x: -14, y: 0 },
   },
-  footer: {
-    path: 'M-120 650 Q720 -170 1560 650',
-    viewBox: '0 0 1440 650',
-    aspectRatio: 'none',
-    stripeOffset: { x: 0, y: 23 },
-  },
 };
 
 export function ColourRibbon({ variant = 'hero', animate = false }) {

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { ArrowUp, ArrowUpRight } from 'lucide-react';
 import { AnchorLink } from '../AnchorLink';
 import { FlameCanvas } from './FlameCanvas';
+import { contactEmail } from '../../data/site';
 
 const footerLinks = [
   { href: '#good-insides', label: 'The good stuff' },
@@ -33,7 +34,7 @@ export function Footer() {
   }, []);
 
   return (
-    <footer className="site-footer flame-footer">
+    <footer className="flame-footer">
       <FlameCanvas />
       <div className="footer-top">
         <AnchorLink className="wordmark footer-logo" href="#top" aria-label="PULP home">
@@ -52,7 +53,7 @@ export function Footer() {
       </div>
       <div className="footer-rule" aria-hidden="true" />
       <div className="footer-mid">
-        <a className="footer-headline" href="mailto:hasanmuhammad2004@gmail.com" aria-label="Get in touch">
+        <a className="footer-headline" href={`mailto:${contactEmail}`} aria-label="Get in touch">
           <span>Get in Touch</span>
         </a>
       </div>

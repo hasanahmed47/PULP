@@ -3,7 +3,6 @@
   --ink: #fff;
   --dim: rgba(255, 255, 255, .62);
   --rule: rgba(255, 255, 255, .22);
-  --yellow: #ffd84a;
   --pad: clamp(1.25rem, 2.6vw, 3rem);
   position: relative;
   min-height: 100svh;

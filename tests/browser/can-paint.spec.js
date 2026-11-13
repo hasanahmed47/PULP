@@ -54,7 +54,7 @@ test('can frames survive idle pin transitions and offscreen resizing', async ({ 
     }
 
     await page.screenshot({ path: testInfo.outputPath(`${selector.slice(1)}-boundary.png`) });
-    await page.locator('.site-footer').scrollIntoViewIfNeeded();
+    await page.getByRole('contentinfo').scrollIntoViewIfNeeded();
     await waitForPaint(page);
     const beforeResize = await canvas.evaluate((element) => [element.width, element.height]);
     await page.setViewportSize({ width: viewport.width + 3, height: viewport.height + 3 });

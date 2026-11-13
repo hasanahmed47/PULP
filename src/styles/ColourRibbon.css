@@ -29,10 +29,6 @@
   stroke: var(--blue);
 }
 
-.colour-ribbon--footer > path {
-  stroke-width: 11;
-}
-
 .colour-ribbon--hero {
   right: -2%;
   top: -8%;
@@ -52,14 +48,6 @@
   stroke-width: 12;
 }
 
-.colour-ribbon--footer {
-  left: -4%;
-  top: -1.875rem;
-  width: 108%;
-  height: 35.625rem;
-  opacity: .13;
-}
-
 @media (max-width: 47.9375rem) {
   .colour-ribbon--hero {
     display: none;
@@ -67,10 +55,5 @@
 
   .colour-ribbon--hero-mobile {
     display: block;
-  }
-
-  .colour-ribbon--footer {
-    height: 20.625rem;
-    top: -0.3125rem;
   }
 }
