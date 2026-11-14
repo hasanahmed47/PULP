@@ -5,6 +5,7 @@
   --rule: var(--cream-rule);
   --pad: clamp(1.25rem, 2.6vw, 3rem);
   position: relative;
+  isolation: isolate;
   min-height: 100svh;
   display: flex;
   flex-direction: column;
@@ -112,6 +113,7 @@
   align-items: center;
   padding: 0 var(--pad);
   container-type: inline-size;
+  mix-blend-mode: difference;
 }
 
 .footer-headline {
@@ -123,6 +125,7 @@
   letter-spacing: -.055em;
   font-size: 18.909047718cqw;
   margin: 0;
+  color: var(--surface-cream);
 }
 
 .footer-headline span {

@@ -53,57 +53,58 @@ async function renderShaderFrames(page, { width, height, fragment = fragmentShad
   }, { vertex: vertexShader, fragment, width, height, frames });
 }
 
-function plumeHeight(pixels, width, horizontalPosition) {
-  const height = pixels.length / (width * 4);
-  const column = Math.floor(horizontalPosition * width);
-  for (let row = height - 1; row >= 0; row--) {
-    const offset = (row * width + column) * 4;
-    if (pixels[offset + 2] > pixels[offset] + 40) return (row + 1) / height;
+function averageFrameDifference(first, second) {
+  let difference = 0;
+  for (let offset = 0; offset < first.length; offset += 4) {
+    difference += Math.abs(first[offset] - second[offset]);
+    difference += Math.abs(first[offset + 1] - second[offset + 1]);
+    difference += Math.abs(first[offset + 2] - second[offset + 2]);
   }
-  return 0;
+  return difference / (first.length / 4 * 3);
 }
 
-test('flame retains desktop composition, animates and keeps text areas clear', async ({ page }) => {
+test('fluid folds animate continuously and preserve the cream top and blue base', async ({ page }) => {
   const viewport = page.viewportSize();
-  const width = Math.round(80 * viewport.width / viewport.height);
+  const width = Math.round(100 * viewport.width / viewport.height);
+  const times = [14, 14 + 1 / 60, 18, 30, 30 + 1 / 60, 60, 120, 300, 600, 14];
   const { frames, error } = await renderShaderFrames(page, {
     width,
-    height: 80,
-    frames: [
-      ...[14, 18, 30, 60, 120, 300, 600, 14].map((time) => ({ time })),
-      { time: 14, width: Math.round(80 * 1.44) },
-    ],
+    height: 100,
+    frames: times.map((time) => ({ time })),
   });
   const first = frames[0].pixels;
-  const desktop = frames.at(-1);
   expect(error).toBe(0);
-  expect(frames.at(-2).pixels).toEqual(first);
-  expect(frames[1].pixels).not.toEqual(first);
-  for (const { pixels } of frames.slice(0, 7)) {
-    const base = pixels.slice(0, width * 4 * 8);
-    for (let offset = 0; offset < base.length; offset += 4) {
-      expect(base[offset + 2]).toBeGreaterThan(base[offset] + 40);
-    }
-    const top = pixels.slice(-width * 4);
-    for (let offset = 0; offset < top.length; offset += 4) {
-      expect(top.slice(offset, offset + 4)).toEqual([253, 248, 243, 255]);
-    }
-  }
-  let bluePixels = 0;
-  for (let offset = 0; offset < first.length; offset += 4) {
-    if (first[offset + 2] > first[offset] + 40) bluePixels += 1;
-    expect(first[offset + 3]).toBe(255);
-  }
-  expect(bluePixels).toBeGreaterThan(width * 4);
+  expect(frames.at(-1).pixels).toEqual(first);
+  expect(averageFrameDifference(first, frames[2].pixels)).toBeGreaterThan(2);
+  expect(averageFrameDifference(first, frames[1].pixels)).toBeLessThan(1.5);
+  expect(averageFrameDifference(frames[3].pixels, frames[4].pixels)).toBeLessThan(1.5);
 
-  let silhouetteDifference = 0;
-  for (let sample = 0; sample < 24; sample++) {
-    const position = (sample + 0.5) / 24;
-    silhouetteDifference += Math.abs(
-      plumeHeight(first, width, position) - plumeHeight(desktop.pixels, desktop.width, position),
-    );
+  for (const { pixels } of frames) {
+    let invalidTopPixels = 0;
+    let invalidBasePixels = 0;
+    let transparentPixels = 0;
+    let darkestBlue = 255;
+    let brightestBlue = 0;
+
+    for (let offset = 0; offset < pixels.length; offset += 4) {
+      const red = pixels[offset];
+      const green = pixels[offset + 1];
+      const blue = pixels[offset + 2];
+      const row = Math.floor(offset / (width * 4));
+      if (pixels[offset + 3] !== 255) transparentPixels++;
+      if (row < 8 && blue <= red + 40) invalidBasePixels++;
+      if (row >= 75 && (red !== 253 || green !== 248 || blue !== 243)) invalidTopPixels++;
+      if (red < 80 && blue > red + 40) {
+        darkestBlue = Math.min(darkestBlue, blue);
+        brightestBlue = Math.max(brightestBlue, blue);
+      }
+    }
+
+    expect(invalidTopPixels).toBe(0);
+    expect(invalidBasePixels).toBe(0);
+    expect(transparentPixels).toBe(0);
+    expect(brightestBlue - darkestBlue).toBeGreaterThan(80);
   }
-  expect(silhouetteDifference / 24).toBeLessThan(0.025);
 });
 
 test('noise seeds survive lower float precision and noise stays continuous at lattice boundaries', async ({ page }) => {

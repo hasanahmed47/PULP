@@ -13,12 +13,11 @@ uniform float uTime;
 out vec4 fragmentColor;
 
 const vec3 BACKGROUND = vec3(0.992, 0.973, 0.953);
-const vec3 DEEP_BLUE = vec3(0.06, 0.12, 0.62);
-const vec3 FLAME_BLUE = vec3(0.10, 0.32, 1.0);
-const vec3 HIGHLIGHT = vec3(0.55, 0.72, 1.0);
-const float MIN_COMPOSITION_WIDTH = 1.44;
-const float FLOW_SPEED = 0.22;
-const float SLOPE_STEP = 0.01;
+const vec3 DEEP_BLUE = vec3(0.025, 0.06, 0.38);
+const vec3 FLAME_BLUE = vec3(0.08, 0.25, 1.0);
+const vec3 HIGHLIGHT = vec3(0.24, 0.45, 1.0);
+const float FLOW_SPEED = 0.34;
+const float FIELD_HEIGHT = 2.6;
 
 float randomValue(vec2 cell) {
   uvec2 grid = uvec2(ivec2(cell));
@@ -39,67 +38,49 @@ float smoothNoise(vec2 position) {
   return mix(lower, upper, blend.y);
 }
 
-float layeredNoise(vec2 position) {
-  float value = 0.0;
-  float amplitude = 0.5;
+vec2 warpFlow(vec2 position, float time) {
+  position.x += time * 0.3;
+  vec2 drift = vec2(-0.18, 0.12) * time;
+  vec2 turbulence = vec2(
+    smoothNoise(position * 0.85 + drift),
+    smoothNoise(position * 0.85 + vec2(5.2, 1.3) - drift)
+  );
+  position += (turbulence - 0.5) * 0.45;
 
-  for (int octave = 0; octave < 3; octave++) {
-    value += amplitude * smoothNoise(position);
-    position = position * 2.03 + vec2(3.1, 1.7);
-    amplitude *= 0.5;
+  for (int layer = 0; layer < 5; layer++) {
+    float order = float(layer);
+    float frequency = 1.0 + order * 0.7;
+    float strength = 0.68 / (1.0 + order);
+    vec2 bend = vec2(
+      sin(position.y * frequency + time + order * 1.3),
+      cos(position.x * frequency - time * 0.7 + order * 0.8)
+    );
+    position += bend * strength;
   }
 
-  return value;
+  return position;
 }
 
-float plumeProfile(float position, float center, float width) {
-  float distanceFromCenter = (position - center) / width;
-  return exp(-distanceFromCenter * distanceFromCenter);
-}
-
-float sampleDensity(vec2 position, vec2 displacement, float height, float compositionWidth) {
-  float flow = uTime * FLOW_SPEED;
-  vec2 warped = position + vec2(0.85, 0.3) * (displacement - 0.5);
-  float texture = layeredNoise(vec2(warped.x * 1.45, warped.y * 0.8 - flow));
-  float mainCenter = compositionWidth * (0.17 * sin(uTime * 0.11) + 0.07 * sin(uTime * 0.23 + 1.7) - 0.12);
-  float sideCenter = compositionWidth * (0.30 + 0.10 * sin(uTime * 0.08 + 2.0));
-  float tipFade = 1.0 - smoothstep(0.08, 0.85, height);
-  float plumes = 0.5 * plumeProfile(warped.x, mainCenter, 0.2);
-  plumes += 0.26 * plumeProfile(warped.x, sideCenter, 0.16);
-
-  float density = 0.9 * texture + 0.58 * (1.0 - height) + plumes * tipFade - 0.8;
-  float baseGlow = 0.4 * (1.0 - smoothstep(0.10, 0.24, height));
-  return density + baseGlow;
-}
-
-vec3 shadeFlame(float density, vec2 slope) {
-  vec3 normal = normalize(vec3(-slope * 0.9, 1.0));
-  vec3 lightDirection = normalize(vec3(-0.4, 0.6, 0.7));
-  float light = smoothstep(0.5, 0.95, dot(normal, lightDirection));
-  float reflection = max(dot(reflect(-lightDirection, normal), vec3(0.0, 0.0, 1.0)), 0.0);
-  float specular = pow(reflection, 22.0);
-  float core = smoothstep(0.0, 0.55, density);
-  float shade = 0.55 + 0.45 * mix(light, 1.0, 0.35 * core);
-  shade *= mix(0.82, 1.0, core);
-
-  return mix(DEEP_BLUE, FLAME_BLUE, clamp(shade, 0.0, 1.0)) + HIGHLIGHT * specular * 0.35 * light;
+vec3 ribbonColor(vec2 flow, float depth, float time) {
+  float fold = 0.5 + 0.5 * sin(flow.x * 0.9 + flow.y * 3.8 - time * 0.4);
+  float light = smoothstep(0.1, 0.9, fold);
+  vec3 color = mix(DEEP_BLUE, FLAME_BLUE, light);
+  float crest = exp(-depth * depth * 5.0);
+  return mix(color, HIGHLIGHT, crest * 0.2);
 }
 
 void main() {
   vec2 uv = gl_FragCoord.xy / uResolution;
-  float compositionWidth = max(uResolution.x / uResolution.y, MIN_COMPOSITION_WIDTH);
-  vec2 position = (uv - 0.5) * vec2(compositionWidth, 1.0);
-  float flow = uTime * FLOW_SPEED;
-  vec2 displacement = vec2(
-    layeredNoise(position * 0.9 + vec2(0.0, -flow * 0.6)),
-    layeredNoise(position * 0.9 + vec2(5.2, 1.3 - flow * 0.8))
-  );
+  float aspect = max(uResolution.x / uResolution.y, 0.7);
+  vec2 position = (uv - vec2(0.5, 0.0)) * vec2(aspect, 1.0) * FIELD_HEIGHT;
+  float time = uTime * FLOW_SPEED;
+  vec2 flow = warpFlow(position, time);
+  float depth = 0.46 * FIELD_HEIGHT - flow.y;
+  float coverage = smoothstep(-0.22, 0.26, depth);
+  coverage *= 1.0 - smoothstep(0.55, 0.70, uv.y);
+  coverage = mix(1.0, coverage, smoothstep(0.08, 0.22, uv.y));
 
-  float density = sampleDensity(position, displacement, uv.y, compositionWidth);
-  float horizontal = sampleDensity(position + vec2(SLOPE_STEP, 0.0), displacement, uv.y, compositionWidth);
-  float vertical = sampleDensity(position + vec2(0.0, SLOPE_STEP), displacement, uv.y, compositionWidth);
-  vec2 slope = (vec2(horizontal, vertical) - density) / SLOPE_STEP;
-  float body = smoothstep(0.0, 0.1, density);
-
-  fragmentColor = vec4(mix(BACKGROUND, shadeFlame(density, slope), body), 1.0);
-}`;
+  vec3 color = ribbonColor(flow, depth, time);
+  fragmentColor = vec4(mix(BACKGROUND, color, coverage), 1.0);
+}
+`;
