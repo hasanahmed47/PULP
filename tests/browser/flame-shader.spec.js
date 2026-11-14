@@ -1,12 +1,10 @@
 import { test, expect } from '@playwright/test';
 import { vertexShader, fragmentShader } from '../../src/components/Footer/flameShader.js';
 
-async function renderFlameFrames(page) {
-  const viewport = page.viewportSize();
-  return page.evaluate(({ vertex, fragment, aspect }) => {
+async function renderShaderFrames(page, { width, height, fragment = fragmentShader, frames }) {
+  return page.evaluate(({ vertex, fragment, width, height, frames }) => {
     const canvas = document.createElement('canvas');
-    canvas.width = Math.round(80 * aspect);
-    canvas.height = 80;
+    canvas.height = height;
     const gl = canvas.getContext('webgl2');
     if (!gl) throw new Error('WebGL2 is required to verify the flame.');
     const shaders = [];
@@ -23,15 +21,15 @@ async function renderFlameFrames(page) {
       gl.attachShader(program, shader);
     }
 
-    function renderFrame(time, frameAspect = aspect) {
-      canvas.width = Math.round(80 * frameAspect);
+    function renderFrame({ time, width: frameWidth = width }) {
+      canvas.width = frameWidth;
       gl.viewport(0, 0, canvas.width, canvas.height);
       gl.uniform2f(gl.getUniformLocation(program, 'uResolution'), canvas.width, canvas.height);
       gl.uniform1f(gl.getUniformLocation(program, 'uTime'), time);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
       const pixels = new Uint8Array(canvas.width * canvas.height * 4);
       gl.readPixels(0, 0, canvas.width, canvas.height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
-      return [...pixels];
+      return { width: canvas.width, pixels: [...pixels] };
     }
 
     try {
@@ -44,13 +42,7 @@ async function renderFlameFrames(page) {
       gl.useProgram(program);
       gl.disable(gl.DITHER);
       return {
-        width: canvas.width,
-        first: renderFrame(14),
-        later: renderFrame(18),
-        samples: [30, 60, 120, 300, 600].map((time) => renderFrame(time)),
-        repeated: renderFrame(14),
-        desktop: renderFrame(14, 1.44),
-        desktopWidth: canvas.width,
+        frames: frames.map(renderFrame),
         error: gl.getError(),
       };
     } finally {
@@ -58,7 +50,7 @@ async function renderFlameFrames(page) {
       shaders.forEach((shader) => gl.deleteShader(shader));
       gl.getExtension('WEBGL_lose_context')?.loseContext();
     }
-  }, { vertex: vertexShader, fragment: fragmentShader, aspect: viewport.width / viewport.height });
+  }, { vertex: vertexShader, fragment, width, height, frames });
 }
 
 function plumeHeight(pixels, width, horizontalPosition) {
@@ -72,11 +64,22 @@ function plumeHeight(pixels, width, horizontalPosition) {
 }
 
 test('flame retains desktop composition, animates and keeps text areas clear', async ({ page }) => {
-  const { width, first, later, repeated, samples, desktop, desktopWidth, error } = await renderFlameFrames(page);
+  const viewport = page.viewportSize();
+  const width = Math.round(80 * viewport.width / viewport.height);
+  const { frames, error } = await renderShaderFrames(page, {
+    width,
+    height: 80,
+    frames: [
+      ...[14, 18, 30, 60, 120, 300, 600, 14].map((time) => ({ time })),
+      { time: 14, width: Math.round(80 * 1.44) },
+    ],
+  });
+  const first = frames[0].pixels;
+  const desktop = frames.at(-1);
   expect(error).toBe(0);
-  expect(repeated).toEqual(first);
-  expect(later).not.toEqual(first);
-  for (const pixels of [first, later, ...samples]) {
+  expect(frames.at(-2).pixels).toEqual(first);
+  expect(frames[1].pixels).not.toEqual(first);
+  for (const { pixels } of frames.slice(0, 7)) {
     const base = pixels.slice(0, width * 4 * 8);
     for (let offset = 0; offset < base.length; offset += 4) {
       expect(base[offset + 2]).toBeGreaterThan(base[offset] + 40);
@@ -97,8 +100,60 @@ test('flame retains desktop composition, animates and keeps text areas clear', a
   for (let sample = 0; sample < 24; sample++) {
     const position = (sample + 0.5) / 24;
     silhouetteDifference += Math.abs(
-      plumeHeight(first, width, position) - plumeHeight(desktop, desktopWidth, position),
+      plumeHeight(first, width, position) - plumeHeight(desktop.pixels, desktop.width, position),
     );
   }
   expect(silhouetteDifference / 24).toBeLessThan(0.025);
+});
+
+test('noise seeds survive lower float precision and noise stays continuous at lattice boundaries', async ({ page }) => {
+  const functions = fragmentShader.slice(0, fragmentShader.lastIndexOf('void main()'));
+  const probe = `${functions}
+void main() {
+  vec2 cell = floor(gl_FragCoord.xy) - vec2(16.0);
+  fragmentColor = vec4(vec3(randomValue(cell)), 1.0);
+}`;
+  const settings = { width: 32, height: 32, frames: [{ time: 14 }] };
+  const normal = await renderShaderFrames(page, { ...settings, fragment: probe });
+  const lowerPrecision = await renderShaderFrames(page, {
+    ...settings,
+    fragment: probe.replace('precision highp float;', 'precision mediump float;'),
+  });
+  expect(normal.error).toBe(0);
+  expect(lowerPrecision.error).toBe(0);
+  const seedSamples = [
+    { x: -16, y: -16, value: 20 },
+    { x: 15, y: -16, value: 46 },
+    { x: -16, y: 15, value: 24 },
+    { x: 15, y: 15, value: 80 },
+    { x: -3, y: 7, value: 172 },
+    { x: 0, y: 0, value: 0 },
+  ];
+  for (const { x, y, value } of seedSamples) {
+    const offset = ((y + 16) * 32 + x + 16) * 4;
+    expect(Math.abs(normal.frames[0].pixels[offset] - value)).toBeLessThanOrEqual(1);
+  }
+  let largestDifference = 0;
+  for (let index = 0; index < normal.frames[0].pixels.length; index++) {
+    const difference = Math.abs(normal.frames[0].pixels[index] - lowerPrecision.frames[0].pixels[index]);
+    largestDifference = Math.max(largestDifference, difference);
+  }
+  expect(largestDifference).toBeLessThanOrEqual(1);
+
+  const boundaryProbe = `${functions}
+void main() {
+  vec2 position = floor(gl_FragCoord.xy) - vec2(16.0);
+  position.y += 0.37;
+  float center = smoothNoise(position);
+  float before = smoothNoise(position - vec2(0.001, 0.0));
+  float after = smoothNoise(position + vec2(0.001, 0.0));
+  fragmentColor = vec4(center, before, after, 1.0);
+}`;
+  const boundary = await renderShaderFrames(page, { ...settings, fragment: boundaryProbe });
+  expect(boundary.error).toBe(0);
+  const pixels = boundary.frames[0].pixels;
+  for (let offset = 0; offset < pixels.length; offset += 4) {
+    expect(Math.abs(pixels[offset] - pixels[offset + 1])).toBeLessThanOrEqual(1);
+    expect(Math.abs(pixels[offset] - pixels[offset + 2])).toBeLessThanOrEqual(1);
+  }
 });

@@ -6,6 +6,7 @@ void main() {
 
 export const fragmentShader = `#version 300 es
 precision highp float;
+precision highp int;
 
 uniform vec2 uResolution;
 uniform float uTime;
@@ -20,9 +21,12 @@ const float FLOW_SPEED = 0.22;
 const float SLOPE_STEP = 0.01;
 
 float randomValue(vec2 cell) {
-  cell = fract(cell * vec2(123.34, 456.21));
-  cell += dot(cell, cell + 45.32);
-  return fract(cell.x * cell.y);
+  uvec2 grid = uvec2(ivec2(cell));
+  uint seed = (grid.x * 1597334677u) ^ (grid.y * 3812015801u);
+  seed = (seed ^ (seed >> 16u)) * 0x7feb352du;
+  seed = (seed ^ (seed >> 15u)) * 0x846ca68bu;
+  seed ^= seed >> 16u;
+  return float(seed >> 8u) / 16777216.0;
 }
 
 float smoothNoise(vec2 position) {
