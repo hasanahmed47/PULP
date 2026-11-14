@@ -1,9 +1,9 @@
 .shopping-bag {
-  --gutter: 1.75rem;
-  --radius: 1.375rem;
+  --gutter: 1.5rem;
+  --radius: 1.75rem;
   --tab-inline: 0.5rem;
 
-  margin-top: clamp(3rem, 6vw, 6rem);
+  margin-top: clamp(3rem, 7vw, 6.875rem);
   border: 0.0625rem solid var(--line);
   border-radius: var(--radius);
   background: var(--paper);
@@ -14,9 +14,8 @@
 
 .shopping-bag__tabs {
   display: flex;
-  gap: 0.5rem;
-
-  margin-inline: calc(var(--gutter) - var(--tab-inline));
+  gap: .375rem;
+  padding-inline: var(--gutter);
   border-bottom: 0.0625rem solid var(--line);
 }
 
@@ -24,19 +23,19 @@
   display: flex;
   align-items: center;
   gap: 0.625rem;
-  min-height: 4.5rem;
+  min-height: 4rem;
 
   margin-bottom: -0.0625rem;
-  padding: 1.5rem var(--tab-inline) 1.25rem;
+  padding: .75rem var(--tab-inline);
   border: 0;
-  border-bottom: 0.1875rem solid transparent;
+  border-bottom: .125rem solid transparent;
   background: transparent;
   color: var(--muted);
-  font-size: 0.9375rem;
+  font-size: 1.0625rem;
 }
 
 .shopping-bag__tab[aria-selected='true'] {
-  border-bottom-color: var(--blue);
+  border-bottom-color: var(--footer-flame-blue);
   color: var(--ink);
 }
 
@@ -48,7 +47,7 @@
   padding-inline: 0.375rem;
   border-radius: var(--radius-pill);
 
-  background: var(--surface-muted, var(--surface-hover));
+  background: color-mix(in srgb, var(--ink) 9%, transparent);
   font-size: 0.75rem;
   font-variant-numeric: tabular-nums;
 }
@@ -64,12 +63,16 @@
 }
 
 .shopping-bag__panel {
-  padding: 0.75rem var(--gutter);
+  padding: .5rem var(--gutter);
 }
 
 .shopping-bag__empty {
   margin: 0;
+  display: flex;
+  align-items: center;
+  min-height: 6.875rem;
   padding-block: 1.75rem;
+  font-size: 1.125rem;
   line-height: 1.6;
 }
 
@@ -78,10 +81,10 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 1.125rem var(--gutter);
+  padding: 1.375rem var(--gutter);
   border-top: 0.0625rem solid var(--line);
   background: var(--surface);
-  font-size: 0.8125rem;
+  font-size: .875rem;
 }
 
 .shopping-bag__action {

@@ -69,9 +69,13 @@
 
 .hl__stage {
   position: relative;
+  display: grid;
 }
 
 .hl__viewport {
+  position: relative;
+  z-index: 0;
+  grid-area: 1 / 1;
   overflow: hidden;
   touch-action: pan-y pinch-zoom;
   user-select: none;
@@ -158,7 +162,10 @@
 }
 
 .hl__controls {
-  position: fixed;
+  position: sticky;
+  grid-area: 1 / 1;
+  align-self: end;
+  margin-bottom: var(--space-md);
   left: 0;
   right: 0;
   bottom: calc(var(--space-md) + env(safe-area-inset-bottom));
@@ -411,22 +418,8 @@
     --hl-ctl: 3.25rem;
   }
 
-  .hl__stage {
-    display: grid;
-  }
-
-  .hl__viewport {
-    position: relative;
-    z-index: 0;
-    grid-area: 1 / 1;
-  }
-
   .hl__controls {
-    position: sticky;
     z-index: 30;
-    grid-area: 1 / 1;
-    align-self: end;
-    margin-bottom: var(--space-md);
   }
 }
 

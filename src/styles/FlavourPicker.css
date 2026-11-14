@@ -7,7 +7,7 @@
 .flavour-picker legend {
   padding: 0;
   margin-bottom: 0.9375rem;
-  font-size: 0.875rem;
+  font-size: clamp(.9375rem, 1.1vw, 1.125rem);
 }
 
 .flavour-picker__options {
@@ -20,13 +20,14 @@
   position: relative;
   display: flex;
   align-items: center;
-  gap: 0.625rem;
-  min-height: 3.625rem;
-  padding: 0.75rem;
+  gap: .875rem;
+  min-height: 4rem;
+  padding: .75rem 1.125rem;
   border: 0.0625rem solid var(--line);
-  border-radius: 0.75rem;
+  border-radius: .875rem;
+  background: var(--paper);
   cursor: pointer;
-  font-size: 0.8125rem;
+  font-size: .9375rem;
   transition: background-color 180ms ease, border-color 180ms ease;
 }
 
@@ -41,12 +42,12 @@
 }
 
 .flavour-picker__option:hover {
-  background: color-mix(in srgb, var(--flavour-pale) 55%, var(--paper));
+  border-color: var(--muted);
 }
 
 .flavour-picker__option:has(input:checked) {
   border-color: var(--flavour-colour);
-  background: color-mix(in srgb, var(--flavour-pale) 36%, var(--paper));
+  background: color-mix(in srgb, var(--flavour-colour) 10%, var(--paper));
   box-shadow: inset 0 0 0 0.0625rem var(--flavour-colour);
 }
 
@@ -58,8 +59,8 @@
 .flavour-picker__swatch {
   display: grid;
   place-items: center;
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 1.75rem;
+  height: 1.75rem;
   flex: 0 0 auto;
   border-radius: 50%;
   background: var(--flavour-colour);
@@ -76,22 +77,8 @@
   color: var(--ink);
 }
 
-@media (max-width: 56.25rem) {
+@media (max-width: 32.5rem) {
   .flavour-picker__options {
-    gap: 0.5rem;
-  }
-
-  .flavour-picker__option {
-    gap: 0.5rem;
-    padding: 0.625rem 0.5rem;
-    font-size: 0.6875rem;
-  }
-}
-
-@media (max-width: 43.75rem) {
-  .flavour-picker__option {
-    font-size: 0.75rem;
-    min-height: 3.75rem;
-    padding: 0.75rem;
+    grid-template-columns: 1fr;
   }
 }

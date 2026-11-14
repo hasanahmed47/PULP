@@ -62,7 +62,7 @@ export function PickYourPulp({ selectedId, onSelectFlavour }) {
     >
       <header className="pulp-shop__header">
         <h2 id="shop-title" className="headline">
-          PICK YOUR<br />PULP<span className="pulp-shop__full-stop">.</span>
+          PICK YOUR<br />PULP<span className="pulp-shop__full-stop" aria-hidden="true" />
         </h2>
         <AnchorLink href="#shopping-bag" className="pulp-shop__bag-count">
           <ShopIcon name="bag" />

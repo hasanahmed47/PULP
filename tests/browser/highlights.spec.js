@@ -22,6 +22,31 @@ async function showRemainingPortion(page, portion) {
   }, portion);
 }
 
+test('controls stay within highlights and disappear over the next section', async ({ page }, testInfo) => {
+  await openCarousel(page);
+  const controls = page.locator('.hl__controls');
+  await expect(controls).toHaveCSS('opacity', '1');
+  await expect.poll(() => controls.evaluate((element) => {
+    const stage = element.closest('.hl__stage').getBoundingClientRect();
+    return element.getBoundingClientRect().bottom - stage.bottom;
+  })).toBeLessThanOrEqual(1);
+
+  await page.locator('#good-stuff').evaluate((section) => {
+    window.scrollTo({ top: window.scrollY + section.getBoundingClientRect().top, behavior: 'instant' });
+  });
+  await expect(controls).toBeHidden();
+  await expect(controls).toHaveAttribute('inert', '');
+  await expect.poll(() => page.locator('.hl__slide.is-active video').evaluate((video) => video.paused)).toBe(true);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
+  await page.screenshot({ path: testInfo.outputPath('next-section-without-chip.png') });
+
+  await showRemainingPortion(page, 1);
+  await expect(controls).toBeVisible();
+  await expect(controls).toHaveCSS('opacity', '1');
+  await expect(controls).not.toHaveAttribute('inert', '');
+  await page.screenshot({ path: testInfo.outputPath('highlights-contained-chip.png') });
+});
+
 test('completed videos advance automatically and wrap to the first slide', async ({ page }) => {
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));

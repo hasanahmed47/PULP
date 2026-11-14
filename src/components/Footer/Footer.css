@@ -1,8 +1,8 @@
 .flame-footer {
-  --bg: var(--footer-blue-deep);
-  --ink: #fff;
-  --dim: rgba(255, 255, 255, .62);
-  --rule: rgba(255, 255, 255, .22);
+  --bg: var(--surface-cream);
+  --ink: var(--cream-ink);
+  --dim: var(--cream-muted);
+  --rule: var(--cream-rule);
   --pad: clamp(1.25rem, 2.6vw, 3rem);
   position: relative;
   min-height: 100svh;
@@ -10,12 +10,12 @@
   flex-direction: column;
   overflow: hidden;
   color: var(--ink);
-  color-scheme: dark;
+  color-scheme: light;
   font-family: var(--font-sans);
   line-height: normal;
   padding-top: env(safe-area-inset-top, 0rem);
   padding-bottom: env(safe-area-inset-bottom, 0rem);
-  background: var(--bg) radial-gradient(120% 70% at 70% 110%, var(--footer-blue-glow), var(--footer-blue-mid) 50%, var(--bg) 80%);
+  background: var(--bg) radial-gradient(120% 70% at 70% 110%, var(--footer-flame-blue), var(--footer-cream-mid) 45%, var(--bg) 75%);
 }
 
 .flame-footer > :not(canvas) {
@@ -24,7 +24,7 @@
 }
 
 .flame-footer a:focus-visible {
-  outline: .125rem solid var(--yellow);
+  outline: .125rem solid var(--footer-flame-blue);
   outline-offset: .25rem;
   border-radius: .25rem;
 }
@@ -41,7 +41,7 @@
   display: inline-block;
   font-size: clamp(1.75rem, 3.2vw, 2.875rem);
   line-height: 1;
-  color: var(--ink);
+  color: var(--footer-flame-blue);
   transform-origin: left bottom;
 }
 
@@ -80,8 +80,9 @@
   display: inline-flex;
   align-items: center;
   gap: .7em;
-  background: var(--yellow);
-  color: #111;
+  min-height: 2.75rem;
+  background: var(--footer-yellow);
+  color: var(--cream-ink);
   font-weight: 500;
   font-size: clamp(.9375rem, 1.2vw, 1.1875rem);
   padding: .85em 1.4em;
@@ -129,6 +130,7 @@
 }
 
 .footer-bottom {
+  color: var(--paper);
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   align-items: end;
@@ -140,7 +142,7 @@
 
 .footer-clock time {
   font-weight: 500;
-  color: var(--ink);
+  color: inherit;
   margin-left: .6em;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -172,6 +174,11 @@
   .footer-nav {
     grid-column: 1 / -1;
     grid-row: 2;
+    font-size: clamp(1.5rem, 7vw, 2rem);
+  }
+
+  .footer-nav a {
+    min-height: 2.75rem;
   }
 
   .footer-cta {
@@ -180,6 +187,9 @@
 
   .footer-bottom {
     grid-template-columns: 1fr 1fr;
+    row-gap: .375rem;
+    align-items: center;
+    font-size: .875rem;
   }
 
   .footer-clock {
@@ -188,6 +198,7 @@
 
   .footer-up {
     order: 4;
+    min-height: 2.75rem;
   }
 
   .footer-bottom > :nth-child(2) {

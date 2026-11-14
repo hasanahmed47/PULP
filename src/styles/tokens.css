@@ -12,10 +12,14 @@
   --ink: #171719;
   --paper: #fff;
   --blue: #2257f5;
-  --footer-blue-deep: #06117a;
-  --footer-blue-mid: #0b24b8;
-  --footer-blue-glow: #3a6bff;
-  --surface-blue: color-mix(in srgb, var(--blue) 7%, var(--paper));
+  --surface-cream: #fdf8f3;
+  --cream-ink: #121212;
+  --cream-muted: rgb(18 18 18 / 55%);
+  --cream-line: #ece6df;
+  --cream-rule: rgb(18 18 18 / 14%);
+  --footer-cream-mid: #c9d6ff;
+  --footer-flame-blue: #2b59ff;
+  --footer-yellow: #ffd84a;
   --yellow: #ffdf4b;
   --muted: #66666b;
   --line: #e4e4e5;

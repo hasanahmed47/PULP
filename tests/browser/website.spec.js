@@ -113,10 +113,16 @@ test('all interiors open and select the matching shop flavour', async ({ page, i
   await inside.screenshot({ path: testInfo.outputPath('inside.png') });
 });
 
-test('shopping, wishlist, tabs and review survive selection changes and reload', async ({ page }) => {
+test('shopping, wishlist, tabs and review survive selection changes and reload', async ({ page }, testInfo) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await openWebsite(page);
   const shop = page.locator('.pulp-shop');
+  await expect(shop).toHaveCSS('background-color', 'rgb(253, 248, 243)');
+  await expectNoHorizontalOverflow(page);
+  await shop.screenshot({
+    path: testInfo.outputPath('cream-shop.png'),
+    style: '.skip-link:not(:focus) { visibility: hidden; }',
+  });
   await shop.getByRole('button', { name: 'Increase quantity', exact: true }).click();
   await shop.getByRole('button', { name: 'Add to bag' }).click();
   await expect(shop.locator('.pulp-shop__status')).toContainText('2 Blood Orange cans added');
