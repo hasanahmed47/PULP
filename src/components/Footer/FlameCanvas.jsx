@@ -1,12 +1,8 @@
 import './FlameCanvas.css';
 import { useEffect, useRef } from 'react';
-import { vertexShader, fragmentShader } from './flameShader';
+import { createFlameRenderer } from './createFlameRenderer';
 
-function resolutionScale() {
-  const lowPower = navigator.hardwareConcurrency <= 4 || navigator.deviceMemory <= 4 || navigator.connection?.saveData;
-  const scale = window.innerWidth < 760 || lowPower ? .6 : .9;
-  return Math.min(window.devicePixelRatio || 1, 1.5) * scale;
-}
+const INITIAL_TIME = 14;
 
 export function FlameCanvas() {
   const canvasRef = useRef(null);
@@ -25,8 +21,7 @@ export function FlameCanvas() {
     }
     if (!gl) return;
 
-    const shaders = [];
-    let program;
+    let renderer;
     let frame = 0;
     let visible = false;
     let disposed = false;
@@ -35,18 +30,6 @@ export function FlameCanvas() {
     let resizeObserver = null;
     let intersectionObserver = null;
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
-
-    function compileShader(type, source) {
-      const shader = gl.createShader(type);
-      if (!shader) throw new Error('Unable to allocate a footer shader.');
-      shaders.push(shader);
-      gl.shaderSource(shader, source);
-      gl.compileShader(shader);
-      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        throw new Error(gl.getShaderInfoLog(shader) || 'Footer shader compilation failed.');
-      }
-      return shader;
-    }
 
     function stopAnimation() {
       window.cancelAnimationFrame(frame);
@@ -67,29 +50,14 @@ export function FlameCanvas() {
       document.removeEventListener('visibilitychange', synchronizeAnimation);
       motion.removeEventListener('change', synchronizeAnimation);
       canvas.removeEventListener('webglcontextlost', handleContextLoss);
-      if (program) gl.deleteProgram(program);
-      shaders.forEach((shader) => gl.deleteShader(shader));
+      renderer?.dispose();
       queueMicrotask(function releaseContext() {
         if (generationRef.current === generation) gl.getExtension('WEBGL_lose_context')?.loseContext();
       });
     }
 
-    let resolutionUniform;
-    let timeUniform;
     try {
-      const vertex = compileShader(gl.VERTEX_SHADER, vertexShader);
-      const fragment = compileShader(gl.FRAGMENT_SHADER, fragmentShader);
-      program = gl.createProgram();
-      if (!program) throw new Error('Unable to allocate the footer program.');
-      gl.attachShader(program, vertex);
-      gl.attachShader(program, fragment);
-      gl.linkProgram(program);
-      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-        throw new Error(gl.getProgramInfoLog(program) || 'Footer shader linking failed.');
-      }
-      gl.useProgram(program);
-      resolutionUniform = gl.getUniformLocation(program, 'r');
-      timeUniform = gl.getUniformLocation(program, 't');
+      renderer = createFlameRenderer(gl, canvas);
     } catch (error) {
       console.error('PULP footer:', error);
       dispose();
@@ -101,9 +69,7 @@ export function FlameCanvas() {
     }
 
     function draw(time) {
-      gl.uniform2f(resolutionUniform, canvas.width, canvas.height);
-      gl.uniform1f(timeUniform, time);
-      gl.drawArrays(gl.TRIANGLES, 0, 3);
+      renderer.draw(time);
       canvas.hidden = false;
     }
 
@@ -112,28 +78,22 @@ export function FlameCanvas() {
       if (!canDraw()) return;
       if (previousTime !== null) elapsed += (now - previousTime) / 1000;
       previousTime = now;
-      draw(14 + elapsed);
+      draw(INITIAL_TIME + elapsed);
       frame = window.requestAnimationFrame(animate);
     }
 
     function synchronizeAnimation() {
       stopAnimation();
       if (!canDraw()) return;
-      if (motion.matches) draw(14);
+      if (motion.matches) draw(INITIAL_TIME);
       else frame = window.requestAnimationFrame(animate);
     }
 
     function resize() {
       if (disposed || gl.isContextLost()) return;
       const bounds = canvas.parentElement.getBoundingClientRect();
-      const scale = resolutionScale();
-      const width = Math.max(2, Math.floor(bounds.width * scale));
-      const height = Math.max(2, Math.floor(bounds.height * scale));
-      if (canvas.width === width && canvas.height === height) return;
-      canvas.width = width;
-      canvas.height = height;
-      gl.viewport(0, 0, width, height);
-      if (canDraw()) draw(motion.matches ? 14 : 14 + elapsed);
+      const resized = renderer.resize(bounds.width, bounds.height);
+      if (resized && canDraw()) draw(motion.matches ? INITIAL_TIME : INITIAL_TIME + elapsed);
     }
 
     resize();

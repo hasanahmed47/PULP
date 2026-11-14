@@ -1,77 +1,101 @@
 export const vertexShader = `#version 300 es
-void main(){
-  vec2 p = vec2((gl_VertexID << 1) & 2, gl_VertexID & 2);
-  gl_Position = vec4(p * 2. - 1., 0., 1.);
+void main() {
+  vec2 corner = vec2((gl_VertexID << 1) & 2, gl_VertexID & 2);
+  gl_Position = vec4(corner * 2.0 - 1.0, 0.0, 1.0);
 }`;
 
 export const fragmentShader = `#version 300 es
 precision highp float;
-uniform vec2 r;
-uniform float t;
-const vec3 uBg = vec3(.992, .973, .953);
-const vec3 uDeep = vec3(.06, .12, .62);
-const vec3 uBlue = vec3(.10, .32, 1.);
-const vec3 uHi = vec3(.55, .72, 1.);
-out vec4 o;
 
-float hash(vec2 p){
-  p = fract(p * vec2(123.34, 456.21));
-  p += dot(p, p + 45.32);
-  return fract(p.x * p.y);
+uniform vec2 uResolution;
+uniform float uTime;
+out vec4 fragmentColor;
+
+const vec3 BACKGROUND = vec3(0.992, 0.973, 0.953);
+const vec3 DEEP_BLUE = vec3(0.06, 0.12, 0.62);
+const vec3 FLAME_BLUE = vec3(0.10, 0.32, 1.0);
+const vec3 HIGHLIGHT = vec3(0.55, 0.72, 1.0);
+const float MIN_COMPOSITION_WIDTH = 1.44;
+const float FLOW_SPEED = 0.22;
+const float SLOPE_STEP = 0.01;
+
+float randomValue(vec2 cell) {
+  cell = fract(cell * vec2(123.34, 456.21));
+  cell += dot(cell, cell + 45.32);
+  return fract(cell.x * cell.y);
 }
-float noise(vec2 p){
-  vec2 i = floor(p), f = fract(p);
-  f = f*f*f*(f*(f*6. - 15.) + 10.);
-  return mix(mix(hash(i), hash(i + vec2(1,0)), f.x),
-             mix(hash(i + vec2(0,1)), hash(i + vec2(1,1)), f.x), f.y);
+
+float smoothNoise(vec2 position) {
+  vec2 cell = floor(position);
+  vec2 blend = fract(position);
+  blend = blend * blend * blend * (blend * (blend * 6.0 - 15.0) + 10.0);
+
+  float lower = mix(randomValue(cell), randomValue(cell + vec2(1.0, 0.0)), blend.x);
+  float upper = mix(randomValue(cell + vec2(0.0, 1.0)), randomValue(cell + vec2(1.0, 1.0)), blend.x);
+  return mix(lower, upper, blend.y);
 }
-float fbm(vec2 p){
-  float v = 0., a = .5;
-  for(int i = 0; i < 3; i++){
-    v += a * noise(p);
-    p = p * 2.03 + vec2(3.1, 1.7);
-    a *= .5;
+
+float layeredNoise(vec2 position) {
+  float value = 0.0;
+  float amplitude = 0.5;
+
+  for (int octave = 0; octave < 3; octave++) {
+    value += amplitude * smoothNoise(position);
+    position = position * 2.03 + vec2(3.1, 1.7);
+    amplitude *= 0.5;
   }
-  return v;
+
+  return value;
 }
 
-float D(vec2 p, vec2 q, float uvy, float asp){
-  float T = t * .22;
-  vec2  w = p + vec2(.85, .3) * (q - .5);
-  float n = fbm(vec2(w.x * 1.45, w.y * .8 - T));
-  float c1 = asp * (.17 * sin(t*.11) + .07 * sin(t*.23 + 1.7)) - .12 * asp;
-  float c2 = asp * (.30 + .10 * sin(t*.08 + 2.));
-  float fade = 1. - smoothstep(.08, .85, uvy);
-  float col = .5 * exp(-pow((w.x - c1) / .2, 2.)) + .26 * exp(-pow((w.x - c2) / .16, 2.));
-  return .9 * n + .58 * (1. - uvy) + col * fade - .8;
+float plumeProfile(float position, float center, float width) {
+  float distanceFromCenter = (position - center) / width;
+  return exp(-distanceFromCenter * distanceFromCenter);
 }
 
-void main(){
-  vec2 uv = gl_FragCoord.xy / r;
-  float asp = r.x / r.y;
+float sampleDensity(vec2 position, vec2 displacement, float height, float compositionWidth) {
+  float flow = uTime * FLOW_SPEED;
+  vec2 warped = position + vec2(0.85, 0.3) * (displacement - 0.5);
+  float texture = layeredNoise(vec2(warped.x * 1.45, warped.y * 0.8 - flow));
+  float mainCenter = compositionWidth * (0.17 * sin(uTime * 0.11) + 0.07 * sin(uTime * 0.23 + 1.7) - 0.12);
+  float sideCenter = compositionWidth * (0.30 + 0.10 * sin(uTime * 0.08 + 2.0));
+  float tipFade = 1.0 - smoothstep(0.08, 0.85, height);
+  float plumes = 0.5 * plumeProfile(warped.x, mainCenter, 0.2);
+  plumes += 0.26 * plumeProfile(warped.x, sideCenter, 0.16);
 
-  float zoom = 1. + max(0., 1.2 - asp) * .9;
-  vec2 p = (uv - .5) * vec2(asp, 1.) * zoom;
+  float density = 0.9 * texture + 0.58 * (1.0 - height) + plumes * tipFade - 0.8;
+  float baseGlow = 0.4 * (1.0 - smoothstep(0.10, 0.24, height));
+  return density + baseGlow;
+}
 
-  float T = t * .22;
-  vec2 q = vec2(fbm(p * .9 + vec2(0., -T * .6)), fbm(p * .9 + vec2(5.2, 1.3 - T * .8)));
+vec3 shadeFlame(float density, vec2 slope) {
+  vec3 normal = normalize(vec3(-slope * 0.9, 1.0));
+  vec3 lightDirection = normalize(vec3(-0.4, 0.6, 0.7));
+  float light = smoothstep(0.5, 0.95, dot(normal, lightDirection));
+  float reflection = max(dot(reflect(-lightDirection, normal), vec3(0.0, 0.0, 1.0)), 0.0);
+  float specular = pow(reflection, 22.0);
+  float core = smoothstep(0.0, 0.55, density);
+  float shade = 0.55 + 0.45 * mix(light, 1.0, 0.35 * core);
+  shade *= mix(0.82, 1.0, core);
 
-  float e = .01;
-  float d  = D(p, q, uv.y, asp);
-  float dx = (D(p + vec2(e, 0.), q, uv.y, asp) - d) / e;
-  float dy = (D(p + vec2(0., e), q, uv.y, asp) - d) / e;
+  return mix(DEEP_BLUE, FLAME_BLUE, clamp(shade, 0.0, 1.0)) + HIGHLIGHT * specular * 0.35 * light;
+}
 
-  float body = smoothstep(.0, .1, d);
+void main() {
+  vec2 uv = gl_FragCoord.xy / uResolution;
+  float compositionWidth = max(uResolution.x / uResolution.y, MIN_COMPOSITION_WIDTH);
+  vec2 position = (uv - 0.5) * vec2(compositionWidth, 1.0);
+  float flow = uTime * FLOW_SPEED;
+  vec2 displacement = vec2(
+    layeredNoise(position * 0.9 + vec2(0.0, -flow * 0.6)),
+    layeredNoise(position * 0.9 + vec2(5.2, 1.3 - flow * 0.8))
+  );
 
-  vec3 n3 = normalize(vec3(-dx * .9, -dy * .9, 1.));
-  vec3 L = normalize(vec3(-.4, .6, .7));
-  float dif = dot(n3, L);
-  float lit = smoothstep(.5, .95, dif);
-  float spec = pow(max(dot(reflect(-L, n3), vec3(0., 0., 1.)), 0.), 22.);
-  float core = smoothstep(.0, .55, d);
-  float shade = .55 + .45 * mix(lit, 1., .35 * core);
-  shade *= mix(.82, 1., core);
+  float density = sampleDensity(position, displacement, uv.y, compositionWidth);
+  float horizontal = sampleDensity(position + vec2(SLOPE_STEP, 0.0), displacement, uv.y, compositionWidth);
+  float vertical = sampleDensity(position + vec2(0.0, SLOPE_STEP), displacement, uv.y, compositionWidth);
+  vec2 slope = (vec2(horizontal, vertical) - density) / SLOPE_STEP;
+  float body = smoothstep(0.0, 0.1, density);
 
-  vec3 flame = mix(uDeep, uBlue, clamp(shade, 0., 1.)) + uHi * spec * .35 * lit;
-  o = vec4(mix(uBg, flame, body), 1.);
+  fragmentColor = vec4(mix(BACKGROUND, shadeFlame(density, slope), body), 1.0);
 }`;

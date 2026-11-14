@@ -101,7 +101,7 @@ it('pauses offscreen and in hidden tabs without accumulating elapsed time', () =
   setVisible(true);
   stepFrame(1000);
   stepFrame(2000);
-  expect(gl.uniform1f).toHaveBeenLastCalledWith('t', 15);
+  expect(gl.uniform1f).toHaveBeenLastCalledWith('uTime', 15);
   setVisible(false);
   expect(frames.size).toBe(0);
   setVisible(true);
@@ -111,7 +111,7 @@ it('pauses offscreen and in hidden tabs without accumulating elapsed time', () =
   hidden = false;
   document.dispatchEvent(new Event('visibilitychange'));
   stepFrame(10000);
-  expect(gl.uniform1f).toHaveBeenLastCalledWith('t', 15);
+  expect(gl.uniform1f).toHaveBeenLastCalledWith('uTime', 15);
   expect(frames.size).toBe(1);
 });
 
@@ -119,17 +119,17 @@ it('draws reduced motion once at time 14, redraws on parent resize and handles l
   motion.matches = true;
   const { container } = render(<FlameCanvas />);
   const canvas = container.querySelector('canvas');
-  expect(canvas.width).toBe(1350);
+  expect(canvas.width).toBe(1500);
   expect(observers[0].observe).toHaveBeenCalledWith(canvas.parentElement);
   setVisible(true);
-  expect(gl.uniform1f).toHaveBeenLastCalledWith('t', 14);
+  expect(gl.uniform1f).toHaveBeenLastCalledWith('uTime', 14);
   expect(gl.drawArrays).toHaveBeenCalledTimes(1);
   expect(frames.size).toBe(0);
   bounds = { width: 500, height: 700 };
   vi.stubGlobal('innerWidth', 500);
   observers[0].callback();
-  expect(canvas.width).toBe(449);
-  expect(canvas.height).toBe(629);
+  expect(canvas.width).toBe(750);
+  expect(canvas.height).toBe(1050);
   expect(gl.drawArrays).toHaveBeenCalledTimes(2);
   expect(frames.size).toBe(0);
   motion.matches = false;
@@ -138,13 +138,26 @@ it('draws reduced motion once at time 14, redraws on parent resize and handles l
   motion.matches = true;
   motion.dispatchEvent(new Event('change'));
   expect(frames.size).toBe(0);
-  expect(gl.uniform1f).toHaveBeenLastCalledWith('t', 14);
+  expect(gl.uniform1f).toHaveBeenLastCalledWith('uTime', 14);
 });
 
-it('uses the lower resolution on low-power desktops', () => {
+it('caps low-power rendering at native CSS resolution', () => {
   vi.spyOn(navigator, 'hardwareConcurrency', 'get').mockReturnValue(4);
   const { container } = render(<FlameCanvas />);
-  expect(container.querySelector('canvas').width).toBe(899);
+  expect(container.querySelector('canvas').width).toBe(1000);
+});
+
+it('keeps phone detail at high DPR and limits the pixel cost of large screens', () => {
+  bounds = { width: 390, height: 844 };
+  const { container } = render(<FlameCanvas />);
+  const canvas = container.querySelector('canvas');
+  expect(canvas.width).toBe(585);
+  expect(canvas.height).toBe(1266);
+
+  bounds = { width: 3840, height: 2160 };
+  observers[0].callback();
+  expect(canvas.width * canvas.height).toBeLessThanOrEqual(1_800_000);
+  expect(canvas.width / canvas.height).toBeCloseTo(3840 / 2160, 2);
 });
 
 it.each(['unavailable', 'compile', 'link'])('keeps the gradient visible after %s failure', async (failure) => {

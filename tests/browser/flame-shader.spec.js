@@ -23,8 +23,11 @@ async function renderFlameFrames(page) {
       gl.attachShader(program, shader);
     }
 
-    function renderFrame(time) {
-      gl.uniform1f(gl.getUniformLocation(program, 't'), time);
+    function renderFrame(time, frameAspect = aspect) {
+      canvas.width = Math.round(80 * frameAspect);
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.uniform2f(gl.getUniformLocation(program, 'uResolution'), canvas.width, canvas.height);
+      gl.uniform1f(gl.getUniformLocation(program, 'uTime'), time);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
       const pixels = new Uint8Array(canvas.width * canvas.height * 4);
       gl.readPixels(0, 0, canvas.width, canvas.height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
@@ -40,13 +43,14 @@ async function renderFlameFrames(page) {
       }
       gl.useProgram(program);
       gl.disable(gl.DITHER);
-      gl.viewport(0, 0, canvas.width, canvas.height);
-      gl.uniform2f(gl.getUniformLocation(program, 'r'), canvas.width, canvas.height);
       return {
         width: canvas.width,
         first: renderFrame(14),
         later: renderFrame(18),
+        samples: [30, 60, 120, 300, 600].map((time) => renderFrame(time)),
         repeated: renderFrame(14),
+        desktop: renderFrame(14, 1.44),
+        desktopWidth: canvas.width,
         error: gl.getError(),
       };
     } finally {
@@ -57,14 +61,30 @@ async function renderFlameFrames(page) {
   }, { vertex: vertexShader, fragment: fragmentShader, aspect: viewport.width / viewport.height });
 }
 
-test('cream flame paints blue plumes, preserves the cream top and animates deterministically', async ({ page }) => {
-  const { width, first, later, repeated, error } = await renderFlameFrames(page);
+function plumeHeight(pixels, width, horizontalPosition) {
+  const height = pixels.length / (width * 4);
+  const column = Math.floor(horizontalPosition * width);
+  for (let row = height - 1; row >= 0; row--) {
+    const offset = (row * width + column) * 4;
+    if (pixels[offset + 2] > pixels[offset] + 40) return (row + 1) / height;
+  }
+  return 0;
+}
+
+test('flame retains desktop composition, animates and keeps text areas clear', async ({ page }) => {
+  const { width, first, later, repeated, samples, desktop, desktopWidth, error } = await renderFlameFrames(page);
   expect(error).toBe(0);
   expect(repeated).toEqual(first);
   expect(later).not.toEqual(first);
-  const top = first.slice(-width * 4);
-  for (let offset = 0; offset < top.length; offset += 4) {
-    expect(top.slice(offset, offset + 4)).toEqual([253, 248, 243, 255]);
+  for (const pixels of [first, later, ...samples]) {
+    const base = pixels.slice(0, width * 4 * 8);
+    for (let offset = 0; offset < base.length; offset += 4) {
+      expect(base[offset + 2]).toBeGreaterThan(base[offset] + 40);
+    }
+    const top = pixels.slice(-width * 4);
+    for (let offset = 0; offset < top.length; offset += 4) {
+      expect(top.slice(offset, offset + 4)).toEqual([253, 248, 243, 255]);
+    }
   }
   let bluePixels = 0;
   for (let offset = 0; offset < first.length; offset += 4) {
@@ -72,4 +92,13 @@ test('cream flame paints blue plumes, preserves the cream top and animates deter
     expect(first[offset + 3]).toBe(255);
   }
   expect(bluePixels).toBeGreaterThan(width * 4);
+
+  let silhouetteDifference = 0;
+  for (let sample = 0; sample < 24; sample++) {
+    const position = (sample + 0.5) / 24;
+    silhouetteDifference += Math.abs(
+      plumeHeight(first, width, position) - plumeHeight(desktop, desktopWidth, position),
+    );
+  }
+  expect(silhouetteDifference / 24).toBeLessThan(0.025);
 });
