@@ -112,7 +112,7 @@ export function CanScene({
   const reducedMotion = useReducedMotion();
   const visible = useVisibility(wrapperRef);
   const approaching = useVisibleOnce(wrapperRef, '600px 0px');
-  const { sceneRef, status } = useCanRenderer(canvasRef, poseRef, {
+  const { sceneRef, status, blendReady } = useCanRenderer(canvasRef, poseRef, {
     allFlavours,
     interactive,
     preload: preload || approaching,
@@ -121,10 +121,10 @@ export function CanScene({
 
   const flavour = flavours[activeFlavourIndex];
   const failed = status === 'failed';
-  const ready = status === 'ready';
+  const ready = status === 'ready' && blendReady;
   const showFallback = useFallbackVisibility(ready);
   const fallbackStatus = useCanFallback(fallbackRef, flavour.image, showFallback);
-  const settled = ready || (failed && fallbackStatus !== 'loading');
+  const settled = ready || ((failed || status === 'ready') && fallbackStatus !== 'loading');
   const canSpin = interactive && ready;
   const hasDrop = dropRun != null;
   const lastFlavourIndex = allFlavours ? flavours.length - 1 : 0;

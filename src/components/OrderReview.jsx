@@ -1,10 +1,12 @@
 import { useEffect, useRef } from 'react';
 import { ShopIcon } from './ShopIcon';
+import { useDialogScrollLock } from '../hooks/useDialogScrollLock';
 import '../styles/OrderReview.css';
 
 export function OrderReview({ items, onClose }) {
   const dialogRef = useRef(null);
   const total = items.reduce((count, item) => count + item.quantity, 0);
+  useDialogScrollLock(true);
 
   useEffect(() => {
     const dialog = dialogRef.current;

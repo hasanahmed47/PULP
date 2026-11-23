@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { gsap } from '../lib/animation';
 import { useReducedMotion } from './useReducedMotion';
 
@@ -19,7 +19,9 @@ const lensMotion = {
 };
 
 export function usePeekLens() {
-  const [lens, setLens] = useState(null);
+  const [peeking, setPeeking] = useState(false);
+  const clipRef = useRef(null);
+  const lensRef = useRef(null);
   const position = useRef({ ...defaultLensPosition });
   const motion = useRef(null);
   const hintSettled = useRef(false);
@@ -31,24 +33,29 @@ export function usePeekLens() {
   }, []);
 
   const showPosition = useCallback(function showPosition() {
-    setLens({ x: position.current.x, y: position.current.y });
+    for (const circle of [clipRef.current, lensRef.current]) {
+      if (!circle) continue;
+      circle.setAttribute('cx', position.current.x);
+      circle.setAttribute('cy', position.current.y);
+    }
   }, []);
 
   const placeLens = useCallback(function placeLens(target) {
     stopMotion();
     Object.assign(position.current, target);
     showPosition();
+    setPeeking(true);
   }, [showPosition, stopMotion]);
 
   const hideLens = useCallback(function hideLens() {
     stopMotion();
-    setLens(null);
+    setPeeking(false);
   }, [stopMotion]);
 
   const glideLens = useCallback(function glideLens(target) {
     hintSettled.current = true;
 
-    if (!lens || reducedMotion) {
+    if (!peeking || reducedMotion) {
       placeLens(target);
       return;
     }
@@ -60,7 +67,7 @@ export function usePeekLens() {
       ...lensMotion.glide,
       onUpdate: showPosition,
     });
-  }, [lens, placeLens, reducedMotion, showPosition, stopMotion]);
+  }, [peeking, placeLens, reducedMotion, showPosition, stopMotion]);
 
   const hintLens = useCallback(function hintLens() {
     if (hintSettled.current) return;
@@ -79,6 +86,7 @@ export function usePeekLens() {
     stopMotion();
     Object.assign(position.current, sweep.start);
     showPosition();
+    setPeeking(true);
 
     motion.current = gsap.timeline({ onUpdate: showPosition, onComplete: settleHint })
       .to(position.current, { y: sweep.endY, duration: sweep.duration, ease: sweep.ease }, 0)
@@ -100,9 +108,10 @@ export function usePeekLens() {
     if (!hintSettled.current) stopMotion();
   }, [stopMotion]);
 
-  useEffect(function stopMotionOnUnmount() {
+  useLayoutEffect(function synchronizeMotionPreference() {
+    if (reducedMotion) stopMotion();
     return stopMotion;
-  }, [stopMotion]);
+  }, [reducedMotion, stopMotion]);
 
-  return { lens, placeLens, glideLens, hideLens, hintLens, cancelHint };
+  return { peeking, clipRef, lensRef, placeLens, glideLens, hideLens, hintLens, cancelHint };
 }

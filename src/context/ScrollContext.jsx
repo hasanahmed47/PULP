@@ -31,12 +31,38 @@ function getScrollPosition(destination) {
   const pinnedTrigger = ScrollTrigger.getAll().find((trigger) => trigger.pin === destination);
   if (pinnedTrigger) return Math.max(0, pinnedTrigger.start);
 
-  return destination.getBoundingClientRect().top + window.scrollY;
+  const margin = parseFloat(getComputedStyle(destination).scrollMarginTop) || 0;
+  return Math.max(0, destination.getBoundingClientRect().top + window.scrollY - margin);
 }
 
 export function ScrollProvider({ children, suspended = false }) {
   const reducedMotion = useReducedMotion();
   const lenisRef = useRef(null);
+  const locksRef = useRef(new Set());
+  const refreshFrame = useRef(0);
+
+  const refreshScroll = useCallback(function scheduleRefresh() {
+    if (refreshFrame.current) return;
+
+    refreshFrame.current = requestAnimationFrame(() => {
+      refreshFrame.current = 0;
+      ScrollTrigger.refresh(true);
+    });
+  }, []);
+
+  const lockScroll = useCallback(function acquireScrollLock() {
+    const lock = Symbol('dialog');
+    const locks = locksRef.current;
+    locks.add(lock);
+    document.documentElement.setAttribute('data-scroll-locked', '');
+    lenisRef.current?.stop();
+
+    return function releaseScrollLock() {
+      if (!locks.delete(lock) || locks.size > 0) return;
+      document.documentElement.removeAttribute('data-scroll-locked');
+      if (!document.hidden) lenisRef.current?.start();
+    };
+  }, []);
 
   useEffect(function connectSmoothScroll() {
     if (reducedMotion || suspended) return;
@@ -54,7 +80,7 @@ export function ScrollProvider({ children, suspended = false }) {
     }
 
     function handleVisibility() {
-      if (document.hidden) {
+      if (document.hidden || locksRef.current.size > 0) {
         lenis.stop();
         return;
       }
@@ -75,34 +101,81 @@ export function ScrollProvider({ children, suspended = false }) {
 
   const scrollTo = useCallback(function scrollToTarget(target, { immediate = false } = {}) {
     const destination = resolveScrollTarget(target);
-    if (destination === null || destination === undefined) return;
+    if (destination === null || destination === undefined || locksRef.current.size > 0) return;
     const top = getScrollPosition(destination);
 
-    if (lenisRef.current && !reducedMotion) {
+    if (lenisRef.current) {
       lenisRef.current.scrollTo(top, { immediate, duration: anchorScrollDuration });
       return;
     }
 
     window.scrollTo({ top, behavior: 'instant' });
-  }, [reducedMotion]);
+  }, []);
 
   useEffect(function refreshScrollMeasurements() {
+    if (suspended) return;
     let cancelled = false;
 
     function refresh() {
-      if (!cancelled) ScrollTrigger.refresh();
+      if (!cancelled) refreshScroll();
     }
 
     document.fonts.ready.then(refresh);
-    const frame = requestAnimationFrame(refresh);
+    refresh();
 
     return function cancelRefresh() {
       cancelled = true;
-      cancelAnimationFrame(frame);
     };
-  }, [reducedMotion]);
+  }, [reducedMotion, suspended, refreshScroll]);
 
-  const value = useMemo(() => ({ scrollTo }), [scrollTo]);
+  useEffect(function synchronizeScrollDimensions() {
+    function resizeScroller() {
+      lenisRef.current?.resize();
+    }
+
+    ScrollTrigger.addEventListener('refresh', resizeScroller);
+    return function disconnectMeasurements() {
+      ScrollTrigger.removeEventListener('refresh', resizeScroller);
+      cancelAnimationFrame(refreshFrame.current);
+      refreshFrame.current = 0;
+    };
+  }, []);
+
+  useEffect(function synchronizeHashNavigation() {
+    if (suspended) return;
+    let frame = 0;
+
+    function followHash() {
+      cancelAnimationFrame(frame);
+      if (!window.location.hash) return;
+
+      frame = requestAnimationFrame(() => {
+        let id = window.location.hash.slice(1);
+        try {
+          id = decodeURIComponent(id);
+        } catch {
+          return;
+        }
+
+        const destination = document.getElementById(id);
+        if (!destination) return;
+        ScrollTrigger.refresh();
+        scrollTo(destination, { immediate: true });
+      });
+    }
+
+    followHash();
+    window.addEventListener('popstate', followHash);
+    window.addEventListener('hashchange', followHash);
+
+    return function disconnectHashNavigation() {
+      cancelAnimationFrame(frame);
+      window.removeEventListener('popstate', followHash);
+      window.removeEventListener('hashchange', followHash);
+    };
+  }, [suspended, scrollTo]);
+
+  const value = useMemo(() => ({ scrollTo, refreshScroll, lockScroll }), [scrollTo, refreshScroll, lockScroll]);
 
   return (
     <ScrollContext.Provider value={value}>

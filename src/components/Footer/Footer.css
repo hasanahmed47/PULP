@@ -88,17 +88,12 @@
   font-size: clamp(.9375rem, 1.2vw, 1.1875rem);
   padding: .85em 1.4em;
   border-radius: 62.4375rem;
-  transition: transform .2s;
 }
 
 .footer-cta svg {
   width: .8125rem;
   height: .8125rem;
   flex: none;
-}
-
-.footer-cta:hover {
-  transform: translateY(-.125rem);
 }
 
 .footer-rule {
@@ -206,15 +201,5 @@
 
   .footer-bottom > :nth-child(2) {
     justify-self: end;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .footer-cta {
-    transition: none;
-  }
-
-  .footer-cta:hover {
-    transform: none;
   }
 }

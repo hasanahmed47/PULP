@@ -11,6 +11,7 @@ export function useCanRenderer(hostRef, poseRef, { allFlavours, interactive, pre
   const sceneRef = useRef(null);
   const [requested, setRequested] = useState(interactive || preload);
   const [status, setStatus] = useState('loading');
+  const [blendReady, setBlendReady] = useState(false);
   const startAllowed = useSceneStartAllowed();
 
   useEffect(() => {
@@ -30,6 +31,7 @@ export function useCanRenderer(hostRef, poseRef, { allFlavours, interactive, pre
     let watchdog;
     let retryTimer;
     setStatus('loading');
+    setBlendReady(false);
 
     function armWatchdog(delay) {
       watchdogDelay = delay;
@@ -59,6 +61,7 @@ export function useCanRenderer(hostRef, poseRef, { allFlavours, interactive, pre
       stopWatching();
       window.clearTimeout(retryTimer);
       disposeScene();
+      setBlendReady(false);
 
       if (attempt < retryDelays.length) {
         setStatus('loading');
@@ -94,6 +97,10 @@ export function useCanRenderer(hostRef, poseRef, { allFlavours, interactive, pre
 
         const sceneFlavours = allFlavours ? flavours : [flavours[0]];
         const created = createCanScene(hostRef.current, sceneFlavours, {
+          initialBlend: poseRef.current.blend,
+          onBlendReady: (ready) => {
+            if (isCurrentAttempt()) setBlendReady(ready);
+          },
           onPrepared: () => {
             if (isCurrentAttempt()) armWatchdog(firstFrameTimeout);
           },
@@ -133,5 +140,5 @@ export function useCanRenderer(hostRef, poseRef, { allFlavours, interactive, pre
     };
   }, [allFlavours, hostRef, poseRef, requested, startAllowed]);
 
-  return { sceneRef, status };
+  return { sceneRef, status, blendReady };
 }

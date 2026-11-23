@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { media } from '../data/media';
+import { SplitText } from '../components/react-bits/SplitText';
 import { useCarouselDrag } from '../hooks/useCarouselDrag';
 import { useCarouselPlayback } from '../hooks/useCarouselPlayback';
+import { useDialogScrollLock } from '../hooks/useDialogScrollLock';
 import { useMobileViewport } from '../hooks/useMobileViewport';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import { useVisibleOnce } from '../hooks/useVisibleOnce';
@@ -61,6 +63,7 @@ export default function HighlightsCarousel({ slides: suppliedSlides = defaultSli
   const mediaEnabled = useVisibleOnce(stageRef, MEDIA_LOAD_MARGIN);
   const running = playing && visible && !filmOpen;
   const controlsVisible = visible && !filmOpen;
+  useDialogScrollLock(filmOpen);
 
   const handleBlockedPlayback = useCallback(() => setPlaying(false), []);
   const handleVideoFailure = useCallback((source) => {
@@ -170,7 +173,7 @@ export default function HighlightsCarousel({ slides: suppliedSlides = defaultSli
   return (
     <section className="hl" aria-labelledby="hl-heading">
       <header ref={headingRef} className={`hl__head${headingRevealed ? ' is-visible' : ''}`}>
-        <h2 id="hl-heading" className="hl__heading">GET THE HIGHLIGHTS.</h2>
+        <SplitText id="hl-heading" className="hl__heading" text="GET THE HIGHLIGHTS." />
         <button type="button" className="hl__film" onClick={() => setFilmOpen(true)}>
           Watch the film
           <svg viewBox="0 0 20 20" aria-hidden="true">
@@ -217,13 +220,13 @@ export default function HighlightsCarousel({ slides: suppliedSlides = defaultSli
                     videos.current[slideIndex] = element;
                     return () => { videos.current[slideIndex] = null; };
                   }}
-                  src={mediaEnabled ? slide.videoSrc : undefined}
+                  src={mediaEnabled && slideIndex === index ? slide.videoSrc : undefined}
                   poster={mediaEnabled ? slide.posterSrc : undefined}
                   muted
                   playsInline
                   loop={slideCount === 1}
                   disablePictureInPicture
-                  preload="metadata"
+                  preload={slideIndex === index ? 'metadata' : 'none'}
                   onEnded={() => {
                     if (slideIndex === index && running) advanceSlide(1);
                   }}
@@ -297,6 +300,7 @@ export default function HighlightsCarousel({ slides: suppliedSlides = defaultSli
         ref={dialogRef}
         className="hl__dialog"
         aria-label="PULP film"
+        data-lenis-prevent
         onClose={() => setFilmOpen(false)}
         onClick={(event) => {
           if (event.target === event.currentTarget) setFilmOpen(false);

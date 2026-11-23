@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef } from 'react';
+import { useCallback, useEffect, useId, useRef } from 'react';
 import { useHoverless } from '../hooks/useHoverless';
 import { defaultLensPosition, lensBounds, usePeekLens } from '../hooks/usePeekLens';
 import { useVisibility } from '../hooks/useVisibility';
@@ -25,12 +25,22 @@ export function PeekCan({ flavour, selected, onSelect }) {
   const clipId = useId();
   const buttonRef = useRef(null);
   const imageRef = useRef(null);
+  const pointerFrame = useRef(0);
+  const pendingPointer = useRef(null);
   const hoverless = useHoverless();
   const inView = useVisibility(buttonRef, hintViewMargin);
   const nearViewport = useVisibleOnce(buttonRef, imageLoadMargin);
-  const { lens, placeLens, glideLens, hideLens, hintLens, cancelHint } = usePeekLens();
-  const lensPosition = lens ?? defaultLensPosition;
-  const peeking = Boolean(lens);
+  const { peeking, clipRef, lensRef, placeLens, glideLens, hideLens, hintLens, cancelHint } = usePeekLens();
+
+  const cancelPointerFrame = useCallback(function cancelPointerFrame() {
+    cancelAnimationFrame(pointerFrame.current);
+    pointerFrame.current = 0;
+    pendingPointer.current = null;
+  }, []);
+
+  useEffect(function cleanUpPointerTracking() {
+    return cancelPointerFrame;
+  }, [cancelPointerFrame]);
 
   useEffect(function hintLensOnTouchDevices() {
     if (!hoverless || !selected || !inView) return;
@@ -46,29 +56,40 @@ export function PeekCan({ flavour, selected, onSelect }) {
   function followPointer(event) {
     if (event.pointerType === 'touch') return;
 
-    const position = getLensPosition(imageRef.current, event);
-    if (position) placeLens(position);
+    pendingPointer.current = { clientX: event.clientX, clientY: event.clientY };
+    if (pointerFrame.current) return;
+
+    pointerFrame.current = requestAnimationFrame(function updatePointerLens() {
+      pointerFrame.current = 0;
+      const position = getLensPosition(imageRef.current, pendingPointer.current);
+      pendingPointer.current = null;
+      if (position) placeLens(position);
+    });
   }
 
   function moveLensToTap(event) {
     if (event.pointerType === 'mouse') return;
 
+    cancelPointerFrame();
     const position = getLensPosition(imageRef.current, event);
     if (position) glideLens(position);
   }
 
   function focusLens(event) {
     if (!event.currentTarget.matches(':focus-visible')) return;
+    cancelPointerFrame();
     placeLens(defaultLensPosition);
   }
 
   function releasePointer(event) {
     if (event.pointerType === 'touch') return;
+    cancelPointerFrame();
     hideLens();
   }
 
   function releaseFocus() {
     if (hoverless) return;
+    cancelPointerFrame();
     hideLens();
   }
 
@@ -91,6 +112,7 @@ export function PeekCan({ flavour, selected, onSelect }) {
       onFocus={focusLens}
       onBlur={releaseFocus}
       onPointerLeave={releasePointer}
+      onPointerCancel={releasePointer}
     >
       <svg
         ref={imageRef}
@@ -102,7 +124,7 @@ export function PeekCan({ flavour, selected, onSelect }) {
       >
         <defs>
           <clipPath id={clipId}>
-            <circle cx={lensPosition.x} cy={lensPosition.y} r="150" />
+            <circle ref={clipRef} cx={defaultLensPosition.x} cy={defaultLensPosition.y} r="150" />
           </clipPath>
         </defs>
         {nearViewport && (
@@ -118,9 +140,10 @@ export function PeekCan({ flavour, selected, onSelect }) {
           </>
         )}
         <circle
+          ref={lensRef}
           className="peek-can__lens"
-          cx={lensPosition.x}
-          cy={lensPosition.y}
+          cx={defaultLensPosition.x}
+          cy={defaultLensPosition.y}
           r="150"
         />
       </svg>

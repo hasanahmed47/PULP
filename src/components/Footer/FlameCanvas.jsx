@@ -4,7 +4,7 @@ import { createFlameRenderer } from './createFlameRenderer';
 
 const INITIAL_TIME = 14;
 
-export function FlameCanvas() {
+export function FlameCanvas({ enabled = true }) {
   const canvasRef = useRef(null);
   const generationRef = useRef(0);
 
@@ -12,6 +12,7 @@ export function FlameCanvas() {
     const canvas = canvasRef.current;
     const generation = ++generationRef.current;
     canvas.hidden = true;
+    if (!enabled) return;
     let gl;
 
     try {
@@ -109,7 +110,7 @@ export function FlameCanvas() {
     canvas.addEventListener('webglcontextlost', handleContextLoss);
 
     return dispose;
-  }, []);
+  }, [enabled]);
 
   return <canvas ref={canvasRef} className="footer-flames" aria-hidden="true" />;
 }

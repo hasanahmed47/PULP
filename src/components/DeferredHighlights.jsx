@@ -1,6 +1,7 @@
-import { lazy, Suspense, useRef } from 'react';
+import { lazy, Suspense, useEffect, useRef } from 'react';
 import { CirclePlay } from 'lucide-react';
 import { useVisibleOnce } from '../hooks/useVisibleOnce';
+import { useScroll } from '../context/ScrollContext';
 import '../styles/HighlightsCarousel.css';
 import '../styles/DeferredHighlights.css';
 
@@ -21,6 +22,22 @@ function HighlightsPlaceholder() {
 export default function DeferredHighlights() {
   const sectionRef = useRef(null);
   const approaching = useVisibleOnce(sectionRef, '1000px 0px');
+  const { refreshScroll } = useScroll();
+
+  useEffect(function trackHighlightsSize() {
+    const section = sectionRef.current;
+    let height = section.offsetHeight;
+
+    const observer = new ResizeObserver(() => {
+      const nextHeight = section.offsetHeight;
+      if (nextHeight === height) return;
+      height = nextHeight;
+      refreshScroll();
+    });
+
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, [refreshScroll]);
 
   return (
     <div ref={sectionRef} className="deferred-highlights">

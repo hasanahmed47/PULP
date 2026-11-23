@@ -118,7 +118,7 @@ function waitForIdle() {
 export function createCanScene(
   host,
   flavours,
-  { onPrepared, onReady, onError },
+  { onPrepared, onReady, onError, onBlendReady, initialBlend = { from: 0, to: 0, amount: 0 } },
 ) {
   const renderer = new THREE.WebGLRenderer({
     alpha: true,
@@ -205,13 +205,18 @@ export function createCanScene(
 
     const renderedSize = new THREE.Vector2();
     const textures = [];
+    const textureRequests = new Map();
+    const loader = new THREE.TextureLoader();
     const lastFlavourIndex = flavours.length - 1;
+    let currentBlend = clampBlend(initialBlend, lastFlavourIndex);
+    let texturesReady = false;
+    let blendReady = false;
 
-    let currentBlend = {
-      from: 0,
-      to: 0,
-      amount: 0,
-    };
+    function reportBlendReady(value) {
+      if (blendReady === value) return;
+      blendReady = value;
+      onBlendReady?.(value);
+    }
 
     function render() {
       animationFrame = 0;
@@ -219,6 +224,7 @@ export function createCanScene(
       if (
         disposed ||
         !isPrepared ||
+        !texturesReady ||
         !isVisible ||
         document.hidden
       ) {
@@ -245,6 +251,8 @@ export function createCanScene(
         return;
       }
 
+      reportBlendReady(true);
+
       if (!isReady) {
         isReady = true;
         onReady();
@@ -265,18 +273,29 @@ export function createCanScene(
       animationFrame = requestAnimationFrame(render);
     };
 
-    function getLoadedTexture(index) {
-      return textures[index] ?? textures.find(Boolean);
+    function requiredFlavourIndices() {
+      const { from, to, amount } = currentBlend;
+      if (amount === 0) return [from];
+      if (amount === 1) return [to];
+      return [...new Set([from, to])];
     }
 
     function applyFlavourBlend() {
       const { from, to, amount } = currentBlend;
+      const currentTexture = textures[amount === 1 ? to : from];
+      const nextTexture = amount === 0 ? currentTexture : textures[to];
+      texturesReady = Boolean(currentTexture && nextTexture);
+
+      if (!texturesReady) {
+        reportBlendReady(false);
+        return;
+      }
 
       model.setFlavour(
         flavours[from],
         flavours[to],
-        getLoadedTexture(from),
-        getLoadedTexture(to),
+        currentTexture,
+        nextTexture,
         amount,
       );
 
@@ -292,47 +311,55 @@ export function createCanScene(
       );
 
       applyFlavourBlend();
+      for (const index of requiredFlavourIndices()) {
+        loadFlavourTexture(index).catch(() => undefined);
+      }
+    }
+
+    async function loadTexture(source) {
+      const texture = await loader.loadAsync(source);
+
+      if (disposed) {
+        texture.dispose();
+        return null;
+      }
+
+      trackResource(texture);
+
+      texture.colorSpace = THREE.SRGBColorSpace;
+
+      texture.anisotropy = Math.min(
+        MAX_ANISOTROPY,
+        renderer.capabilities.getMaxAnisotropy(),
+      );
+
+      renderer.initTexture(texture);
+
+      return texture;
+    }
+
+    async function storeFlavourTexture(index) {
+      const texture = await loadTexture(
+        flavours[index].texture,
+      );
+
+      if (!texture || disposed) return;
+
+      textures[index] = texture;
+
+      if (isPrepared) {
+        applyFlavourBlend();
+      }
+    }
+
+    function loadFlavourTexture(index) {
+      if (!textureRequests.has(index)) {
+        textureRequests.set(index, storeFlavourTexture(index));
+      }
+      return textureRequests.get(index);
     }
 
     async function prepareScene() {
-      const loader = new THREE.TextureLoader();
-
-      async function loadTexture(source) {
-        const texture = await loader.loadAsync(source);
-
-        if (disposed) {
-          texture.dispose();
-          return null;
-        }
-
-        trackResource(texture);
-
-        texture.colorSpace = THREE.SRGBColorSpace;
-
-        texture.anisotropy = Math.min(
-          MAX_ANISOTROPY,
-          renderer.capabilities.getMaxAnisotropy(),
-        );
-
-        renderer.initTexture(texture);
-
-        return texture;
-      }
-
-      async function loadFlavourTexture(index) {
-        const texture = await loadTexture(
-          flavours[index].texture,
-        );
-
-        if (!texture || disposed) return;
-
-        textures[index] = texture;
-
-        if (isPrepared) {
-          applyFlavourBlend();
-        }
-      }
-
       const endTexturePromises = Object.entries(
         media.canDetails,
       ).map(async ([side, source]) => {
@@ -343,12 +370,7 @@ export function createCanScene(
         }
       });
 
-      const initialFlavourIndices = [
-        ...new Set([
-          currentBlend.from,
-          currentBlend.to,
-        ]),
-      ];
+      const initialFlavourIndices = requiredFlavourIndices();
 
       const remainingFlavourIndices = [
         ...flavours.keys(),

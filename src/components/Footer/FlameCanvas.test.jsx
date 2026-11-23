@@ -95,6 +95,22 @@ it('survives StrictMode replay and releases all resources on actual unmount', as
   expect(frames.size).toBe(0);
 });
 
+it('defers GPU allocation until enabled and keeps it through visibility changes', () => {
+  const { container, rerender, unmount } = render(<FlameCanvas enabled={false} />);
+  expect(HTMLCanvasElement.prototype.getContext).not.toHaveBeenCalled();
+  expect(container.querySelector('canvas').hidden).toBe(true);
+  expect(observers).toHaveLength(0);
+  rerender(<FlameCanvas enabled />);
+  expect(HTMLCanvasElement.prototype.getContext).toHaveBeenCalledTimes(1);
+  setVisible(true);
+  stepFrame(100);
+  setVisible(false);
+  setVisible(true);
+  expect(HTMLCanvasElement.prototype.getContext).toHaveBeenCalledTimes(1);
+  unmount();
+  expect(gl.deleteProgram).toHaveBeenCalledTimes(1);
+});
+
 it('pauses offscreen and in hidden tabs without accumulating elapsed time', () => {
   render(<FlameCanvas />);
   expect(frames.size).toBe(0);

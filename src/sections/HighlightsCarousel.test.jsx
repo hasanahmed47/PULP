@@ -5,7 +5,9 @@ import { media } from '../data/media';
 import HighlightsCarousel from './HighlightsCarousel';
 
 vi.mock('../hooks/useReducedMotion', () => ({ useReducedMotion: () => true }));
+vi.mock('../lib/animation', () => ({ gsap: {} }));
 vi.mock('../hooks/useVisibility', () => ({ useVisibility: () => true }));
+vi.mock('../hooks/useDialogScrollLock', () => ({ useDialogScrollLock: () => {} }));
 
 const customSlides = [0, 1, 2, 3, 4].map((index) => ({
   id: `custom-${index}`,
@@ -101,4 +103,16 @@ it('advances completed active clips, wraps the slideshow and respects manual pau
 it('loops the video only when the carousel has one slide', () => {
   const { container } = render(<HighlightsCarousel slides={customSlides.slice(0, 1)} />);
   expect(container.querySelector('video').loop).toBe(true);
+});
+
+it('keeps inactive slides on posters and attaches only the selected video source', () => {
+  const { container } = render(<HighlightsCarousel slides={customSlides} />);
+  const videos = [...container.querySelectorAll('.hl__video')];
+  expect(videos.filter((video) => video.hasAttribute('src'))).toHaveLength(1);
+  expect(videos[1].getAttribute('poster')).toBe('/custom-1.webp');
+  fireEvent.click(screen.getByRole('button', { name: 'Next slide' }));
+  expect(videos[0].hasAttribute('src')).toBe(false);
+  expect(videos[1].getAttribute('src')).toBe('/custom-1.mp4');
+  expect(videos.filter((video) => video.hasAttribute('src'))).toHaveLength(1);
+  expect(HTMLMediaElement.prototype.play).not.toHaveBeenCalled();
 });

@@ -5,6 +5,7 @@ import { HeroFlavourPicker } from '../components/HeroFlavourPicker';
 import { AnchorLink } from '../components/AnchorLink';
 import { ColourRibbon } from '../components/ColourRibbon';
 import { ReplayDropButton } from '../components/ReplayDropButton';
+import { Magnet } from '../components/react-bits/Magnet';
 import { flavours } from '../data/flavours';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import { useVisibility } from '../hooks/useVisibility';
@@ -16,6 +17,7 @@ const heroMotion = {
   flavourDuration: 0.6,
   flavourEase: 'power1.inOut',
   mobileQuery: '(max-width: 47.9375rem)',
+  pinQuery: '(min-width: 48rem), (min-height: 40rem)',
   mobileTravel: 0.35,
   desktopTravel: 0.46,
   scrollDistance: 1.5,
@@ -33,7 +35,7 @@ const heroIntro = {
     selector: '.hero-line__text',
     offset: 105,
     duration: 0.85,
-    ease: 'power5.out',
+    ease: 'power4.out',
     stagger: 0.1,
     at: 0,
   },
@@ -118,7 +120,9 @@ export function Hero({ onReady, revealed = false }) {
       can?.setRotation(turn.value);
     }
 
-    const context = gsap.context(() => {
+    const media = gsap.matchMedia();
+
+    media.add(heroMotion.pinQuery, () => {
       const timeline = gsap.timeline({
         defaults: { ease: 'none', duration: heroMotion.scrollDuration },
         scrollTrigger: {
@@ -152,11 +156,15 @@ export function Hero({ onReady, revealed = false }) {
         { opacity: 1, y: 0, duration: heroMotion.secondEntrance.duration },
         heroMotion.secondEntrance.at,
       );
+
+      return function resetHeroPose() {
+        turn.value = 0;
+        can?.setRotation(0);
+      };
     }, sectionRef);
 
     return function resetHeroAnimation() {
-      context.revert();
-      can?.setRotation(0);
+      media.revert();
     };
   }, [reducedMotion]);
 
@@ -280,7 +288,7 @@ export function Hero({ onReady, revealed = false }) {
           </span>
         </h1>
         <AnchorLink className="pill hero-explore" href="#flavours">
-          Explore flavours <ArrowUpRight className="hero-explore__icon" aria-hidden="true" />
+          <Magnet>Explore flavours <ArrowUpRight className="hero-explore__icon" aria-hidden="true" /></Magnet>
         </AnchorLink>
         {!reducedMotion && (
           <ReplayDropButton className="hero-replay hero-replay--mobile" round onClick={replayDrop} />

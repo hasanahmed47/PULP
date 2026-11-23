@@ -1,0 +1,11 @@
+.magnet,
+.magnet__content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: inherit;
+  gap: inherit;
+}
+
+.magnet {
+  pointer-events: none;
+}

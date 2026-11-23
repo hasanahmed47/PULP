@@ -19,10 +19,6 @@
   text-align: center;
 }
 
-.inside-title span {
-  display: block;
-}
-
 .inside-instruction {
   margin: 0.75rem 0 0;
   color: var(--muted);
@@ -105,18 +101,19 @@
 @media (prefers-reduced-motion: no-preference) {
   .inside-section[data-visible='true'] .peek-can {
     animation: inside-arrive 600ms both cubic-bezier(.2, .75, .25, 1);
+    animation-delay: var(--peek-delay, 0ms);
   }
 
   .peek-can:nth-child(2) {
-    animation-delay: 60ms;
+    --peek-delay: 60ms;
   }
 
   .peek-can:nth-child(3) {
-    animation-delay: 120ms;
+    --peek-delay: 120ms;
   }
 
   .peek-can:nth-child(4) {
-    animation-delay: 180ms;
+    --peek-delay: 180ms;
   }
 }
 

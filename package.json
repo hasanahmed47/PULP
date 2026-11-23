@@ -12,8 +12,9 @@
     "check:release": "node scripts/check-project.mjs --release",
     "lint": "eslint . --max-warnings=0",
     "test": "node --test tests/unit/*.test.js",
+    "test:components": "vitest run",
     "test:browser": "playwright test",
-    "verify": "npm run lint && npm test && npm run check && npm run build",
+    "verify": "npm run lint && npm test && npm run test:components && npm run check && npm run build",
     "assets:optimize": "node scripts/optimize-assets.mjs"
   },
   "engines": {

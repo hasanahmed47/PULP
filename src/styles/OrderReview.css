@@ -16,6 +16,30 @@
   backdrop-filter: blur(0.4375rem);
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  .order-review[open] {
+    opacity: 1;
+    transform: none;
+    transition: opacity var(--motion-enter) ease-out, transform var(--motion-enter) var(--ease-settle);
+  }
+
+  .order-review[open]::backdrop {
+    opacity: 1;
+    transition: opacity var(--motion-enter) ease-out;
+  }
+
+  @starting-style {
+    .order-review[open] {
+      opacity: 0;
+      transform: translateY(0.5rem);
+    }
+
+    .order-review[open]::backdrop {
+      opacity: 0;
+    }
+  }
+}
+
 .order-review__header {
   display: flex;
   align-items: center;

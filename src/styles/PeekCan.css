@@ -22,14 +22,6 @@
   cursor: pointer;
 }
 
-.peek-can[data-peekable='true'] .peek-can__image {
-  cursor: crosshair;
-}
-
-.peek-can__silhouette {
-  mask-type: alpha;
-}
-
 .peek-can__interior {
   opacity: 0;
   transition: opacity 180ms ease;

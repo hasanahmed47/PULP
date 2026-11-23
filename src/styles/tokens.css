@@ -45,6 +45,9 @@
   --space-lg: 2.5rem;
   --radius-panel: 1.75rem;
   --radius-pill: 62.4375rem;
+  --motion-feedback: 180ms;
+  --motion-enter: 220ms;
+  --ease-settle: cubic-bezier(.22, 1, .36, 1);
 }
 
 [data-flavour='blood-orange'] {

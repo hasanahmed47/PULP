@@ -1,5 +1,4 @@
 .hero-flavour-picker {
-  --picker-colour-duration: .4s;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: calc(var(--space-sm) * 2 / 3);
@@ -23,12 +22,19 @@
   font-weight: 600;
   line-height: 1.25;
   text-align: center;
-  transition: border-color var(--picker-colour-duration);
+  transition: background-color var(--motion-feedback) ease, color var(--motion-feedback) ease, border-color var(--motion-feedback) ease;
 }
 
-.hero-flavour-picker__chip:hover {
+.hero-flavour-picker__chip:focus-visible {
   background-color: var(--flavour-pale);
   border-color: var(--ink);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .hero-flavour-picker__chip:hover {
+    background-color: var(--flavour-pale);
+    border-color: var(--ink);
+  }
 }
 
 .hero-flavour-picker__chip[aria-pressed='true'] {

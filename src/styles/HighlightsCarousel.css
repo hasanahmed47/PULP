@@ -26,13 +26,16 @@
   gap: var(--space-md);
   padding-inline: calc((100% - var(--hl-card-w)) / 2);
   margin-bottom: var(--hl-heading-gap);
+}
+
+.hl__film {
   opacity: 0;
   transform: translateY(2rem);
   transition: opacity var(--hl-heading-duration) ease-out, transform var(--hl-heading-duration) var(--hl-ease);
 }
 
-.hl__head.is-visible,
-.hl__head:focus-within {
+.hl__head.is-visible .hl__film,
+.hl__head:focus-within .hl__film {
   opacity: 1;
   transform: none;
 }
@@ -87,7 +90,8 @@
   transition-delay: var(--hl-card-delay);
 }
 
-.hl__stage.is-visible .hl__viewport {
+.hl__stage.is-visible .hl__viewport,
+.hl__stage:focus-within .hl__viewport {
   opacity: 1;
   transform: none;
 }
@@ -375,6 +379,30 @@
   backdrop-filter: blur(0.375rem);
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  .hl__dialog[open] {
+    opacity: 1;
+    transform: none;
+    transition: opacity var(--motion-enter) ease-out, transform var(--motion-enter) var(--ease-settle);
+  }
+
+  .hl__dialog[open]::backdrop {
+    opacity: 1;
+    transition: opacity var(--motion-enter) ease-out;
+  }
+
+  @starting-style {
+    .hl__dialog[open] {
+      opacity: 0;
+      transform: translateY(0.5rem);
+    }
+
+    .hl__dialog[open]::backdrop {
+      opacity: 0;
+    }
+  }
+}
+
 .hl__dialog video {
   aspect-ratio: 16 / 9;
   object-fit: contain;
@@ -459,13 +487,18 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .hl__btn:active,
+  .hl__arrow:active {
+    transform: none;
+  }
+
   .hl *,
   .hl__controls {
     transition-duration: 1ms !important;
     transition-delay: 0s !important;
   }
 
-  .hl__head,
+  .hl__film,
   .hl__viewport {
     opacity: 1;
     transform: none;

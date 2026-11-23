@@ -191,11 +191,6 @@
 .pulp-shop__add:hover {
   background: var(--blue);
   border-color: var(--blue);
-  transform: translateY(-0.125rem);
-}
-
-.pulp-shop__add:active {
-  transform: translateY(0.125rem);
 }
 
 .pulp-shop__favourite {
@@ -212,10 +207,6 @@
 
 .pulp-shop__favourite[aria-pressed='true'] .shop-icon {
   fill: currentColor;
-}
-
-.pulp-shop__favourite:hover {
-  transform: scale(1.06);
 }
 
 .pulp-shop__buy {
@@ -250,9 +241,23 @@
   }
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .pulp-shop__add:hover {
+    transform: translateY(-0.125rem);
+  }
+
+  .pulp-shop__favourite:hover {
+    transform: scale(1.06);
+  }
+
   .pulp-shop__art:hover .pulp-shop__can {
     transform: rotate(9deg) translateY(-.375rem);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .pulp-shop__add:active {
+    transform: translateY(0.125rem);
   }
 }
 

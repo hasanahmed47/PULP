@@ -1,13 +1,14 @@
 import { useRef, useState } from 'react';
 import { AnchorLink } from '../components/AnchorLink';
 import { PeekCan } from '../components/PeekCan';
+import { SplitText } from '../components/react-bits/SplitText';
 import { flavours } from '../data/flavours';
-import { useVisibility } from '../hooks/useVisibility';
+import { useVisibleOnce } from '../hooks/useVisibleOnce';
 import '../styles/Cutaway.css';
 
 export function Cutaway({ onPickFlavour }) {
   const sectionRef = useRef(null);
-  const visible = useVisibility(sectionRef);
+  const visible = useVisibleOnce(sectionRef);
   const [selectedFlavour, setSelectedFlavour] = useState(flavours[0]);
 
   function pickSelectedFlavour() {
@@ -23,10 +24,7 @@ export function Cutaway({ onPickFlavour }) {
       tabIndex="-1"
       aria-labelledby="inside-title"
     >
-      <h2 id="inside-title" className="inside-title">
-        <span>IT'S WHAT'S</span>
-        <span>INSIDE.</span>
-      </h2>
+      <SplitText id="inside-title" className="inside-title" text={"IT'S WHAT'S\nINSIDE."} />
       <p className="inside-instruction">Move over a can to peek inside. Click or tap to choose it.</p>
 
       <div className="inside-gallery" role="group" aria-label="Explore the four flavours">

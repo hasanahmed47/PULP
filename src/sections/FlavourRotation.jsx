@@ -38,21 +38,21 @@ export function FlavourRotation() {
       return;
     }
 
-    const state = { position: 0 };
-    let disposed = false;
+    const media = gsap.matchMedia();
 
-    function updateCan() {
-      if (disposed) return;
-      can?.setFlavourPosition(state.position);
-      can?.setRotation(state.position * Math.PI * 2);
-      const index = Math.round(state.position);
-      if (activeRef.current === index) return;
+    media.add('(min-width: 48rem), (min-height: 47.5rem)', () => {
+      const state = { position: 0 };
 
-      activeRef.current = index;
-      setActive(index);
-    }
+      function updateCan() {
+        can?.setFlavourPosition(state.position);
+        can?.setRotation(state.position * Math.PI * 2);
+        const index = Math.round(state.position);
+        if (activeRef.current === index) return;
 
-    const context = gsap.context(() => {
+        activeRef.current = index;
+        setActive(index);
+      }
+
       const tween = gsap.to(state, {
         position: flavours.length - 1,
         ease: 'none',
@@ -69,12 +69,16 @@ export function FlavourRotation() {
       });
       triggerRef.current = tween.scrollTrigger;
       updateCan();
+
+      return function restoreManualSelection() {
+        triggerRef.current = null;
+        can?.setFlavourPosition(activeRef.current);
+        can?.setRotation(0);
+      };
     }, sectionRef);
 
     return function stopFlavourAnimation() {
-      disposed = true;
-      triggerRef.current = null;
-      context.revert();
+      media.revert();
     };
   }, [reducedMotion]);
 

@@ -38,8 +38,8 @@ Make sure **Node.js** and **npm** are installed.
 Clone the repository:
 
 ```bash
-git clone YOUR_REPO_URL
-cd YOUR_REPOSITORY_FOLDER
+git clone https://github.com/hasanahmed47/PULP.git
+cd PULP
 ```
 
 Install dependencies and start the development server:
@@ -61,7 +61,7 @@ npm run build
 
 ## Project Structure
 
-Source responsibilities, function inputs/outputs, styling rules and retained browser-unit exceptions are documented in [docs/FILES.md](docs/FILES.md). All application CSS, including global styles and design tokens, lives in `src/styles/`.
+Source responsibilities, function inputs/outputs, styling rules and retained browser-unit exceptions are documented in [docs/FILES.md](docs/FILES.md). Shared styles and design tokens live in `src/styles/`; Footer and React Bits components keep their CSS beside their JSX.
 
 ```text
 src/

@@ -59,6 +59,12 @@ test('prototype layout fits, links resolve and reduced-motion flames ignore the 
 test('flames render only in view and stop immediately when reduced motion is enabled', async ({ page }) => {
   await page.addInitScript(() => {
     window.footerDraws = 0;
+    window.footerContexts = 0;
+    const getContext = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function (...args) {
+      if (this.classList.contains('footer-flames')) window.footerContexts += 1;
+      return getContext.apply(this, args);
+    };
     const draw = WebGL2RenderingContext.prototype.drawArrays;
     WebGL2RenderingContext.prototype.drawArrays = function (...args) {
       if (this.canvas.classList.contains('footer-flames')) window.footerDraws += 1;
@@ -69,9 +75,11 @@ test('flames render only in view and stop immediately when reduced motion is ena
   await page.goto('/');
   await expect(page.locator('.loading-screen')).toHaveCount(0, { timeout: 25000 });
   expect(await page.evaluate(() => window.footerDraws)).toBe(0);
+  expect(await page.evaluate(() => window.footerContexts)).toBe(0);
   const footer = page.getByRole('contentinfo');
   await footer.scrollIntoViewIfNeeded();
   await expect.poll(() => page.evaluate(() => window.footerDraws)).toBeGreaterThan(2);
+  expect(await page.evaluate(() => window.footerContexts)).toBe(1);
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await footer.scrollIntoViewIfNeeded();
   await page.waitForTimeout(300);
@@ -87,6 +95,7 @@ test('flames render only in view and stop immediately when reduced motion is ena
   const offscreen = await page.evaluate(() => window.footerDraws);
   await page.waitForTimeout(250);
   expect(await page.evaluate(() => window.footerDraws)).toBe(offscreen);
+  expect(await page.evaluate(() => window.footerContexts)).toBe(1);
 });
 
 test('WebGL2 fallback preserves the gradient, contact and navigation', async ({ page }, testInfo) => {

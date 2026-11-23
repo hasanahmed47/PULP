@@ -2,6 +2,7 @@ import '../styles/FlavourCard.css';
 import { useEffect, useRef } from 'react';
 import { FloatingFruit } from './FloatingFruit';
 import { AnchorLink } from './AnchorLink';
+import { Magnet } from './react-bits/Magnet';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import { useVisibility } from '../hooks/useVisibility';
 import { gsap } from '../lib/animation';
@@ -26,20 +27,24 @@ export function FlavourCard({ flavour, onPickFlavour }) {
   const reducedMotion = useReducedMotion();
   const visible = useVisibility(cardRef);
 
-  useEffect(() => {
+  useEffect(function enablePointerTilt() {
     if (reducedMotion) return;
     const product = productRef.current;
-    const controls = {
-      x: gsap.quickTo(product, 'rotationX', { duration: .65, ease: 'power2.out' }),
-      y: gsap.quickTo(product, 'rotationY', { duration: .65, ease: 'power2.out' }),
-    };
-    tiltRef.current = controls;
+    const media = gsap.matchMedia();
 
-    return () => {
-      controls.x.tween.kill();
-      controls.y.tween.kill();
-      gsap.set(product, { clearProps: 'transform' });
-      tiltRef.current = null;
+    media.add('(hover: hover) and (pointer: fine)', () => {
+      tiltRef.current = {
+        x: gsap.quickTo(product, 'rotationX', { duration: .65, ease: 'power2.out' }),
+        y: gsap.quickTo(product, 'rotationY', { duration: .65, ease: 'power2.out' }),
+      };
+
+      return function clearTiltControls() {
+        tiltRef.current = null;
+      };
+    });
+
+    return function stopPointerTilt() {
+      media.revert();
     };
   }, [reducedMotion]);
 
@@ -70,6 +75,7 @@ export function FlavourCard({ flavour, onPickFlavour }) {
       data-flavour={flavour.id}
       onPointerMove={handlePointerMove}
       onPointerLeave={resetTilt}
+      onPointerCancel={resetTilt}
       aria-labelledby={`${flavour.id}-title`}
     >
       <div className="card-copy">
@@ -84,7 +90,7 @@ export function FlavourCard({ flavour, onPickFlavour }) {
           href="#pick-your-pulp"
           onNavigate={pickFlavour}
         >
-          Pick this flavour <span aria-hidden="true">↗</span>
+          <Magnet>Pick this flavour <span aria-hidden="true">↗</span></Magnet>
         </AnchorLink>
       </div>
       <div className="card-art">

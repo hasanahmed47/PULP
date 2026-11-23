@@ -85,3 +85,24 @@ it('does not create a scene from a module that finishes after unmount', async ()
   expect(createCanScene).not.toHaveBeenCalled();
   expect(vi.getTimerCount()).toBe(0);
 });
+
+it('restores the selected blend and ignores texture readiness from a replaced scene', async () => {
+  poseRef.current.blend = { from: 3, to: 3, amount: 0 };
+  const { result } = renderHook(useRenderer);
+  await act(async () => {});
+  expect(scenes[0].callbacks.initialBlend).toEqual(poseRef.current.blend);
+  act(() => {
+    scenes[0].callbacks.onBlendReady(true);
+    scenes[0].callbacks.onReady();
+  });
+  expect(result.current.blendReady).toBe(true);
+  act(() => scenes[0].callbacks.onBlendReady(false));
+  expect(result.current.blendReady).toBe(false);
+  expect(result.current.status).toBe('ready');
+  act(() => scenes[0].callbacks.onError());
+  await act(async () => vi.advanceTimersByTimeAsync(1000));
+  act(() => scenes[0].callbacks.onBlendReady(true));
+  expect(result.current.blendReady).toBe(false);
+  act(() => scenes[1].callbacks.onBlendReady(true));
+  expect(result.current.blendReady).toBe(true);
+});

@@ -1,0 +1,7 @@
+.split-text__row {
+  display: block;
+}
+
+.split-text__word {
+  white-space: nowrap;
+}

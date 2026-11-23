@@ -42,15 +42,34 @@
   transform: none;
 }
 
-@media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .text-link > span,
-  .underlined-link > span {
-    transition: transform .2s;
+:is(.text-link, .underlined-link, .pill) {
+  --link-arrow-x: 0.1875rem;
+  --link-arrow-y: -0.125rem;
+}
+
+.text-link[href='#good-insides'] {
+  --link-arrow-x: 0rem;
+  --link-arrow-y: 0.1875rem;
+}
+
+.text-link[href='#top'] {
+  --link-arrow-x: 0rem;
+  --link-arrow-y: -0.1875rem;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :is(.text-link, .underlined-link, .pill) > [aria-hidden='true'] {
+    transition: transform var(--motion-feedback) var(--ease-settle);
   }
 
-  .text-link:hover > span,
-  .underlined-link:hover > span {
-    transform: translate(0.1875rem, -0.125rem);
+  :is(.text-link, .underlined-link, .pill):focus-visible > [aria-hidden='true'] {
+    transform: translate(var(--link-arrow-x), var(--link-arrow-y));
+  }
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  :is(.text-link, .underlined-link, .pill):hover > [aria-hidden='true'] {
+    transform: translate(var(--link-arrow-x), var(--link-arrow-y));
   }
 }
 

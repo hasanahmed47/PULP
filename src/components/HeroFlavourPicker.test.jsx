@@ -1,7 +1,7 @@
 import { StrictMode, useImperativeHandle } from 'react';
 import { cleanup, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { Hero } from '../sections/Hero';
 
 const scene = vi.hoisted(() => ({
@@ -25,10 +25,19 @@ vi.mock('./AnchorLink', () => ({
   },
 }));
 
+beforeEach(() => {
+  vi.stubGlobal('matchMedia', vi.fn(() => ({
+    matches: false,
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+  })));
+});
+
 afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
   vi.clearAllMocks();
+  vi.unstubAllGlobals();
 });
 
 it('keeps hero colour, pressed chips, can flavour and live text in sync', async () => {

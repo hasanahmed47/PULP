@@ -1,9 +1,11 @@
 import './Footer.css';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ArrowUp, ArrowUpRight } from 'lucide-react';
 import { AnchorLink } from '../AnchorLink';
 import { FlameCanvas } from './FlameCanvas';
+import { Magnet } from '../react-bits/Magnet';
 import { contactEmail } from '../../data/site';
+import { useVisibleOnce } from '../../hooks/useVisibleOnce';
 
 const footerLinks = [
   { href: '#good-insides', label: 'The good stuff' },
@@ -16,6 +18,8 @@ const clockFormatter = new Intl.DateTimeFormat('en-US', {
 });
 
 export function Footer() {
+  const footerRef = useRef(null);
+  const approaching = useVisibleOnce(footerRef, '600px 0px');
   const [now, setNow] = useState(() => new Date());
   const formattedTime = clockFormatter.format(now).toLowerCase().replace(' ', '\u00a0');
 
@@ -34,8 +38,8 @@ export function Footer() {
   }, []);
 
   return (
-    <footer className="flame-footer">
-      <FlameCanvas />
+    <footer ref={footerRef} className="flame-footer">
+      <FlameCanvas enabled={approaching} />
       <div className="footer-top">
         <AnchorLink className="wordmark footer-logo" href="#top" aria-label="PULP home">
           PULP<span>®</span>
@@ -48,7 +52,7 @@ export function Footer() {
           ))}
         </nav>
         <AnchorLink className="footer-cta" href="#pick-your-pulp">
-          Choose your flavour <ArrowUpRight aria-hidden="true" />
+          <Magnet>Choose your flavour <ArrowUpRight aria-hidden="true" /></Magnet>
         </AnchorLink>
       </div>
       <div className="footer-rule" aria-hidden="true" />
